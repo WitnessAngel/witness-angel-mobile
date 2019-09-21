@@ -1,0 +1,102 @@
+#:kivy 1.8.0
+#:import randint random.randint
+#:import to_rgba kivy.utils.get_color_from_hex
+#:import _ waclient.waclient_app._
+
+#:set link_clr '222222'
+#:set kivy_github 'https://github.com/kivy/kivy'
+#:set cookiecutter_github 'https://github.com/audreyr/cookiecutter'
+#:set cookiedozer_github 'https://github.com/hackebrot/cookiedozer'
+#:set repo_github 'https://github.com/pakal/witness-angel-client'
+
+#:set fsize 15
+
+<Slide@BoxLayout>:
+    bg_hex_clr: '000000'
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: to_rgba(root.bg_hex_clr)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<I18NLabel>:
+    source_text: ''
+    halign: 'center'
+    font_size: fsize
+    text: app.translation(self.source_text)
+
+
+<RefLabel>:
+    halign: 'center'
+    font_size: fsize
+    markup: True
+
+
+<TransitionProgress>:
+    size_hint: 0.8, 0.1
+    value: app.timer
+
+
+AnchorLayout:
+    anchor_y: 'bottom'
+    Carousel:
+        id: carousel
+        loop: True
+        Slide:
+            name: 'hello'
+            bg_hex_clr: '154152'
+            I18NLabel:
+                source_text: _("'Witness Angel Client'\n\nA sleek slideshow app that supports swipe gestures.")
+        Slide:
+            name: 'kivy'
+            spacing: 10
+            bg_hex_clr: '057173'
+            I18NLabel:
+                text_size: self.size
+                valign: 'bottom'
+                source_text: _("This app uses Kivy, a Python Framework for NUI Development.")
+            RefLabel:
+                text_size: self.size
+                valign: 'top'
+                text:
+                    "[ref={kivy_github}][color={link_clr}]{kivy_github}[/color][/ref]" \
+                    "".format(**locals())
+        Slide:
+            name: 'cookiecutterdozer'
+            spacing: 10
+            bg_hex_clr: '487353'
+            I18NLabel:
+                valign: 'bottom'
+                text_size: self.size
+                source_text: _("It was generated with the Python command-line utility\nCookiecutter along with Cookiedozer.")
+            RefLabel:
+                valign: 'top'
+                text_size: self.size
+                text:
+                    "[ref={cookiecutter_github}][color={link_clr}]{cookiecutter_github}[/color][/ref]\n" \
+                    "[ref={cookiedozer_github}][color={link_clr}]{cookiedozer_github}[/color][/ref]\n" \
+                    "".format(**locals())
+        Slide:
+            name: 'license'
+            bg_hex_clr: 'C2872E'
+            I18NLabel:
+                source_text: _("Distributed under the terms of the MIT license,\n'Witness Angel Client' is free and open source software.")
+        Slide:
+            name: 'github'
+            spacing: 10
+            bg_hex_clr: 'AB3E2B'
+            I18NLabel:
+                valign: 'bottom'
+                text_size: self.size
+                source_text: _("Fork me on GitHub")
+            RefLabel:
+                valign: 'top'
+                text_size: self.size
+                text:
+                    "[ref={repo_github}][color={link_clr}]{repo_github}[/color][/ref]" \
+                    "".format(**locals())
+    TransitionProgress:
+        id: progress_bar
