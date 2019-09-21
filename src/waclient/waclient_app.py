@@ -153,7 +153,7 @@ class WitnessAngelClientApp(App):
     def build_settings(self, settings):
         """Read the user settings and create a panel from it."""
         settings_file =  join(dirname(__file__), 'usersettings.json')
-        settings.add_json_panel(self.title, self.config, settings_file)
+        settings.add_json_panel(title=self.title, config=self.config, filename=settings_file)
 
     def on_config_change(self, config, section, key, value):
         """Called when the user changes the config values via the settings
@@ -199,8 +199,8 @@ class WitnessAngelClientApp(App):
         )
 
         print(">>>> SWITCHING TO", language)
-        import traceback
-        traceback.print_stack()
+        #import traceback
+        #traceback.print_stack()
 
 
         def mygettext(*args, **kwargs):
