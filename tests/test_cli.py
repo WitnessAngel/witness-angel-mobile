@@ -21,11 +21,11 @@ def cli_param(request):
 
 @pytest.fixture
 def mock_app(mocker):
-    return mocker.patch('witness-angel-client.cli.WitnessAngelClientApp')
+    return mocker.patch('waclient.cli.WitnessAngelClientApp')
 
 
 def test_language_to_app(runner, mock_app, cli_param, lang):
-    result = runner.invoke(main, [cli_param,lang])
+    result = runner.invoke(main, [cli_param, lang])
     assert result.exit_code == 0
     mock_app.assert_called_once_with(lang)
 

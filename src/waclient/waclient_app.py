@@ -82,7 +82,7 @@ class WitnessAngelClientApp(App):
 
     title = 'Witness Angel Client'
 
-    language = StringProperty('de')
+    language = StringProperty('en')
     translation = ObjectProperty(None, allownone=True)
 
     timer = BoundedNumericProperty(0, min=0, max=400)
@@ -90,7 +90,7 @@ class WitnessAngelClientApp(App):
 
     def __init__(self, language, **kwargs):
         self.language = language
-        print("SWITCHING TO", language)
+        #print("SWITCHING TO LANG", language)
         self.switch_lang(self.language)
         super(WitnessAngelClientApp, self).__init__(**kwargs)
 
