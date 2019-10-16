@@ -89,10 +89,9 @@ class WitnessAngelClientApp(App):
     carousel = ObjectProperty(Carousel)
 
     def __init__(self, language, **kwargs):
-        self.language = language
-        #print("SWITCHING TO LANG", language)
-        self.switch_lang(self.language)
         super(WitnessAngelClientApp, self).__init__(**kwargs)
+        self.language = language
+        #self.switch_lang(self.language)
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
@@ -124,8 +123,8 @@ class WitnessAngelClientApp(App):
           (:class:`kivy.uix.anchorlayout.AnchorLayout`): Root widget specified
             in the kv file of the app
         """
-        print ("CONFIG IS", self.config)
-        self.language = self.config.get('usersettings', 'language')
+        #print ("CONFIG IS", self.config)
+        #self.language = self.config.get('usersettings', 'language')
 
         user_interval = self.config.get('usersettings', 'timer_interval')
         self.timer_interval = TIMER_OPTIONS[user_interval]
@@ -192,7 +191,7 @@ class WitnessAngelClientApp(App):
         self.switch_lang(language)
 
     def switch_lang(self, language):
-
+        #print("SWITCHING TO LANG", language)
         #locale_dir = join(dirname(dirname(dirname(__file__))), 'data', 'locales')
         locales = gettext.translation(
             'witness-angel-client', LOCALE_DIR, languages=[self.language]
