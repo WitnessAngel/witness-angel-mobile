@@ -19,6 +19,3 @@ def main(language):
     """
     WitnessAngelClientApp(language).run()
 
-
-if __name__ == "__main__":
-    main()
