@@ -59,14 +59,12 @@
 
 
 ScreenManager:
-    Screen:
-        KivyConsole:
 
     Screen:
         name: "dashboard"
         BoxLayout:
             orientation: 'vertical'
-            spacing: 100
+            spacing: 20
             ActionBar:
                 pos_hint: {'top':1}
                 ActionView:
@@ -88,19 +86,28 @@ ScreenManager:
     #                    ActionButton:
     #                        text: 'Btn7'
                     ActionButton:
-                        icon: 'data/icons/settings2.png'
+                        icon: 'data/icons/settings3.png'
                         on_press: app.open_settings()
 
             ToggleButton:
                 text: "Hello World"
                 pos_hint: {'center_x': 0.5}
-                size_hint: (0.7, 0.6)
+                size_hint: (0.7, 0.2)
 
-            Button:
-                text: "I'm another label"
-                pos_hint: {'center_x': 0.5}
-                size_hint: (0.7, 0.6)
-                on_press: root.current = 'settings'
+            KivyConsole:
+                canvas.after:
+                    Color:
+                        rgba: 1,1,1,1
+                    Line:
+                        points: 0, self.height, self.width-1, self.height
+                        #self.x+1,self.y+1,self.width-1,self.height-1
+                        #dash_offset: 5
+                        #dash_length: 3
+     #       Button:
+     #           text: "I'm another label"
+     #           pos_hint: {'center_x': 0.5}
+     #           size_hint: (0.7, 0.6)
+     #           on_press: root.current = 'settings'
 
 
     Screen:

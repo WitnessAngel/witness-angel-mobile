@@ -11,14 +11,15 @@ import sys
 
 Builder.load_string('''
 <KivyConsole>:
-    console_input: console_input
+    console_output: console_output
     scroll_view: scroll_view
     ScrollView:
         id: scroll_view
         bar_width: 10
-        ConsoleInput:
-            id: console_input
+        ConsoleOutput:
+            id: console_output
             readonly: True
+            padding: 6, 6
             size_hint: (1, None)
             font_name: root.font_name
             font_size: root.font_size
@@ -28,27 +29,27 @@ Builder.load_string('''
 ''')
 
 
-class ConsoleInput(TextInput):
-    '''Displays Output and sends input to Shell. Emits 'on_ready_to_input'
-       when it is ready to get input from user.
-    '''
+class ConsoleOutput(TextInput):
 
     #__events__ = ('on_start', )
 
     def __init__(self, **kwargs):
-        super(ConsoleInput, self).__init__(**kwargs)
+        super(ConsoleOutput, self).__init__(**kwargs)
         app = App.get_running_app()
         app.bind(on_start=self.my_on_start)
 
+
+    def is_at_bottom(self):
+        return (self.parent.scroll_y <= 0.05)
+
     def scroll_to_bottom(self):
-        self.parent.scroll_y = 0.5
+        self.parent.scroll_y = 0
 
     def add_text(self, text):
-        #scroll_y = self.parent.scroll_y
-        #print("scroll_y is", scroll_y)
+        is_locked = self.is_at_bottom()
         self.text += text
         self.parent.scroll_y = 0
-        #if True: #scroll_y >= 0.95:
+        if is_locked:
             #print("FORCE SCROLL", self.parent.scroll_y)
             #self.parent.scroll_y = 1  # lock-to-bottom behaviour
         ##print(output)
@@ -60,9 +61,9 @@ class ConsoleInput(TextInput):
 
 class KivyConsole(BoxLayout):
 
-    console_input = ObjectProperty(None)
-    '''Instance of ConsoleInput
-       :data:`console_input` is an :class:`~kivy.properties.ObjectProperty`
+    console_output = ObjectProperty(None)
+    '''Instance of ConsoleOutput
+       :data:`console_output` is an :class:`~kivy.properties.ObjectProperty`
     '''
 
     scroll_view = ObjectProperty(None)
