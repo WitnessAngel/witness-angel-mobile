@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 
 import kivy
+from kivy.uix.settings import SettingsWithTabbedPanel
+
 kivy.require('1.8.0')
 
 from kivy.animation import Animation
@@ -80,7 +82,7 @@ class WitnessAngelClientApp(App):
         Widget that holds several slides about the app
     """
 
-    title = 'Witness Angel Client'
+    title = 'Witness Angel'
 
     language = StringProperty('en')
     translation = ObjectProperty(None, allownone=True)
@@ -91,7 +93,8 @@ class WitnessAngelClientApp(App):
     def __init__(self, language, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.language = language
-        #self.switch_lang(self.language)
+        self.switch_lang(self.language)
+        self.settings_cls = SettingsWithTabbedPanel
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
@@ -165,6 +168,9 @@ class WitnessAngelClientApp(App):
                 self.timer_interval=TIMER_OPTIONS[value]
             elif token == ('usersettings', 'language'):
                 self.language = value
+
+    #def on_start(self):
+    #    BBBBBBBBBB
 
     def on_pause(self):
         """Enables the user to switch to another application causing

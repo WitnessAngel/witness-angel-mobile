@@ -2,6 +2,7 @@
 #:import randint random.randint
 #:import to_rgba kivy.utils.get_color_from_hex
 #:import _ waclient.waclient_app._
+#:import KivyConsole waclient.console.KivyConsole
 
 #:set link_clr '222222'
 #:set kivy_github 'https://github.com/kivy/kivy'
@@ -39,16 +40,68 @@
     size_hint: 0.8, 0.1
     value: app.timer
 
+
+<TabbedPanelHeader>:
+    font_size: '15sp'
+
+
+
+<InterfaceWithTabbedPanel>:
+    tabbedpanel: tp
+    TabbedPanel:
+        id: tp
+        size: root.size
+        pos: root.pos
+        #do_default_tab: False
+        background_color: (0,0,0,1)
+        tab_width: '200dp'  # ADDED THIS
+
+
+
 ScreenManager:
     Screen:
-        Widget:
-            Button:
+        KivyConsole:
+
+    Screen:
+        name: "dashboard"
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 100
+            ActionBar:
+                pos_hint: {'top':1}
+                ActionView:
+                    use_separator: True
+                    ActionPrevious:
+                        title: 'Action Bar'
+                        with_previous: False
+                    ActionOverflow:
+                    ActionButton:
+                        icon: 'atlas://data/images/defaulttheme/overflow'
+                    ActionButton:
+                        text: 'Btn2'
+    #                ActionGroup:
+    #                    text: 'Group1'
+    #                    ActionButton:
+    #                        text: 'Btn5'
+    #                    ActionButton:
+    #                        text: 'Btn6'
+    #                    ActionButton:
+    #                        text: 'Btn7'
+                    ActionButton:
+                        icon: 'data/icons/settings2.png'
+                        on_press: app.open_settings()
+
+            ToggleButton:
                 text: "Hello World"
+                pos_hint: {'center_x': 0.5}
+                size_hint: (0.7, 0.6)
 
             Button:
                 text: "I'm another label"
-                pos: (200, 200)
+                pos_hint: {'center_x': 0.5}
+                size_hint: (0.7, 0.6)
                 on_press: root.current = 'settings'
+
 
     Screen:
         name: "settings"
