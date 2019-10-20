@@ -31,9 +31,16 @@ exclude = ["_build"]
 python = ">=3.6"
 
 # Main utilities
-kivy = "^1.11"
+kivy = "=1.11.1"
 decorator = "^4.4"
 wacryptolib = "^0.3.0"
+docutils = "^0.15.2"
+pygments = "^2.4"
+pypiwin32 = "^223.0"
+"kivy_deps.sdl2" = "=0.1.22"
+"kivy_deps.glew" = "=0.1.12"
+"kivy_deps.gstreamer" = "=0.1.17"
+kivy_examples = "=1.11.1"
 
 [tool.poetry.dev-dependencies]
 
