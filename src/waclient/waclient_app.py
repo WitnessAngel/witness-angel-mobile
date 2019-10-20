@@ -90,6 +90,8 @@ class WitnessAngelClientApp(App):
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
 
+    use_kivy_settings = True  # TODO disable this in prod
+
     def __init__(self, language, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.language = language
@@ -215,3 +217,7 @@ class WitnessAngelClientApp(App):
 
         self.translation = mygettext
 
+    def log_output(self, msg):
+        print (">>>>>>ROOT IDS:", self.root.ids)
+
+        self.root.ids.kivy_console.console_output.add_text(msg)

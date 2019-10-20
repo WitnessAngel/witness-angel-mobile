@@ -1,4 +1,5 @@
 #:kivy 1.8.0
+#:import time time.time
 #:import randint random.randint
 #:import to_rgba kivy.utils.get_color_from_hex
 #:import _ waclient.waclient_app._
@@ -70,13 +71,17 @@ ScreenManager:
                 ActionView:
                     use_separator: True
                     ActionPrevious:
-                        title: 'Action Bar'
+                        title: 'My WA Action Bar'
                         with_previous: False
                     ActionOverflow:
+                    #ActionButton:
+                    #    icon: 'atlas://data/images/defaulttheme/overflow'
                     ActionButton:
-                        icon: 'atlas://data/images/defaulttheme/overflow'
+                        text: 'LogTest'
+                        on_release: app.log_output("Time: %d" % time())
                     ActionButton:
-                        text: 'Btn2'
+                        text: 'Files'
+                        on_release: root.current = "containers"
     #                ActionGroup:
     #                    text: 'Group1'
     #                    ActionButton:
@@ -90,11 +95,12 @@ ScreenManager:
                         on_press: app.open_settings()
 
             ToggleButton:
-                text: "Hello World"
+                text: "Launch Witness Angel"
                 pos_hint: {'center_x': 0.5}
                 size_hint: (0.7, 0.2)
 
             KivyConsole:
+                id: kivy_console
                 canvas.after:
                     Color:
                         rgba: 1,1,1,1
@@ -110,7 +116,32 @@ ScreenManager:
      #           on_press: root.current = 'settings'
 
 
-    Screen:
+    Screen
+        name: "containers"
+        BoxLayout:
+            orientation: 'vertical'
+
+            ActionBar:
+                pos_hint: {'top':1}
+                ActionView:
+                    ActionPrevious:
+                        with_previous: True
+                        on_release: root.current = "dashboard"
+
+            FileChooserIconView:
+                id: filebrowser
+                #path: xxx
+                #rootpath: xxx
+                #filter: <lambda callbac khere>
+
+            Splitter:
+                sizable_from: 'top'
+                min_size: 20
+                rescale_with_parent: False
+                Label:
+                    text: "Area for container properties"
+
+    Screen:  # This is and old demo of carousel!
         name: "settings"
         AnchorLayout:
             anchor_y: 'bottom'

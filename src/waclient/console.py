@@ -46,10 +46,12 @@ class ConsoleOutput(TextInput):
         self.parent.scroll_y = 0
 
     def add_text(self, text):
+        text += "\n"
         is_locked = self.is_at_bottom()
         self.text += text
         self.parent.scroll_y = 0
         if is_locked:
+            self.scroll_to_bottom()
             #print("FORCE SCROLL", self.parent.scroll_y)
             #self.parent.scroll_y = 1  # lock-to-bottom behaviour
         ##print(output)
@@ -100,7 +102,6 @@ class KivyConsole(BoxLayout):
 
     def __init__(self, **kwargs):
         super(KivyConsole, self).__init__(**kwargs)
-
 
 
 if __name__ == '__main__':
