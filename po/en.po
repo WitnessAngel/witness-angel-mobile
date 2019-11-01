@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-18 13:00+0200\n"
+"POT-Creation-Date: 2019-11-01 10:31+0100\n"
 "PO-Revision-Date: 2015-07-18 13:00+0200\n"
 "Last-Translator: Pascal Chambon <pythoniks@gmail.com>\n"
 "Language-Team: English <pythoniks@gmail.com>\n"
@@ -16,29 +16,53 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: foobar/helloworld.kv:47
+#: src/waclient/witnessangelclient.kv:68
+msgid "My WA Action Bar"
+msgstr ""
+
+#: src/waclient/witnessangelclient.kv:74
+msgid "LogTest"
+msgstr ""
+
+#: src/waclient/witnessangelclient.kv:77
+msgid "Files"
+msgstr ""
+
+#: src/waclient/witnessangelclient.kv:92
+msgid "Start Angel Witness"
+msgstr ""
+
+#: src/waclient/witnessangelclient.kv:92
+msgid "Angel Witness is recording"
+msgstr ""
+
+#: src/waclient/witnessangelclient.kv:136
+msgid "Area for container properties"
+msgstr ""
+
+#: src/waclient/witnessangelclient.kv:149
 msgid ""
 "'Witness Angel Client'\n"
 "\n"
 "A sleek slideshow app that supports swipe gestures."
 msgstr ""
 
-#: foobar/helloworld.kv:51
+#: src/waclient/witnessangelclient.kv:157
 msgid "This app uses Kivy, a Python Framework for NUI Development."
 msgstr ""
 
-#: foobar/helloworld.kv:59
+#: src/waclient/witnessangelclient.kv:171
 msgid ""
 "It was generated with the Python command-line utility\n"
 "Cookiecutter along with Cookiedozer."
 msgstr ""
 
-#: foobar/helloworld.kv:68
+#: src/waclient/witnessangelclient.kv:183
 msgid ""
 "Distributed under the terms of the MIT license,\n"
 "'Witness Angel Client' is free and open source software."
 msgstr ""
 
-#: foobar/helloworld.kv:72
+#: src/waclient/witnessangelclient.kv:191
 msgid "Fork me on GitHub"
 msgstr ""

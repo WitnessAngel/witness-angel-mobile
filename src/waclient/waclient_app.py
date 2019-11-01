@@ -10,6 +10,7 @@ from kivy.uix.settings import SettingsWithTabbedPanel
 
 kivy.require('1.8.0')
 
+from kivy.lang import Observable
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -31,14 +32,6 @@ TIMER_OPTIONS = {
 LOCALE_DIR = (Path(__file__).parents[2] / "data" / "locales")
 print("LOCALE DIR", LOCALE_DIR)
 
-def _(text):
-    """This is just so we can use the default gettext format."""
-    return text
-
-
-class I18NLabel(Label):
-    """Label that supports internationlization."""
-    source_text = StringProperty('')
 
 
 class RefLabel(Label):
@@ -69,6 +62,46 @@ class TransitionProgress(ProgressBar):
         self._out.start(self)
 
 
+class Lang(Observable):
+    """Internationalization of the program : https://github.com/tito/kivy-gettext-example"""
+    observers = []
+    lang = None
+
+    def __init__(self, defaultlang):
+        super(Lang, self).__init__()
+        self.ugettext = None
+        self.lang = defaultlang
+        self.switch_lang(self.lang)
+
+    def _(self, text):
+        return self.ugettext(text)
+
+    def fbind(self, name, func, args, **kwargs):
+        if name == "_":
+            self.observers.append((func, args, kwargs))
+        else:
+            return super(Lang, self).fbind(name, func, *largs, **kwargs)
+
+    def funbind(self, name, func, args, **kwargs):
+        if name == "_":
+            key = (func, args, kwargs)
+            if key in self.observers:
+                self.observers.remove(key)
+        else:
+            return super(Lang, self).funbind(name, func, *args, **kwargs)
+
+    def switch_lang(self, lang):
+        # instanciate a gettext
+        locales = gettext.translation(
+            'witness-angel-client', LOCALE_DIR, languages=[lang])
+        self.ugettext = locales.gettext
+
+        # update all the kv rules attached to this text
+        for func, largs, kwargs in self.observers:
+            func(largs, None, None)
+
+tr = Lang("en")
+
 class WitnessAngelClientApp(App):
     """Simple Slideshow App with a user defined title.
 
@@ -84,8 +117,6 @@ class WitnessAngelClientApp(App):
 
     title = 'Witness Angel'
 
-    language = StringProperty('en')
-    translation = ObjectProperty(None, allownone=True)
 
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
@@ -95,7 +126,7 @@ class WitnessAngelClientApp(App):
     def __init__(self, language, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.language = language
-        self.switch_lang(self.language)
+        #self.switch_lang(self.language)
         self.settings_cls = SettingsWithTabbedPanel
 
     def start_timer(self, *args, **kwargs):
@@ -129,7 +160,8 @@ class WitnessAngelClientApp(App):
             in the kv file of the app
         """
         #print ("CONFIG IS", self.config)
-        #self.language = self.config.get('usersettings', 'language')
+        self.language = self.config.get('usersettings', 'language')
+        tr.switch_lang(self.language)
 
         user_interval = self.config.get('usersettings', 'timer_interval')
         self.timer_interval = TIMER_OPTIONS[user_interval]
@@ -150,7 +182,7 @@ class WitnessAngelClientApp(App):
         config.setdefaults(
             'usersettings', {
                 'timer_interval': '1/60 sec',
-                'language': 'de'
+                'language': 'en'
             }
         )
 
@@ -169,7 +201,7 @@ class WitnessAngelClientApp(App):
             if token == ('usersettings', 'timer_interval'):
                 self.timer_interval=TIMER_OPTIONS[value]
             elif token == ('usersettings', 'language'):
-                self.language = value
+                tr.switch_lang(value)
 
     #def on_start(self):
     #    BBBBBBBBBB
@@ -195,27 +227,6 @@ class WitnessAngelClientApp(App):
             self.carousel.load_next()
             Logger.debug("Automatically loading next slide")
 
-    def on_language(self, instance, language):
-        self.switch_lang(language)
-
-    def switch_lang(self, language):
-        #print("SWITCHING TO LANG", language)
-        #locale_dir = join(dirname(dirname(dirname(__file__))), 'data', 'locales')
-        locales = gettext.translation(
-            'witness-angel-client', LOCALE_DIR, languages=[self.language]
-        )
-
-        print(">>>> SWITCHING TO", language)
-        #import traceback
-        #traceback.print_stack()
-
-
-        def mygettext(*args, **kwargs):
-            gotten = locales.gettext(*args, **kwargs)
-            #print("mygettext", args, kwargs, "->", gotten)
-            return gotten
-
-        self.translation = mygettext
 
     def log_output(self, msg):
         print (">>>>>>ROOT IDS:", self.root.ids)
