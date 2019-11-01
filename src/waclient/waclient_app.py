@@ -4,6 +4,7 @@ import webbrowser
 import gettext
 import sys
 from pathlib import Path
+import os
 
 import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
@@ -116,8 +117,7 @@ class WitnessAngelClientApp(App):
     """
 
     title = 'Witness Angel'
-
-
+    path = []
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
 
@@ -232,3 +232,13 @@ class WitnessAngelClientApp(App):
         print (">>>>>>ROOT IDS:", self.root.ids)
 
         self.root.ids.kivy_console.console_output.add_text(msg)
+
+    def get_path(self,sd_path):
+        """Called when a file is selected in the File Chooser Widget."""
+        self.path = sd_path
+
+    def get_stat(self):
+        """Just a test of the path usability of the
+         widget FileChooserListView
+         """
+        return os.stat(self.path)
