@@ -235,6 +235,7 @@ class WitnessAngelClientApp(App):
 
     def get_path(self,sd_path):
         """Called when a file is selected in the File Chooser Widget."""
+        print(Path(__file__).parents[2] / "data")
         self.path = sd_path
 
     def get_stat(self):
@@ -242,3 +243,6 @@ class WitnessAngelClientApp(App):
          widget FileChooserListView
          """
         return os.stat(self.path)
+
+    def init_dir(self):
+        return str(Path(__file__).parents[2] / "tests")
