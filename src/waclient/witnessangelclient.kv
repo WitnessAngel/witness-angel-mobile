@@ -2,7 +2,7 @@
 #:import time time.time
 #:import randint random.randint
 #:import to_rgba kivy.utils.get_color_from_hex
-#:import _ waclient.waclient_app._
+#:import tr waclient.waclient_app.tr
 #:import KivyConsole waclient.console.KivyConsole
 
 #:set link_clr '222222'
@@ -10,7 +10,6 @@
 #:set cookiecutter_github 'https://github.com/audreyr/cookiecutter'
 #:set cookiedozer_github 'https://github.com/hackebrot/cookiedozer'
 #:set repo_github 'https://github.com/pakal/witness-angel-client'
-
 #:set fsize 15
 
 <Slide@BoxLayout>:
@@ -23,12 +22,6 @@
             pos: self.pos
             size: self.size
 
-
-<I18NLabel>:
-    source_text: ''
-    halign: 'center'
-    font_size: fsize
-    text: app.translation(self.source_text)
 
 
 <RefLabel>:
@@ -63,6 +56,7 @@ ScreenManager:
 
     Screen:
         name: "dashboard"
+
         BoxLayout:
             orientation: 'vertical'
             spacing: 20
@@ -71,16 +65,16 @@ ScreenManager:
                 ActionView:
                     use_separator: True
                     ActionPrevious:
-                        title: 'My WA Action Bar'
+                        title: tr._('My WA Action Bar')
                         with_previous: False
                     ActionOverflow:
                     #ActionButton:
                     #    icon: 'atlas://data/images/defaulttheme/overflow'
                     ActionButton:
-                        text: 'LogTest'
+                        text: tr._('LogTest')
                         on_release: app.log_output("Time: %d" % time())
                     ActionButton:
-                        text: 'Files'
+                        text: tr._('Files')
                         on_release: root.current = "containers"
     #                ActionGroup:
     #                    text: 'Group1'
@@ -95,7 +89,7 @@ ScreenManager:
                         on_press: app.open_settings()
 
             ToggleButton:
-                text: "Launch Witness Angel"
+                text: tr._('Start Angel Witness') if self.state == 'normal' else tr._('Angel Witness is recording')
                 pos_hint: {'center_x': 0.5}
                 size_hint: (0.7, 0.2)
 
@@ -128,9 +122,10 @@ ScreenManager:
                         with_previous: True
                         on_release: root.current = "dashboard"
 
-            FileChooserIconView:
+            FileChooserListView:
                 id: filebrowser
-                #path: xxx
+                on_selection: app.get_path(self.selection[0])
+                path: app.init_dir()
                 #rootpath: xxx
                 #filter: <lambda callbac khere>
 
@@ -139,7 +134,8 @@ ScreenManager:
                 min_size: 20
                 rescale_with_parent: False
                 Label:
-                    text: "Area for container properties"
+                    text: tr._("Please select a file") if str(filebrowser.selection) =='[]' else str(app.get_stat)
+                    # Here we just print the stats of the folder to check if we can read a foler.
 
     Screen:  # This is and old demo of carousel!
         name: "settings"
@@ -151,16 +147,16 @@ ScreenManager:
                 Slide:
                     name: 'hello'
                     bg_hex_clr: '154152'
-                    I18NLabel:
-                        source_text: _("'Witness Angel Client'\n\nA sleek slideshow app that supports swipe gestures.")
+                    Label:
+                        text: tr._("'Witness Angel Client'\n\nA sleek slideshow app that supports swipe gestures.")
                 Slide:
                     name: 'kivy'
                     spacing: 10
                     bg_hex_clr: '057173'
-                    I18NLabel:
+                    Label:
                         text_size: self.size
                         valign: 'bottom'
-                        source_text: _("This app uses Kivy, a Python Framework for NUI Development.")
+                        text: tr._("This app uses Kivy, a Python Framework for NUI Development.")
                     RefLabel:
                         text_size: self.size
                         valign: 'top'
@@ -171,10 +167,10 @@ ScreenManager:
                     name: 'cookiecutterdozer'
                     spacing: 10
                     bg_hex_clr: '487353'
-                    I18NLabel:
+                    Label:
                         valign: 'bottom'
                         text_size: self.size
-                        source_text: _("It was generated with the Python command-line utility\nCookiecutter along with Cookiedozer.")
+                        text: tr._("It was generated with the Python command-line utility\nCookiecutter along with Cookiedozer.")
                     RefLabel:
                         valign: 'top'
                         text_size: self.size
@@ -185,16 +181,16 @@ ScreenManager:
                 Slide:
                     name: 'license'
                     bg_hex_clr: 'C2872E'
-                    I18NLabel:
-                        source_text: _("Distributed under the terms of the MIT license,\n'Witness Angel Client' is free and open source software.")
+                    Label:
+                        text: tr._("Distributed under the terms of the MIT license,\n'Witness Angel Client' is free and open source software.")
                 Slide:
                     name: 'github'
                     spacing: 10
                     bg_hex_clr: 'AB3E2B'
-                    I18NLabel:
+                    Label:
                         valign: 'bottom'
                         text_size: self.size
-                        source_text: _("Fork me on GitHub")
+                        text: tr._("Fork me on GitHub")
                     RefLabel:
                         valign: 'top'
                         text_size: self.size

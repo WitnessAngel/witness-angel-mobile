@@ -4,41 +4,32 @@ import webbrowser
 import gettext
 import sys
 from pathlib import Path
+import os
 
 import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 
-kivy.require('1.8.0')
+kivy.require("1.8.0")
 
+from kivy.lang import Observable
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
-from kivy.properties import (
-    BoundedNumericProperty, ObjectProperty, StringProperty
-)
+from kivy.properties import BoundedNumericProperty, ObjectProperty, StringProperty
 from kivy.uix.carousel import Carousel
 from kivy.uix.label import Label
 from kivy.uix.progressbar import ProgressBar
 from os.path import join, dirname
 
 TIMER_OPTIONS = {
-    '1/60 sec': 1 / 60.0,
-    '1/30 sec': 1 / 30.0,
-    '1/15 sec': 1 / 15.0,
+    "1/60 sec": 1 / 60.0,
+    "1/30 sec": 1 / 30.0,
+    "1/15 sec": 1 / 15.0,
 }
 
-LOCALE_DIR = (Path(__file__).parents[2] / "data" / "locales")
+LOCALE_DIR = Path(__file__).parents[2] / "data" / "locales"
 print("LOCALE DIR", LOCALE_DIR)
-
-def _(text):
-    """This is just so we can use the default gettext format."""
-    return text
-
-
-class I18NLabel(Label):
-    """Label that supports internationlization."""
-    source_text = StringProperty('')
 
 
 class RefLabel(Label):
@@ -69,6 +60,50 @@ class TransitionProgress(ProgressBar):
         self._out.start(self)
 
 
+class Lang(Observable):
+    """Internationalization of the program : https://github.com/tito/kivy-gettext-example"""
+
+    observers = []
+    lang = None
+
+    def __init__(self, defaultlang):
+        super(Lang, self).__init__()
+        self.ugettext = None
+        self.lang = defaultlang
+        self.switch_lang(self.lang)
+
+    def _(self, text):
+        return self.ugettext(text)
+
+    def fbind(self, name, func, args, **kwargs):
+        if name == "_":
+            self.observers.append((func, args, kwargs))
+        else:
+            return super(Lang, self).fbind(name, func, *largs, **kwargs)
+
+    def funbind(self, name, func, args, **kwargs):
+        if name == "_":
+            key = (func, args, kwargs)
+            if key in self.observers:
+                self.observers.remove(key)
+        else:
+            return super(Lang, self).funbind(name, func, *args, **kwargs)
+
+    def switch_lang(self, lang):
+        # instanciate a gettext
+        locales = gettext.translation(
+            "witness-angel-client", LOCALE_DIR, languages=[lang]
+        )
+        self.ugettext = locales.gettext
+
+        # update all the kv rules attached to this text
+        for func, largs, kwargs in self.observers:
+            func(largs, None, None)
+
+
+tr = Lang("en")
+
+
 class WitnessAngelClientApp(App):
     """Simple Slideshow App with a user defined title.
 
@@ -82,11 +117,8 @@ class WitnessAngelClientApp(App):
         Widget that holds several slides about the app
     """
 
-    title = 'Witness Angel'
-
-    language = StringProperty('en')
-    translation = ObjectProperty(None, allownone=True)
-
+    title = "Witness Angel"
+    path = []
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
 
@@ -95,7 +127,7 @@ class WitnessAngelClientApp(App):
     def __init__(self, language, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.language = language
-        self.switch_lang(self.language)
+        # self.switch_lang(self.language)
         self.settings_cls = SettingsWithTabbedPanel
 
     def start_timer(self, *args, **kwargs):
@@ -116,10 +148,7 @@ class WitnessAngelClientApp(App):
         :attr:`WitnessAngelClientApp.carousel`.
         """
         self.stop_timer()
-        Clock.schedule_once(
-            self.start_timer,
-            self.carousel.anim_move_duration
-        )
+        Clock.schedule_once(self.start_timer, self.carousel.anim_move_duration)
 
     def build(self):
         """Initialize the GUI based on the kv file and set up events.
@@ -128,15 +157,16 @@ class WitnessAngelClientApp(App):
           (:class:`kivy.uix.anchorlayout.AnchorLayout`): Root widget specified
             in the kv file of the app
         """
-        #print ("CONFIG IS", self.config)
-        #self.language = self.config.get('usersettings', 'language')
+        # print ("CONFIG IS", self.config)
+        self.language = self.config.get("usersettings", "language")
+        tr.switch_lang(self.language)
 
-        user_interval = self.config.get('usersettings', 'timer_interval')
+        user_interval = self.config.get("usersettings", "timer_interval")
         self.timer_interval = TIMER_OPTIONS[user_interval]
 
         self.carousel = self.root.ids.carousel
         self.progress_bar = self.root.ids.progress_bar
-        self.progress_bar.max = self.property('timer').get_max(self)
+        self.progress_bar.max = self.property("timer").get_max(self)
 
         self.start_timer()
         self.carousel.bind(on_touch_down=self.stop_timer)
@@ -148,16 +178,15 @@ class WitnessAngelClientApp(App):
         `self.config`.
         """
         config.setdefaults(
-            'usersettings', {
-                'timer_interval': '1/60 sec',
-                'language': 'de'
-            }
+            "usersettings", {"timer_interval": "1/60 sec", "language": "en"}
         )
 
     def build_settings(self, settings):
         """Read the user settings and create a panel from it."""
-        settings_file =  join(dirname(__file__), 'usersettings.json')
-        settings.add_json_panel(title=self.title, config=self.config, filename=settings_file)
+        settings_file = join(dirname(__file__), "usersettings.json")
+        settings.add_json_panel(
+            title=self.title, config=self.config, filename=settings_file
+        )
 
     def on_config_change(self, config, section, key, value):
         """Called when the user changes the config values via the settings
@@ -166,12 +195,12 @@ class WitnessAngelClientApp(App):
         """
         if config is self.config:
             token = (section, key)
-            if token == ('usersettings', 'timer_interval'):
-                self.timer_interval=TIMER_OPTIONS[value]
-            elif token == ('usersettings', 'language'):
-                self.language = value
+            if token == ("usersettings", "timer_interval"):
+                self.timer_interval = TIMER_OPTIONS[value]
+            elif token == ("usersettings", "language"):
+                tr.switch_lang(value)
 
-    #def on_start(self):
+    # def on_start(self):
     #    BBBBBBBBBB
 
     def on_pause(self):
@@ -195,29 +224,21 @@ class WitnessAngelClientApp(App):
             self.carousel.load_next()
             Logger.debug("Automatically loading next slide")
 
-    def on_language(self, instance, language):
-        self.switch_lang(language)
-
-    def switch_lang(self, language):
-        #print("SWITCHING TO LANG", language)
-        #locale_dir = join(dirname(dirname(dirname(__file__))), 'data', 'locales')
-        locales = gettext.translation(
-            'witness-angel-client', LOCALE_DIR, languages=[self.language]
-        )
-
-        print(">>>> SWITCHING TO", language)
-        #import traceback
-        #traceback.print_stack()
-
-
-        def mygettext(*args, **kwargs):
-            gotten = locales.gettext(*args, **kwargs)
-            #print("mygettext", args, kwargs, "->", gotten)
-            return gotten
-
-        self.translation = mygettext
-
     def log_output(self, msg):
-        print (">>>>>>ROOT IDS:", self.root.ids)
+        print(">>>>>>ROOT IDS:", self.root.ids)
 
         self.root.ids.kivy_console.console_output.add_text(msg)
+
+    def get_path(self, sd_path):
+        """Called when a file is selected in the File Chooser Widget."""
+        print(Path(__file__).parents[2] / "data")
+        self.path = sd_path
+
+    def get_stat(self):
+        """Just a test of the path usability of the
+         widget FileChooserListView
+         """
+        return os.stat(self.path)
+
+    def init_dir(self):
+        return str(Path(__file__).parents[2] / "tests")
