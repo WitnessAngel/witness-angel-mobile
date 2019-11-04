@@ -59,6 +59,10 @@ class TakePictureApp(App):
         self.last_fn = self.get_filename()
         self.uri = Uri.parse('file://' + self.last_fn)
         self.uri = cast('android.os.Parcelable', self.uri)
+        # We can write to app folder or CACHE with:
+        # https://stackoverflow.com/a/56946376
+        # https://developer.android.com/Con/android/support/v4/content/FileProvider#GetUri
+        # https://github.com/mobile-insight/mobileinsight-mobile/blob/master/app/check_update.py
         intent.putExtra(MediaStore.EXTRA_OUTPUT, self.uri)
         mActivity.startActivityForResult(intent, 0x123)
 
