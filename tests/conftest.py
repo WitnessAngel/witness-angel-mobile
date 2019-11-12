@@ -4,10 +4,11 @@ import os
 import pytest
 import shutil
 
+
 @pytest.fixture(autouse=True)
 def ignore_app_ini(request):
-    settings_file = 'witness-angel-client/WitnessAngelClientApp.ini'
-    backup_file = 'witness-angel-client/_WitnessAngelClientApp.ini'
+    settings_file = "witness-angel-client/WitnessAngelClientApp.ini"
+    backup_file = "witness-angel-client/_WitnessAngelClientApp.ini"
 
     if os.path.exists(settings_file):
         app_ini_found = True
@@ -35,7 +36,8 @@ def app(request):
     """
     from kivy.interactive import InteractiveLauncher
     from waclient.waclient_app import WitnessAngelClientApp
-    launcher = InteractiveLauncher(WitnessAngelClientApp('en'))
+
+    launcher = InteractiveLauncher(WitnessAngelClientApp("en"))
 
     def stop_launcher():
         launcher.safeOut()

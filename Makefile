@@ -10,10 +10,11 @@ help:
 	@echo "mo - create i18n locales files"
 
 test:
-	python setup.py test
+	pytest
 
 coverage:
-	python setup.py test -a '--cov=witness-angel-client --cov-report=html'
+	coverage run -m pytest
+	coverage html
 	xdg-open htmlcov/index.html
 
 docs:
@@ -27,7 +28,7 @@ deploy:
 	buildozer android deploy logcat
 
 po:
-	xgettext -Lpython --keyword=tr:1 --output=messages.pot witness-angel-client/*.kv
+	xgettext -Lpython --output=messages.pot src/waclient/waclient_app.py src/waclient/*.kv
 	msgmerge --update --no-fuzzy-matching --backup=off po/en.po messages.pot
 	msgmerge --update --no-fuzzy-matching --backup=off po/de.po messages.pot
 	msgmerge --update --no-fuzzy-matching --backup=off po/es.po messages.pot
