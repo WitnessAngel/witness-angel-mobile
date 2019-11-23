@@ -121,13 +121,12 @@ class WitnessAngelClientApp(App):
     path = []
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
+    language = None
 
     use_kivy_settings = True  # TODO disable this in prod
 
-    def __init__(self, language, **kwargs):
+    def __init__(self, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
-        self.language = language
-        # self.switch_lang(self.language)
         self.settings_cls = SettingsWithTabbedPanel
 
     def start_timer(self, *args, **kwargs):

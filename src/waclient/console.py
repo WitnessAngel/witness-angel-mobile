@@ -11,30 +11,6 @@ from kivy.properties import (
 )
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
-import os
-import sys
-
-
-Builder.load_string(
-    """
-<KivyConsole>:
-    console_output: console_output
-    scroll_view: scroll_view
-    ScrollView:
-        id: scroll_view
-        bar_width: 10
-        ConsoleOutput:
-            id: console_output
-            readonly: True
-            padding: 6, 6
-            size_hint: (1, None)
-            font_name: root.font_name
-            font_size: root.font_size
-            foreground_color: root.foreground_color
-            background_color: root.background_color
-            height: max(self.parent.height, self.minimum_height)
-"""
-)
 
 
 class ConsoleOutput(TextInput):
