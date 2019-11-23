@@ -1,9 +1,10 @@
+# GUI template automatically loaded by name convention #
 #:kivy 1.8.0
 #:import time time.time
 #:import randint random.randint
 #:import to_rgba kivy.utils.get_color_from_hex
-#:import tr waclient.waclient_app.tr
-#:import KivyConsole waclient.console.KivyConsole
+#:import tr waclient.app.tr
+#:import KivyConsole waclient.utilities.widgets.KivyConsole
 
 #:set link_clr '222222'
 #:set kivy_github 'https://github.com/kivy/kivy'
@@ -21,7 +22,6 @@
         Rectangle:
             pos: self.pos
             size: self.size
-
 
 
 <RefLabel>:
@@ -44,11 +44,12 @@
     tabbedpanel: tp
     TabbedPanel:
         id: tp
-        size: root.sizewitnessangelclient.kv
+        size: root.size
         pos: root.pos
         #do_default_tab: False
         background_color: (0,0,0,1)
         tab_width: '200dp'  # ADDED THIS
+
 
 <KivyConsole>:
     console_output: console_output
@@ -66,6 +67,7 @@
             foreground_color: root.foreground_color
             background_color: root.background_color
             height: max(self.parent.height, self.minimum_height)
+
 
 ScreenManager:
 

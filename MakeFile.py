@@ -25,7 +25,7 @@ def cli(test, coverage, apk, deploy, po, mo):
     if po:
         po_files = glob.glob("po/*.po")
         subprocess.run(
-            "xgettext -Lpython --output=messages.pot src/waclient/waclient_app.py src/waclient/*.kv",
+            "xgettext -Lpython --output=messages.pot src/waclient/*.py src/waclient/*/*.py src/waclient/*.kv",
             shell=True,
             check=True,
         )

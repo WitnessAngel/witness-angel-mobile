@@ -35,7 +35,7 @@ def app(request):
       :class:`WitnessAngelClientApp`: App instance
     """
     from kivy.interactive import InteractiveLauncher
-    from waclient.waclient_app import WitnessAngelClientApp
+    from waclient.app import WitnessAngelClientApp
 
     launcher = InteractiveLauncher(WitnessAngelClientApp("en"))
 

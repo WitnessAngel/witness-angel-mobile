@@ -1,6 +1,6 @@
 
 import os
-from waclient.waclient_app import WitnessAngelClientApp
+from waclient.app import WitnessAngelClientApp
 
 os.environ["KIVY_NO_ARGS"] = "1"
 

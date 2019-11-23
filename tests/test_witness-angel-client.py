@@ -13,7 +13,7 @@ from functools import partial
 from kivy.base import EventLoop, runTouchApp
 from kivy.clock import Clock
 
-from waclient.waclient_app import WitnessAngelClientApp
+from waclient.app import WitnessAngelClientApp
 
 
 class Test(unittest.TestCase):

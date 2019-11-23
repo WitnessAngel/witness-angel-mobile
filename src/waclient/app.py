@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import webbrowser
-import gettext
-import sys
-from pathlib import Path
 import os
+from pathlib import Path
 
 import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 
+from waclient.utilities.i18n import Lang
+
 kivy.require("1.8.0")
 
-from kivy.lang import Observable
-from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
-from kivy.properties import BoundedNumericProperty, ObjectProperty, StringProperty
+from kivy.properties import BoundedNumericProperty, ObjectProperty
 from kivy.uix.carousel import Carousel
-from kivy.uix.label import Label
-from kivy.uix.progressbar import ProgressBar
 from os.path import join, dirname
 
 TIMER_OPTIONS = {
@@ -27,79 +22,6 @@ TIMER_OPTIONS = {
     "1/30 sec": 1 / 30.0,
     "1/15 sec": 1 / 15.0,
 }
-
-LOCALE_DIR = Path(__file__).parents[2] / "data" / "locales"
-print("LOCALE DIR", LOCALE_DIR)
-
-
-class RefLabel(Label):
-    """Simple that opens a contained url in the webbrowser."""
-
-    def on_ref_press(self, url):
-        """Callback which is being run when the user clicks on a ref in the
-        label.
-
-        :param str url: URL to be opened in the webbrowser
-        """
-        Logger.info("Opening '{url}' in webbrowser.".format(url=url))
-        webbrowser.open(url)
-
-
-class TransitionProgress(ProgressBar):
-    """ProgressBar with pre-defined animations for fading in and out."""
-
-    _in = Animation(opacity=1.0, duration=0.4)
-    _out = Animation(opacity=0.0, duration=0.1)
-
-    def fade_in(self):
-        """Play the animation for changing the ProgressBar to be opaque."""
-        self._in.start(self)
-
-    def fade_out(self):
-        """Play the animation to hide the ProgressBar."""
-        self._out.start(self)
-
-
-class Lang(Observable):
-    """Internationalization of the program : https://github.com/tito/kivy-gettext-example"""
-
-    observers = []
-    lang = None
-
-    def __init__(self, defaultlang):
-        super(Lang, self).__init__()
-        self.ugettext = None
-        self.lang = defaultlang
-        self.switch_lang(self.lang)
-
-    def _(self, text):
-        return self.ugettext(text)
-
-    def fbind(self, name, func, args, **kwargs):
-        if name == "_":
-            self.observers.append((func, args, kwargs))
-        else:
-            return super(Lang, self).fbind(name, func, *largs, **kwargs)
-
-    def funbind(self, name, func, args, **kwargs):
-        if name == "_":
-            key = (func, args, kwargs)
-            if key in self.observers:
-                self.observers.remove(key)
-        else:
-            return super(Lang, self).funbind(name, func, *args, **kwargs)
-
-    def switch_lang(self, lang):
-        # instanciate a gettext
-        locales = gettext.translation(
-            "witness-angel-client", LOCALE_DIR, languages=[lang]
-        )
-        self.ugettext = locales.gettext
-
-        # update all the kv rules attached to this text
-        for func, largs, kwargs in self.observers:
-            func(largs, None, None)
-
 
 tr = Lang("en")
 
@@ -177,14 +99,14 @@ class WitnessAngelClientApp(App):
         `self.config`.
         """
         config.setdefaults(
-            "usersettings", {"timer_interval": "1/60 sec", "language": "en"}
+                section="usersettings", keyvalues={"timer_interval": "1/60 sec", "language": "en"}
         )
 
     def build_settings(self, settings):
         """Read the user settings and create a panel from it."""
-        settings_file = join(dirname(__file__), "usersettings.json")
+        settings_file = join(dirname(__file__), "user_settings_schema.json")
         settings.add_json_panel(
-            title=self.title, config=self.config, filename=settings_file
+                title=self.title, config=self.config, filename=settings_file
         )
 
     def on_config_change(self, config, section, key, value):

@@ -28,7 +28,7 @@ deploy:
 	buildozer android deploy logcat
 
 po:
-	xgettext -Lpython --output=messages.pot src/waclient/waclient_app.py src/waclient/*.kv
+	xgettext -Lpython --output=messages.pot src/waclient/*.py src/waclient/*/*.py src/waclient/*.kv
 	msgmerge --update --no-fuzzy-matching --backup=off po/en.po messages.pot
 	msgmerge --update --no-fuzzy-matching --backup=off po/de.po messages.pot
 	msgmerge --update --no-fuzzy-matching --backup=off po/es.po messages.pot

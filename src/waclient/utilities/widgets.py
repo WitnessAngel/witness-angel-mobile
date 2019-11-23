@@ -1,16 +1,49 @@
+# -*- coding: utf-8 -*-
+
+import webbrowser
+
+from kivy.animation import Animation
 from kivy.app import App
 from kivy.base import runTouchApp
-from kivy.lang import Builder
+from kivy.logger import Logger
 from kivy.properties import (
     ObjectProperty,
     ListProperty,
     StringProperty,
     NumericProperty,
-    Clock,
-    partial,
 )
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.progressbar import ProgressBar
 from kivy.uix.textinput import TextInput
+
+
+class RefLabel(Label):
+    """Simple that opens a contained url in the webbrowser."""
+
+    def on_ref_press(self, url):
+        """Callback which is being run when the user clicks on a ref in the
+        label.
+
+        :param str url: URL to be opened in the webbrowser
+        """
+        Logger.info("Opening '{url}' in webbrowser.".format(url=url))
+        webbrowser.open(url)
+
+
+class TransitionProgress(ProgressBar):
+    """ProgressBar with pre-defined animations for fading in and out."""
+
+    _in = Animation(opacity=1.0, duration=0.4)
+    _out = Animation(opacity=0.0, duration=0.1)
+
+    def fade_in(self):
+        """Play the animation for changing the ProgressBar to be opaque."""
+        self._in.start(self)
+
+    def fade_out(self):
+        """Play the animation to hide the ProgressBar."""
+        self._out.start(self)
 
 
 class ConsoleOutput(TextInput):
@@ -46,7 +79,6 @@ class ConsoleOutput(TextInput):
 
 
 class KivyConsole(BoxLayout):
-
     console_output = ObjectProperty(None)
     """Instance of ConsoleOutput
        :data:`console_output` is an :class:`~kivy.properties.ObjectProperty`
