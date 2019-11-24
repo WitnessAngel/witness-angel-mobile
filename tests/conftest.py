@@ -5,8 +5,8 @@ import pytest
 import shutil
 
 
-@pytest.fixture(autouse=True)
-def ignore_app_ini(request):
+#@pytest.fixture(autouse=True)
+def ___ignore_app_ini(request):
     settings_file = "witness-angel-client/WitnessAngelClientApp.ini"
     backup_file = "witness-angel-client/_WitnessAngelClientApp.ini"
 
@@ -25,8 +25,8 @@ def ignore_app_ini(request):
     request.addfinalizer(restore_app_ini)
 
 
-@pytest.fixture(scope="session")
-def app(request):
+#@pytest.fixture(scope="session")
+def ___app(request):
     """Uses the InteractiveLauncher to provide access to an app instance.
 
     The finalizer stops the launcher once the tests are finished.

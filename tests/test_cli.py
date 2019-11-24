@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 
-from waclient.cli import main
+from waclient.__main__ import main
 
 
 @pytest.fixture
