@@ -1,6 +1,6 @@
 import sys, subprocess
 from oscpy.client import OSCClient
-
+from kivy.logger import Logger as logger
 
 
 class ServiceController:
@@ -12,7 +12,7 @@ class ServiceController:
         assert self._subprocess
         return self._osc.send_message(address, values=values)
 
-    def start(self):
+    def start_service(self):
         assert not self._subprocess
         from waclient import ROOT_DIR
         self._subprocess = subprocess.Popen([sys.executable, "-m", "waclient.background_service"],
@@ -23,7 +23,12 @@ class ServiceController:
         assert self._subprocess
         return self._send_message("/ping")
 
-    def stop(self):
+    def stop_service(self):
         assert self._subprocess
         self._send_message("/stop_server")
-        self._subprocess.wait(timeout=10)
+        try:
+            self._subprocess.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            logger.error("Service subprocess didn't stop gracefully, we kill it now")
+            self._subprocess.kill()
+

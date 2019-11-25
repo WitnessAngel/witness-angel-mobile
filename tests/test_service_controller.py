@@ -7,15 +7,15 @@ def test_service_controller():
 
     try:
 
-        ctrl.start()
+        ctrl.start_service()
 
-        time.sleep(3)
+        time.sleep(1)
 
         print(">>>>>", ctrl.ping())
 
-        time.sleep(3)
+        time.sleep(1)
 
-        ctrl.stop()
+        ctrl.stop_service()
 
     except:
         # Teardown cleanup
