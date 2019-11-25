@@ -8,11 +8,14 @@ from kivy.config import ConfigParser
 from kivy.logger import Logger as logger
 from oscpy.server import OSCThreadServer, ServerClass
 
+from waclient.common_config import CONFIG_FILE
 
 osc = OSCThreadServer(encoding="utf8")
 
 
-CONFIG_FILEPATH = str(Path(__file__).parent / "witnessangelclient.ini")
+
+
+# FIXME what happens if exception on remote OSC endpoint ?
 
 
 @ServerClass
@@ -26,7 +29,7 @@ class BackgroundServer(object):
         self._termination_event = threading.Event()
         logger.info("Service started")
 
-    def _load_config(self, filename=CONFIG_FILEPATH):
+    def _load_config(self, filename=CONFIG_FILE):
         config = ConfigParser(name='service')
         logger.info(f"Service loading config file {filename}")
         try:
@@ -58,6 +61,9 @@ class BackgroundServer(object):
 
     def start_recording(self):
         config = self._load_config()
+
+    def stop_recording(self):
+        pass
 
 
 
