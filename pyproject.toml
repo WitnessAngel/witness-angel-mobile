@@ -42,6 +42,7 @@ pypiwin32 = "^223.0"
 "kivy_deps.gstreamer" = "=0.1.17"
 kivy_examples = "=1.11.1"
 oscpy = "^0.5.0"
+plyer = "^1.4"
 
 [tool.poetry.dev-dependencies]
 

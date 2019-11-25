@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+'''
 import gevent
 from gevent import monkey
 
@@ -99,3 +99,4 @@ def ___test_carousel(app):
 if __name__ == "__main__":
     t = Test()
     t.test_example()
+'''

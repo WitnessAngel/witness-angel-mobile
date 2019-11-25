@@ -481,6 +481,14 @@ python = "<3.8"
 version = ">=0.12"
 
 [[package]]
+category = "main"
+description = "Platform-independent wrapper for platform-dependent APIs"
+name = "plyer"
+optional = false
+python-versions = "*"
+version = "1.4.2"
+
+[[package]]
 category = "dev"
 description = "A collection of helpful Python tools!"
 name = "pockets"
@@ -1009,7 +1017,7 @@ version = "0.6.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "09833e87b26ffba1eccea9f1685fd1e7ce33dd98aa52ea800cc64ef2bed58abd"
+content-hash = "138c1ba1f8da08209af62c76e0a31fba227160f220dc54cc2c0ffd0aaa363f45"
 python-versions = ">=3.6"
 
 [metadata.hashes]
@@ -1061,6 +1069,7 @@ packaging = ["28b924174df7a2fa32c1953825ff29c61e2f5e082343165438812f00d3a7fc47",
 pathspec = ["e285ccc8b0785beadd4c18e5708b12bb8fcf529a1e61215b3feff1d1e559ea5c"]
 pbr = ["2c8e420cd4ed4cec4e7999ee47409e876af575d4c35a45840d59e8b5f3155ab8", "b32c8ccaac7b1a20c0ce00ce317642e6cf231cf038f9875e0280e28af5bf7ac9"]
 pluggy = ["0db4b7601aae1d35b4a033282da476845aa19185c1e6964b25cf324b5e4ec3e6", "fa5fa1622fa6dd5c030e9cad086fa19ef6a0cf6d7a2d12318e10cb49d6d68f34"]
+plyer = ["4d5a5b1ef03eb3bdd9f6f949adaa0576043dee4b1845ca7d02b8bf0645c6b5ed", "d194cdce3fd941b524dd036d945ded6e84420a3f703b73512fbedf45c7a02807"]
 pockets = ["109eb91588e9cf722de98c98d300e1c5896e877f5704dc61176fa09686ca635b", "21a2405543c439ac091453ed187f558cf5294d3f85f15310f214ad4de057e0af"]
 py = ["64f65755aee5b381cea27766a3a147c3f15b9b6b9ac88676de66ba2ae36793fa", "dc639b046a6e2cff5bbe40194ad65936d6ba360b52b3c3fe1d08a82dd50b5e53"]
 pycodestyle = ["95a2219d12372f05704562a14ec30bc76b05a5b297b21a5dfe3f6fac3491ae56", "e40a936c9a450ad81df37f549d676d127b1b66000a6c500caa2b085bc0ca976c"]
