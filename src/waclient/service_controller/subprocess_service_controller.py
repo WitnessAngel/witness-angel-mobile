@@ -14,7 +14,7 @@ class ServiceController:
 
     def start_service(self):
         assert not self._subprocess
-        from waclient import ROOT_DIR
+        from waclient.common_config import ROOT_DIR
         self._subprocess = subprocess.Popen([sys.executable, "-m", "waclient.background_service"],
                                             shell=False, cwd=ROOT_DIR)
         self._osc = OSCClient(address='127.0.0.1', port=8765, encoding="utf8")

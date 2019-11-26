@@ -1,7 +1,7 @@
 
 
 from plyer import gyroscope
-from wacryptolib.container import JsonAggregator, PeriodicValuePoller
+from wacryptolib.sensor import JsonAggregator, PeriodicValuePoller
 
 
 def get_periodic_value_provider(tarfile_aggregator, default_chunk_duration_s, default_poll_interval_s):

@@ -14,7 +14,6 @@ osc = OSCThreadServer(encoding="utf8")
 
 
 
-
 # FIXME what happens if exception on remote OSC endpoint ?
 
 

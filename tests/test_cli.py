@@ -21,7 +21,7 @@ def cli_param(request):
 
 @pytest.fixture
 def mock_app(mocker):
-    return mocker.patch("waclient.cli.WitnessAngelClientApp")
+    return mocker.patch("waclient.app.WitnessAngelClientApp")
 
 
 def test_language_to_app(runner, mock_app, cli_param, lang):

@@ -1,6 +1,6 @@
 import time
 
-from wacryptolib.container import TarfileAggregator
+from wacryptolib.sensor import TarfileAggregator
 from wacryptolib.utilities import load_from_json_bytes
 
 
@@ -10,11 +10,11 @@ class FakeTarfileAggregator(TarfileAggregator):
         self._test_records = []
 
     def add_record(self, **kwargs):
-        print("AAAD")
+        print("FakeTarfileAggregator->add_record()")
         self._test_records.append(kwargs)
 
     def finalize_tarfile(self):
-        print("FINALIZZE")
+        print("FakeTarfileAggregator->finalize_tarfile()")
         self._test_records = []
 
 
@@ -37,7 +37,7 @@ def test_gyroscope():
 
     assert not sensor._json_aggregator._current_dataset
 
-    #assert len(fake_tarfile_aggregator._test_records) == 2
+    assert len(fake_tarfile_aggregator._test_records) == 2
 
     print(fake_tarfile_aggregator._test_records)
 
