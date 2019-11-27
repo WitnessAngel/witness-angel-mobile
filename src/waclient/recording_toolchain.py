@@ -14,7 +14,7 @@ osc = OSCThreadServer(encoding="utf8")
 def build_recording_toolchain(config):
     """Instantiate the whole toolchain of sensors and aggregators, depending on the config."""
 
-    get_conf_value = functools.partial(config.getdefault, section="usersettings")
+    get_conf_value = functools.partial(config.getdefault, "usersettings")
 
     container_storage = ContainerStorage(encryption_conf=ENCRYTION_CONF,
                                          output_dir=INTERNAL_CONTAINERS_DIR,
@@ -36,7 +36,8 @@ def build_recording_toolchain(config):
 
     toolchain = dict(sensors_manager=sensors_manager,
                     data_aggregators=[gyroscope_json_aggregator],
-                    tarfile_aggregators=[tarfile_aggregator])
+                    tarfile_aggregators=[tarfile_aggregator],
+                    container_storage=container_storage)
     return toolchain
 
 

@@ -19,7 +19,7 @@ if not os.path.exists(APP_DIR):
 APP_DIR = Path(APP_DIR)
 print("APP_DIR", repr(APP_DIR))
 
-INTERNAL_CONTAINERS_DIR = APP_DIR / ".containers"
+INTERNAL_CONTAINERS_DIR = APP_DIR / ".wacontainers"
 INTERNAL_CONTAINERS_DIR.mkdir(exist_ok=True)
 
 ENCRYTION_CONF = dict(
