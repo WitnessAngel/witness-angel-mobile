@@ -1,7 +1,5 @@
 import os
 import threading
-import time
-from pathlib import Path
 from configparser import Error as ConfigParserError
 
 from kivy.config import ConfigParser
@@ -10,10 +8,8 @@ from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.common_config import CONFIG_FILE
 
+
 osc = OSCThreadServer(encoding="utf8")
-
-
-
 # FIXME what happens if exception on remote OSC endpoint ?
 
 

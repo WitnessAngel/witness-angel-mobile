@@ -3,6 +3,8 @@ from pathlib import Path
 
 from plyer import storagepath
 
+from wacryptolib.escrow import LOCAL_ESCROW_PLACEHOLDER
+
 ROOT_DIR = Path(__file__).parents[1]
 print("ROOT_DIR", repr(ROOT_DIR))
 
@@ -19,3 +21,25 @@ print("APP_DIR", repr(APP_DIR))
 
 INTERNAL_CONTAINERS_DIR = APP_DIR / ".containers"
 INTERNAL_CONTAINERS_DIR.mkdir(exist_ok=True)
+
+ENCRYTION_CONF = dict(
+    data_encryption_strata=[
+        dict(
+            data_encryption_algo="AES_CBC",
+            key_encryption_strata=[
+                dict(
+                    escrow_key_type="RSA",
+                    key_encryption_algo="RSA_OAEP",
+                    key_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                )
+            ],
+            data_signatures=[
+                dict(
+                    signature_key_type="DSA",
+                    signature_algo="DSS",
+                    signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                )
+            ],
+        )
+    ]
+)

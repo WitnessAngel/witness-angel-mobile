@@ -1,6 +1,6 @@
 import time
 
-from wacryptolib.sensor import TarfileAggregator
+from wacryptolib.sensor import TarfileAggregator, JsonAggregator
 from wacryptolib.utilities import load_from_json_bytes
 
 
@@ -24,7 +24,13 @@ def test_gyroscope():
 
     fake_tarfile_aggregator = FakeTarfileAggregator()
 
-    sensor = get_periodic_value_provider(tarfile_aggregator=fake_tarfile_aggregator, default_chunk_duration_s=0.5, default_poll_interval_s=0.1)
+    json_aggregator = JsonAggregator(
+        max_duration_s=0.5,
+        tarfile_aggregator=fake_tarfile_aggregator,
+        sensor_name="test_gyroscope",
+    )
+
+    sensor = get_periodic_value_provider(json_aggregator=json_aggregator, default_poll_interval_s=0.1)
 
     sensor.start()
 
@@ -33,13 +39,12 @@ def test_gyroscope():
     sensor.stop()
     sensor.join()
 
-    sensor._json_aggregator.flush_dataset()
-
-    assert not sensor._json_aggregator._current_dataset
+    json_aggregator.flush_dataset()
+    assert not json_aggregator._current_dataset
 
     assert len(fake_tarfile_aggregator._test_records) == 2
 
-    print(fake_tarfile_aggregator._test_records)
+    print("TEST RECORDS:", fake_tarfile_aggregator._test_records)
 
     for record in fake_tarfile_aggregator._test_records:
         sensor_entries = load_from_json_bytes(record["data"])

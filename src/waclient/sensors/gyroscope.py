@@ -4,13 +4,7 @@ from plyer import gyroscope
 from wacryptolib.sensor import JsonAggregator, PeriodicValuePoller
 
 
-def get_periodic_value_provider(tarfile_aggregator, default_chunk_duration_s, default_poll_interval_s):
-
-    json_aggregator = JsonAggregator(
-        max_duration_s=default_chunk_duration_s,
-        tarfile_aggregator=tarfile_aggregator,
-        sensor_name="gyroscope",
-    )
+def get_periodic_value_provider(json_aggregator, default_poll_interval_s):
 
     def get_gyroscope_rotation():
         try:
