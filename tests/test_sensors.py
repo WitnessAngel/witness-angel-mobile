@@ -18,7 +18,7 @@ class FakeTarfileAggregator(TarfileAggregator):
         self._test_records = []
 
 
-def test_gyroscope():
+def test_gyroscope_sensor():
 
     from waclient.sensors.gyroscope import get_periodic_value_provider
 

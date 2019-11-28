@@ -7,7 +7,11 @@ from waclient.sensors.gyroscope import get_periodic_value_provider as get_period
 from wacryptolib.container import ContainerStorage
 from wacryptolib.sensor import TarfileAggregator, JsonAggregator, SensorManager
 
+from kivy.logger import Logger as logger
+
+
 osc = OSCThreadServer(encoding="utf8")
+
 
 
 
@@ -58,16 +62,25 @@ def stop_recording_toolchain(toolchain):
 
     # TODO push all this to sensor manager!!
 
+    logger.info("stop_recording_toolchain starts")
+
     sensors_manager=toolchain["sensors_manager"]
     data_aggregators=toolchain["data_aggregators"]
     tarfile_aggregators=toolchain["tarfile_aggregators"]
 
+    logger.info("Stopping sensors manager")
     sensors_manager.stop()
+
+    logger.info("Joining sensors manager")
     sensors_manager.join()
 
+    logger.info("Flushing data aggregators")
     for data_aggregator in data_aggregators:
         data_aggregator.flush_dataset()
 
+    logger.info("Flushing tarfile aggregators")
     for tarfile_aggregator in tarfile_aggregators:
         tarfile_aggregator.finalize_tarfile()
+
+    logger.info("stop_recording_toolchain exits")
 

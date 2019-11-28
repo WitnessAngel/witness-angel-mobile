@@ -27,8 +27,13 @@ class ServiceController:
         assert self._subprocess
         self._send_message("/stop_server")
         try:
-            self._subprocess.wait(timeout=5)
+            self._subprocess.wait(timeout=30)
         except subprocess.TimeoutExpired:
-            logger.error("Service subprocess didn't stop gracefully, we kill it now")
+            logger.error("Service subprocess didn't exit gracefully, we kill it now")
             self._subprocess.kill()
 
+    def start_recording(self):
+        self._send_message("/start_recording")
+
+    def stop_recording(self):
+        self._send_message("/stop_recording")

@@ -1,7 +1,10 @@
+import os
 import time
 
 from kivy.config import ConfigParser
 
+from tests._waclient_test_utilities import purge_test_containers
+from waclient.common_config import INTERNAL_CONTAINERS_DIR
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from wacryptolib.sensor import TarfileAggregator
 from wacryptolib.utilities import load_from_json_bytes
@@ -17,11 +20,12 @@ def test_nominal_recording_case():
     tarfile_aggregators=toolchain["tarfile_aggregators"]
     container_storage = toolchain["container_storage"]
 
+    purge_test_containers()
     # TODO - make this a PURGE() methods of storage!!!
     # CLEANUP of already existing containers
-    for container_name in container_storage.list_container_names(as_sorted_relative_paths=True):
-        container_storage._delete_container(container_name)
-    assert not len(container_storage)
+    #for container_name in container_storage.list_container_names(as_sorted_relative_paths=True):
+    #    container_storage._delete_container(container_name)
+    #assert not len(container_storage)
 
     start_recording_toolchain(toolchain)
     time.sleep(2)
