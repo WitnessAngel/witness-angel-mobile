@@ -106,9 +106,11 @@ ScreenManager:
                         on_press: app.open_settings()
 
             ToggleButton:
+                id: recording_btn
                 text: tr._('Start Angel Witness') if self.state == 'normal' else tr._('Angel Witness is recording')
                 pos_hint: {'center_x': 0.5}
                 size_hint: (0.7, 0.2)
+                on_state: app.service_controller.stop_recording() if self.state == 'normal' else app.service_controller.start_recording()
 
             KivyConsole:
                 id: kivy_console

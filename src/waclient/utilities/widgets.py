@@ -74,8 +74,9 @@ class ConsoleOutput(TextInput):
         # Clock.schedule_once(self.parent.scroll_y = 1)
 
     def my_on_start(self, *args, **kwargs):
-        print(">MY ON START", args, kwargs, self.parent)
-        self.add_text("\n".join(str(i) for i in range(50)))
+        pass
+        #print(">MY ON START", args, kwargs, self.parent)
+        #self.add_text("\n".join(str(i) for i in range(50)))
 
 
 class KivyConsole(BoxLayout):

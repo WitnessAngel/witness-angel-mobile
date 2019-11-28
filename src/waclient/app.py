@@ -16,6 +16,7 @@ from kivy.logger import Logger
 from kivy.properties import BoundedNumericProperty, ObjectProperty
 from kivy.uix.carousel import Carousel
 from os.path import join, dirname
+from waclient.service_controller import ServiceController
 
 TIMER_OPTIONS = {
     "1/60 sec": 1 / 60.0,
@@ -50,6 +51,8 @@ class WitnessAngelClientApp(App):
     def __init__(self, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.settings_cls = SettingsWithTabbedPanel
+        self.service_controller = ServiceController()
+        self.service_controller.start_service()
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
@@ -121,9 +124,6 @@ class WitnessAngelClientApp(App):
             elif token == ("usersettings", "language"):
                 tr.switch_lang(value)
 
-    # def on_start(self):
-    #    BBBBBBBBBB
-
     def on_pause(self):
         """Enables the user to switch to another application causing
         :class:`WitnessAngelClientApp` to wait until the user
@@ -136,6 +136,20 @@ class WitnessAngelClientApp(App):
         stored in :meth:`WitnessAngelClientApp.on_pause`.
         """
         pass
+
+    def on_start(self):
+        '''Event handler for the `on_start` event which is fired after
+        initialization (after build() has been called) but before the
+        application has started running.
+        '''
+        pass
+
+    def on_stop(self):
+        '''Event handler for the `on_stop` event which is fired when the
+        application has finished running (i.e. the window is about to be
+        closed).
+        '''
+        self.service_controller.stop_service()  # Will wait for termination else kill
 
     def _update_timer(self, dt):
         try:

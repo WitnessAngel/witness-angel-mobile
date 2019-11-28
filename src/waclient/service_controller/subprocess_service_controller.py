@@ -18,6 +18,7 @@ class ServiceController:
         self._subprocess = subprocess.Popen([sys.executable, "-m", "waclient.background_service"],
                                             shell=False, cwd=ROOT_DIR)
         self._osc = OSCClient(address='127.0.0.1', port=8765, encoding="utf8")
+        # TODO - wait for remote server to be pingable?
 
     def ping(self):
         assert self._subprocess
