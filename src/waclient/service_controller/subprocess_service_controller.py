@@ -1,24 +1,30 @@
 import sys, subprocess
+
+import atexit
 from oscpy.client import OSCClient
 from kivy.logger import Logger as logger
+
+from waclient.utilities.osc import get_osc_client
 
 
 class ServiceController:
 
     _subprocess = None
-    _osc = None
-
-    def _send_message(self, address, *values):
-        assert self._subprocess
-        return self._osc.send_message(address, values=values)
+    _osc_client = None
 
     def start_service(self):
         assert not self._subprocess
         from waclient.common_config import ROOT_DIR
         self._subprocess = subprocess.Popen([sys.executable, "-m", "waclient.background_service"],
                                             shell=False, cwd=ROOT_DIR)
-        self._osc = OSCClient(address='127.0.0.1', port=8765, encoding="utf8")
+        self._osc_client = get_osc_client(to_master=False)
         # TODO - wait for remote server to be pingable?
+        atexit.register(self.stop_service)  # Protection against ctrl-C
+
+    def _send_message(self, address, *values):
+        logger.debug("Message sent to service: %s", address)
+        assert self._subprocess
+        return self._osc_client.send_message(address, values=values)
 
     def ping(self):
         assert self._subprocess

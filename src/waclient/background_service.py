@@ -6,27 +6,19 @@ from configparser import Error as ConfigParserError
 from decorator import decorator
 from kivy.config import ConfigParser
 from kivy.logger import Logger as logger
+from oscpy.client import OSCClient
 from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.common_config import CONFIG_FILE
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
+from waclient.utilities import swallow_exception
+from waclient.utilities.osc import get_osc_server, get_osc_client
 
-osc = OSCThreadServer(encoding="utf8")
+osc = get_osc_server(is_master=False)
+
 # FIXME what happens if exception on remote OSC endpoint ? CRASH!!
 # TODO add custom "local escrow resolver"
 # TODO add exception swallowers, and logging pushed to frontend app (if present)
-
-
-@decorator
-def swallow_exception(f, *args, **kwargs):
-    try:
-        return f(*args, **kwargs)
-    except Exception as exc:
-        try:
-            logger.error(f"Caught unhandled exception in call of function {f!r}: {exc!r}")
-        except Exception as exc2:
-            print("Beware, service callback {f!r} and logging system are both broken: {exc2!r}")
-
 
 @ServerClass
 class BackgroundServer(object):
@@ -44,9 +36,13 @@ class BackgroundServer(object):
 
     def __init__(self):
         logger.info("Starting service")
-        self._sock = osc.listen(address='127.0.0.1', port=8765, family='inet', default=True)
         self._termination_event = threading.Event()
+        self._osc_client = self._osc_client = get_osc_client(to_master=True)
         logger.info("Service started")
+
+    def _send_message(self, address, *values):
+        logger.info("Message sent from service to app: %s", address)
+        return self._osc_client.send_message(address, values=values)
 
     def _load_config(self, filename=CONFIG_FILE):
         config = ConfigParser(name='service')
@@ -65,11 +61,11 @@ class BackgroundServer(object):
     @swallow_exception
     def ping(self):
         logger.info("Ping successful!")
+        self._send_message("/log_output", "Pong")
 
     @osc.address_method('/start_recording')
     @swallow_exception
     def start_recording(self):
-        #print("Config:", config.getdefault("usersettings", "language", "ITALIANO"))
         if self.is_recording:
             logger.warning("Ignoring call to service.start_recording(), since recording is already started")
             return

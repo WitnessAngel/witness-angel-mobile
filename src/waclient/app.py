@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 from pathlib import Path
 
 import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
+from oscpy.server import OSCThreadServer, ServerClass
 
+from waclient.utilities import swallow_exception
 from waclient.utilities.i18n import Lang
+from waclient.utilities.osc import get_osc_server
 
 kivy.require("1.8.0")
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.logger import Logger
+from kivy.logger import Logger as logger
 from kivy.properties import BoundedNumericProperty, ObjectProperty
 from kivy.uix.carousel import Carousel
 from os.path import join, dirname
@@ -27,6 +31,10 @@ TIMER_OPTIONS = {
 tr = Lang("en")
 
 
+osc = get_osc_server(is_master=True)
+
+
+@ServerClass
 class WitnessAngelClientApp(App):
     """Simple Slideshow App with a user defined title.
 
@@ -48,6 +56,8 @@ class WitnessAngelClientApp(App):
 
     use_kivy_settings = True  # TODO disable this in prod
 
+    _sock = None
+
     def __init__(self, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.settings_cls = SettingsWithTabbedPanel
@@ -56,13 +66,13 @@ class WitnessAngelClientApp(App):
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
-        Logger.debug("Starting timer")
+        logger.debug("Starting timer")
         Clock.schedule_interval(self._update_timer, self.timer_interval)
         self.progress_bar.fade_in()
 
     def stop_timer(self, *args, **kwargs):
         """Reset the timer and unschedule the update routine."""
-        Logger.debug("Stopping timer")
+        logger.debug("Stopping timer")
         Clock.unschedule(self._update_timer)
         self.progress_bar.fade_out()
         self.timer = 0
@@ -95,6 +105,8 @@ class WitnessAngelClientApp(App):
         self.start_timer()
         self.carousel.bind(on_touch_down=self.stop_timer)
         self.carousel.bind(current_slide=self.delay_timer)
+
+        self._console_output = self.root.ids.kivy_console.console_output
         return self.root
 
     def build_config(self, config):
@@ -157,12 +169,12 @@ class WitnessAngelClientApp(App):
         except ValueError:
             self.stop_timer()
             self.carousel.load_next()
-            Logger.debug("Automatically loading next slide")
+            logger.debug("Automatically loading next slide")
 
-    def log_output(self, msg):
-        print(">>>>>>ROOT IDS:", self.root.ids)
-
-        self.root.ids.kivy_console.console_output.add_text(msg)
+    @osc.address_method('/log_output')
+    @swallow_exception
+    def log_output(self, msg=None, *args):
+        self._console_output.add_text(msg)
 
     def get_path(self, sd_path):
         """Called when a file is selected in the File Chooser Widget."""
