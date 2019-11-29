@@ -185,11 +185,28 @@ class WitnessAngelClientApp(App):
         """
         self._console_output.add_text(msg)
 
+    def switch_to_recording_state(self, is_recording):
+        #print(">--->>switch_to_recording_state", is_recording)
+        self.root.ids.recording_btn.disabled = True
+        if is_recording:
+            self.service_controller.start_recording()
+        else:
+            self.service_controller.stop_recording()
+        # TODO - schedule here broadcast_recording_state() calls if OSC is not safe enough..
+
     @osc.address_method('/log_output')
     @swallow_exception
     def _post_log_output(self, msg):
         callback = functools.partial(self.log_output, msg)
         Clock.schedule_once(callback)
+
+    @osc.address_method('/receive_recording_state')
+    @swallow_exception
+    def receive_recording_state(self, is_recording):
+        #print(">>>>>receive_recording_state", is_recording)
+        expected_state = "down" if is_recording else "normal"
+        self.root.ids.recording_btn.state = expected_state
+        self.root.ids.recording_btn.disabled = False
 
     def get_path(self, sd_path):
         """Called when a file is selected in the File Chooser Widget."""

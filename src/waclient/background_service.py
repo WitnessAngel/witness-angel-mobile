@@ -42,10 +42,10 @@ class BackgroundServer(object):
     _recording_toolchain = None
 
     def __init__(self):
+        logger.info("Starting service")  # Will not be sent to App (too early)
+        self._osc_client = get_osc_client(to_master=True)
         logging.getLogger(None).addHandler(CallbackHandler(self._remote_logging_callback))
-        logger.info("Starting service")
         self._termination_event = threading.Event()
-        self._osc_client = self._osc_client = get_osc_client(to_master=True)
         logger.info("Service started")
 
     def _remote_logging_callback(self, msg):
@@ -85,11 +85,18 @@ class BackgroundServer(object):
             config = self._load_config()
             self._recording_toolchain = build_recording_toolchain(config)
         start_recording_toolchain(self._recording_toolchain)
+        self.broadcast_recording_state()
         logger.info("Recording started")
 
     @property
     def is_recording(self):
         return self._recording_toolchain and self._recording_toolchain["sensors_manager"].is_running
+
+    @osc.address_method('/broadcast_recording_state')
+    @swallow_exception
+    def broadcast_recording_state(self):
+        logger.info("Broadcasting recording state")  # TODO make this DEBUG
+        self._send_message("/receive_recording_state", self.is_recording)
 
     @osc.address_method('/stop_recording')
     @swallow_exception
@@ -99,6 +106,7 @@ class BackgroundServer(object):
             return
         logger.info("Stopping recording")
         stop_recording_toolchain(self._recording_toolchain)
+        self.broadcast_recording_state()
         logger.info("Recording stopped")
 
     @osc.address_method('/stop_server')

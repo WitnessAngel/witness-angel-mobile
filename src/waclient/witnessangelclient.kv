@@ -107,10 +107,10 @@ ScreenManager:
 
             ToggleButton:
                 id: recording_btn
-                text: tr._('Start Angel Witness') if self.state == 'normal' else tr._('Angel Witness is recording')
+                text: tr._('Start Angel Witness') if self.state == 'normal' else tr._('Stop Angel Witness')
                 pos_hint: {'center_x': 0.5}
                 size_hint: (0.7, 0.2)
-                on_state: app.service_controller.stop_recording() if self.state == 'normal' else app.service_controller.start_recording()
+                on_state: app.switch_to_recording_state(is_recording=(self.state == "down"))
 
             KivyConsole:
                 id: kivy_console

@@ -44,3 +44,6 @@ class ServiceController:
 
     def stop_recording(self):
         self._send_message("/stop_recording")
+
+    def broadcast_recording_state(self):
+        self._send_message("/broadcast_recording_state")
