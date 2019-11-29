@@ -33,7 +33,7 @@ def build_recording_toolchain(config):
         tarfile_aggregator=tarfile_aggregator,
         sensor_name="gyroscope")
 
-    gyroscope_sensor = get_periodic_value_provider_gyroscope(json_aggregator=gyroscope_json_aggregator, default_poll_interval_s=0.1)
+    gyroscope_sensor = get_periodic_value_provider_gyroscope(json_aggregator=gyroscope_json_aggregator, default_poll_interval_s=0.5)
 
     sensors = [gyroscope_sensor]
     sensors_manager = SensorManager(sensors=sensors)

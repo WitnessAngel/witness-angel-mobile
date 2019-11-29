@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
+import functools
+import logging
 import os
+import threading
 import time
 from pathlib import Path
 
@@ -10,6 +12,7 @@ from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.utilities import swallow_exception
 from waclient.utilities.i18n import Lang
+from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.osc import get_osc_server
 
 kivy.require("1.8.0")
@@ -61,8 +64,6 @@ class WitnessAngelClientApp(App):
     def __init__(self, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.settings_cls = SettingsWithTabbedPanel
-        self.service_controller = ServiceController()
-        self.service_controller.start_service()
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
@@ -154,7 +155,14 @@ class WitnessAngelClientApp(App):
         initialization (after build() has been called) but before the
         application has started running.
         '''
-        pass
+        self.service_controller = ServiceController()
+        self.service_controller.start_service()
+
+        # Push root logger traffic to GUI console
+        logging.getLogger(None).addHandler(CallbackHandler(self.log_output))
+
+        #import logging_tree
+        #logging_tree.printout()
 
     def on_stop(self):
         '''Event handler for the `on_stop` event which is fired when the
@@ -171,10 +179,17 @@ class WitnessAngelClientApp(App):
             self.carousel.load_next()
             logger.debug("Automatically loading next slide")
 
+    def log_output(self, msg, *args, **kwargs):
+        """
+        Extra args/kwargs are for example the "dt" parameter of Clock callbacks.
+        """
+        self._console_output.add_text(msg)
+
     @osc.address_method('/log_output')
     @swallow_exception
-    def log_output(self, msg=None, *args):
-        self._console_output.add_text(msg)
+    def _post_log_output(self, msg):
+        callback = functools.partial(self.log_output, msg)
+        Clock.schedule_once(callback)
 
     def get_path(self, sd_path):
         """Called when a file is selected in the File Chooser Widget."""

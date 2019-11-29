@@ -1,4 +1,9 @@
+
+import os
+
 import contextlib
+import functools
+import logging
 import os
 import threading
 from configparser import Error as ConfigParserError
@@ -8,6 +13,8 @@ from kivy.config import ConfigParser
 from kivy.logger import Logger as logger
 from oscpy.client import OSCClient
 from oscpy.server import OSCThreadServer, ServerClass
+
+from waclient.utilities.logging import CallbackHandler
 
 from waclient.common_config import CONFIG_FILE
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
@@ -35,10 +42,14 @@ class BackgroundServer(object):
     _recording_toolchain = None
 
     def __init__(self):
+        logging.getLogger(None).addHandler(CallbackHandler(self._remote_logging_callback))
         logger.info("Starting service")
         self._termination_event = threading.Event()
         self._osc_client = self._osc_client = get_osc_client(to_master=True)
         logger.info("Service started")
+
+    def _remote_logging_callback(self, msg):
+        return self._osc_client.send_message("/log_output", values=["Service: "+ msg])
 
     def _send_message(self, address, *values):
         logger.info("Message sent from service to app: %s", address)
