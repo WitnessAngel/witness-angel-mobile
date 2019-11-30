@@ -222,12 +222,17 @@ class WitnessAngelClientApp(App):
      #   print(Path(__file__).parents[2] / "data")
      #   self.path = sd_path
 
-    def get_stat(self, filepath):
+    def get_container_info(self, filepath):
         """Just a test of the path usability of the
          widget FileChooserListView
          """
         #print("-----> STATING", filepath)
-        return os.stat(filepath)
+        if not filepath:
+            return "Please select a container"
+        try:
+            return str(os.stat(filepath).st_size)
+        except FileNotFoundError:
+            return "This file was deleted"
 
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)

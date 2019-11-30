@@ -51,6 +51,12 @@
         tab_width: '200dp'  # ADDED THIS
 
 
+<ConsoleOutput>:
+    readonly: True
+    padding: 6, 6
+    size_hint: (1, None)
+
+
 <KivyConsole>:
     console_output: console_output
     scroll_view: scroll_view
@@ -59,15 +65,11 @@
         bar_width: 10
         ConsoleOutput:
             id: console_output
-            readonly: True
-            padding: 6, 6
-            size_hint: (1, None)
+            height: max(self.parent.height, self.minimum_height)
             font_name: root.font_name
-            font_size: root.font_size
+            font_size: root.font_size - 1
             foreground_color: root.foreground_color
             background_color: root.background_color
-            height: max(self.parent.height, self.minimum_height)
-
 
 ScreenManager:
 
@@ -140,21 +142,34 @@ ScreenManager:
                     ActionPrevious:
                         with_previous: True
                         on_release: root.current = "dashboard"
+                    ActionOverflow:
+                    ActionButton:
+                        text: tr._('Refresh')
+                        on_release: filebrowser._trigger_update()
 
             FileChooserListView:
                 id: filebrowser
                 #on_selection: app.get_path(self.selection[0])
                 path: app.internal_containers_dir()
-                #rootpath: xxx
-                #filter: <lambda callbac khere>
+                rootpath: app.internal_containers_dir()
+                filters: ["*.crypt"]
+                multiselect: False
 
             Splitter:
                 sizable_from: 'top'
                 min_size: 20
                 rescale_with_parent: False
-                Label:
-                    text: tr._("Please select a file") if not filebrowser.selection else str(app.get_stat(filebrowser.selection[0]))
+                #Label:
+                #    text: tr._("Please select a file") if not filebrowser.selection else str(app.get_stat(filebrowser.selection[0]))
                     # Here we just print the stats of the folder to check if we can read a foler.
+                ConsoleOutput:
+                    id: file_info
+                    text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
+                    #height: max(self.parent.height, self.minimum_height)
+                    font_name: kivy_console.font_name
+                    font_size: kivy_console.font_size - 1
+                    foreground_color: kivy_console.foreground_color
+                    background_color: kivy_console.background_color
 
     Screen:  # This is and old demo of carousel!
         name: "settings"
