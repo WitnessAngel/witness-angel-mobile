@@ -1,21 +1,32 @@
-
+import importlib
 
 from plyer import gyroscope
+from plyer.utils import platform
+
 from wacryptolib.sensor import JsonAggregator, PeriodicValuePoller
 
+try:
+    importlib.import_module('plyer.platforms.{}.{}'.format(platform, "gyroscope"))
+    gyroscope_is_implemented = True
+except ImportError:
+    gyroscope_is_implemented = False
 
 def get_periodic_value_provider(json_aggregator, default_poll_interval_s):
 
     def get_gyroscope_rotation():
-        try:
-            rotation = gyroscope.rotation
-        except NotImplementedError:
-            # TODO logging or warnings here?
-            rotation = (None, None, None)
-        rotation_dict = {"rotation_x": rotation[0],
-                         "rotation_y": rotation[1],
-                         "rotation_z": rotation[2]}
-        print("Returning rotation", rotation_dict)
+        rotation_rate = None
+        if gyroscope_is_implemented:
+            try:
+                rotation_rate = gyroscope.rotation
+            except NotImplementedError:
+                pass  # TODO logging or warnings here?
+        if rotation_rate is None:
+            rotation_rate = (None, None, None)
+
+        rotation_dict = {"rotation_rate_x": rotation_rate[0],
+                         "rotation_rate_y": rotation_rate[1],
+                         "rotation_rate_z": rotation_rate[2]}
+        print("> got rotation rate", rotation_dict)
         return rotation_dict
 
     poller = PeriodicValuePoller(

@@ -62,7 +62,7 @@ def stop_recording_toolchain(toolchain):
 
     # TODO push all this to sensor manager!!
 
-    logger.info("stop_recording_toolchain starts")
+    #logger.info("stop_recording_toolchain starts")
 
     sensors_manager=toolchain["sensors_manager"]
     data_aggregators=toolchain["data_aggregators"]
@@ -74,13 +74,13 @@ def stop_recording_toolchain(toolchain):
     logger.info("Joining sensors manager")
     sensors_manager.join()
 
-    logger.info("Flushing data aggregators")
-    for data_aggregator in data_aggregators:
+    for idx, data_aggregator in enumerate(data_aggregators, start=1):
+        logger.info("Flushing data aggregator #%d", idx)
         data_aggregator.flush_dataset()
 
-    logger.info("Flushing tarfile aggregators")
-    for tarfile_aggregator in tarfile_aggregators:
+    for idx, tarfile_aggregator in enumerate(tarfile_aggregators, start=1):
+        logger.info("Flushing tarfile aggregator #%d", idx)
         tarfile_aggregator.finalize_tarfile()
 
-    logger.info("stop_recording_toolchain exits")
+    #logger.info("stop_recording_toolchain exits")
 
