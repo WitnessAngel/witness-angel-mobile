@@ -1,18 +1,34 @@
 [
     {
-        "title": "Timer Interval",
+        "title": "Max containers count",
         "type": "options",
         "section": "usersettings",
-        "key": "timer_interval",
-        "options": ["1/60 sec", "1/30 sec", "1/15 sec"],
-        "desc": "Changes the delay after which the timer is being updated."
+        "key": "max_containers_count",
+        "options": ["10", "100", "1000", "10000"],
+        "desc": "The max number of encrypted containers to store in-app."
     },
     {
-        "title": "Language",
+        "title": "Container recording duration",
         "type": "options",
         "section": "usersettings",
-        "key": "language",
-        "options": ["en", "es", "de", "fr"],
-        "desc": "Changes the display language of the application."
+        "key": "container_recording_duration_s",
+        "options": ["10", "60", "120", "600", "3600"],
+        "desc": "How many seconds of recording each container must store."
+    },
+    {
+        "title": "Container member duration",
+        "type": "options",
+        "section": "usersettings",
+        "key": "container_member_duration_s",
+        "options": ["10", "60", "120", "600", "3600"],
+        "desc": "How many seconds of recording each file inside a container must store."
+    },
+    {
+        "title": "Polling interval",
+        "type": "options",
+        "section": "usersettings",
+        "key": "polling_interval_s",
+        "options": ["0.5", "1", "5", "10", "30"],
+        "desc": "Min interval between value retrievals (gps, sensors...)."
     }
 ]

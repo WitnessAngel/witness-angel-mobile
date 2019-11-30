@@ -84,16 +84,16 @@ ScreenManager:
                 ActionView:
                     use_separator: True
                     ActionPrevious:
-                        title: tr._('My WA Action Bar')
+                        title: tr._('Witness Angel')
                         with_previous: False
                     ActionOverflow:
                     #ActionButton:
                     #    icon: 'atlas://data/images/defaulttheme/overflow'
+                    #ActionButton:
+                    #    text: tr._('LogTest')
+                    #    on_release: app.log_output("Time: %d" % time())
                     ActionButton:
-                        text: tr._('LogTest')
-                        on_release: app.log_output("Time: %d" % time())
-                    ActionButton:
-                        text: tr._('Files')
+                        text: tr._('Containers')
                         on_release: root.current = "containers"
     #                ActionGroup:
     #                    text: 'Group1'

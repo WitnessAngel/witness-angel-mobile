@@ -11,7 +11,7 @@ try:
 except ImportError:
     gyroscope_is_implemented = False
 
-def get_periodic_value_provider(json_aggregator, default_poll_interval_s):
+def get_periodic_value_provider(json_aggregator, polling_interval_s):
 
     def get_gyroscope_rotation():
         rotation_rate = None
@@ -30,6 +30,6 @@ def get_periodic_value_provider(json_aggregator, default_poll_interval_s):
         return rotation_dict
 
     poller = PeriodicValuePoller(
-        interval_s=default_poll_interval_s, task_func=get_gyroscope_rotation, json_aggregator=json_aggregator)
+        interval_s=polling_interval_s, task_func=get_gyroscope_rotation, json_aggregator=json_aggregator)
 
     return poller

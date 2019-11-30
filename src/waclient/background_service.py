@@ -1,5 +1,5 @@
 import os
-os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
+#os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
 
 import contextlib
 import functools
@@ -52,7 +52,7 @@ class BackgroundServer(object):
         return self._osc_client.send_message("/log_output", values=["Service: "+ msg])
 
     def _send_message(self, address, *values):
-        logger.info("Message sent from service to app: %s", address)
+        logger.debug("Message sent from service to app: %s", address)
         return self._osc_client.send_message(address, values=values)
 
     def _load_config(self, filename=CONFIG_FILE):

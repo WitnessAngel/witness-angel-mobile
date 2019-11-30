@@ -10,8 +10,6 @@ from wacryptolib.container import extract_metadata_from_container
 from wacryptolib.utilities import load_from_json_file
 
 os.environ["KIVY_NO_ARGS"] = "1"
-custom_kivy_stream_handler = logging.StreamHandler()
-sys._kivy_logging_handler = custom_kivy_stream_handler
 
 
 import functools

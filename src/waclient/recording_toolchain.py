@@ -18,22 +18,36 @@ osc = OSCThreadServer(encoding="utf8")
 def build_recording_toolchain(config):
     """Instantiate the whole toolchain of sensors and aggregators, depending on the config."""
 
-    get_conf_value = functools.partial(config.getdefault, "usersettings")
+    def get_conf_value(*args, converter=None, **kwargs):
+        value = config.getdefault("usersettings", *args, **kwargs)
+        if converter:
+            value = converter(value)
+        return value
+
+    max_containers_count=get_conf_value("max_containers_count", 100, converter=int)
+    container_recording_duration_s=get_conf_value("container_recording_duration_s", 60, converter=float)
+    container_member_duration_s=get_conf_value("container_member_duration_s", 60, converter=float)
+    polling_interval_s=get_conf_value("polling_interval_s", 1.0, converter=float)
+
+    logger.info("Toolchain configuration is %s",
+                str(dict(max_containers_count=max_containers_count,
+                         container_recording_duration_s=container_recording_duration_s,
+                         container_member_duration_s=container_member_duration_s,
+                         polling_interval_s=polling_interval_s)))
 
     container_storage = ContainerStorage(encryption_conf=ENCRYTION_CONF,
                                          output_dir=INTERNAL_CONTAINERS_DIR,
-                                         max_containers_count=get_conf_value("max_containers_count", 100))
+                                         max_containers_count=max_containers_count)
 
     tarfile_aggregator = TarfileAggregator(
-        container_storage=container_storage, max_duration_s=get_conf_value("max_duration_s", 60)
-    )
+        container_storage=container_storage, max_duration_s=container_recording_duration_s)
 
     gyroscope_json_aggregator = JsonAggregator(
-        max_duration_s=get_conf_value("max_duration_s", 60),
+        max_duration_s=container_member_duration_s,
         tarfile_aggregator=tarfile_aggregator,
         sensor_name="gyroscope")
 
-    gyroscope_sensor = get_periodic_value_provider_gyroscope(json_aggregator=gyroscope_json_aggregator, default_poll_interval_s=0.5)
+    gyroscope_sensor = get_periodic_value_provider_gyroscope(json_aggregator=gyroscope_json_aggregator, polling_interval_s=polling_interval_s)
 
     sensors = [gyroscope_sensor]
     sensors_manager = SensorManager(sensors=sensors)
