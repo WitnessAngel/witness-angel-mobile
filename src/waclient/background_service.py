@@ -57,7 +57,7 @@ class BackgroundServer(object):
 
     def _load_config(self, filename=CONFIG_FILE):
         config = ConfigParser(name='service')
-        logger.info(f"Service loading config file {filename}")
+        logger.info(f"Loading config file {filename}")
         try:
             if not os.path.exists(filename):
                 raise FileNotFoundError(filename)
@@ -90,7 +90,7 @@ class BackgroundServer(object):
 
     @property
     def is_recording(self):
-        return self._recording_toolchain and self._recording_toolchain["sensors_manager"].is_running
+        return bool(self._recording_toolchain and self._recording_toolchain["sensors_manager"].is_running)
 
     @osc.address_method('/broadcast_recording_state')
     @swallow_exception
@@ -106,6 +106,7 @@ class BackgroundServer(object):
             return
         logger.info("Stopping recording")
         stop_recording_toolchain(self._recording_toolchain)
+        self._recording_toolchain = None  # Will force a reload of config on next recording
         self.broadcast_recording_state()
         logger.info("Recording stopped")
 

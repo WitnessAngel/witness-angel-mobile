@@ -4,7 +4,7 @@
         "type": "options",
         "section": "usersettings",
         "key": "max_containers_count",
-        "options": ["10", "100", "1000", "10000"],
+        "options": ["5", "10", "100", "1000", "10000"],
         "desc": "The max number of encrypted containers to store in-app."
     },
     {
@@ -12,7 +12,7 @@
         "type": "options",
         "section": "usersettings",
         "key": "container_recording_duration_s",
-        "options": ["10", "60", "120", "600", "3600"],
+        "options": ["5", "10", "30", "60", "120", "600", "3600"],
         "desc": "How many seconds of recording each container must store."
     },
     {
@@ -20,7 +20,7 @@
         "type": "options",
         "section": "usersettings",
         "key": "container_member_duration_s",
-        "options": ["10", "60", "120", "600", "3600"],
+        "options": ["5", "10", "30", "60", "120", "600", "3600"],
         "desc": "How many seconds of recording each file inside a container must store."
     },
     {
@@ -30,5 +30,13 @@
         "key": "polling_interval_s",
         "options": ["0.5", "1", "5", "10", "30"],
         "desc": "Min interval between value retrievals (gps, sensors...)."
+    },
+    {
+        "title": "Language",
+        "type": "options",
+        "section": "usersettings",
+        "key": "language",
+        "options": ["en"],
+        "desc": "The display language of the application."
     }
 ]

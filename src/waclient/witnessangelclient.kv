@@ -133,6 +133,8 @@ ScreenManager:
 
     Screen
         name: "containers"
+        on_pre_enter: filebrowser._trigger_update()
+
         BoxLayout:
             orientation: 'vertical'
 

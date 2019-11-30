@@ -70,7 +70,7 @@ class WitnessAngelClientApp(App):
     carousel = ObjectProperty(Carousel)
     language = None
 
-    use_kivy_settings = True  # TODO disable this in prod
+    use_kivy_settings = False  # TODO disable this in prod
 
     _sock = None
 
@@ -109,16 +109,18 @@ class WitnessAngelClientApp(App):
         self.language = self.config.get("usersettings", "language")
         tr.switch_lang(self.language)
 
-        user_interval = self.config.get("usersettings", "timer_interval")
-        self.timer_interval = TIMER_OPTIONS[user_interval]
+        #user_interval = self.config.get("usersettings", "timer_interval")
+        #self.timer_interval = TIMER_OPTIONS[user_interval]
 
         self.carousel = self.root.ids.carousel
         self.progress_bar = self.root.ids.progress_bar
         self.progress_bar.max = self.property("timer").get_max(self)
 
+        """
         self.start_timer()
         self.carousel.bind(on_touch_down=self.stop_timer)
         self.carousel.bind(current_slide=self.delay_timer)
+        """
 
         self._console_output = self.root.ids.kivy_console.console_output
         return self.root
@@ -127,9 +129,12 @@ class WitnessAngelClientApp(App):
         """Create a config file on disk and assign the ConfigParser object to
         `self.config`.
         """
+        config.add_section("usersettings")
+        """
         config.setdefaults(
                 section="usersettings", keyvalues={"timer_interval": "1/60 sec", "language": "en"}
         )
+        """
 
     def build_settings(self, settings):
         """Read the user settings and create a panel from it."""
@@ -143,12 +148,15 @@ class WitnessAngelClientApp(App):
         panel. If `timer_interval` is being changed update the instance
         variable of the same name accordingly.
         """
+        pass
+        """
         if config is self.config:
             token = (section, key)
             if token == ("usersettings", "timer_interval"):
                 self.timer_interval = TIMER_OPTIONS[value]
             elif token == ("usersettings", "language"):
                 tr.switch_lang(value)
+        """
 
     def on_pause(self):
         """Enables the user to switch to another application causing
