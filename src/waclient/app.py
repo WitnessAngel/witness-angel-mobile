@@ -3,6 +3,12 @@
 
 import os, sys
 import logging
+
+from kivy.uix.filechooser import filesize_units
+
+from wacryptolib.container import extract_metadata_from_container
+from wacryptolib.utilities import load_from_json_file
+
 os.environ["KIVY_NO_ARGS"] = "1"
 custom_kivy_stream_handler = logging.StreamHandler()
 sys._kivy_logging_handler = custom_kivy_stream_handler
@@ -222,6 +228,14 @@ class WitnessAngelClientApp(App):
      #   print(Path(__file__).parents[2] / "data")
      #   self.path = sd_path
 
+    @staticmethod
+    def get_nice_size(size):
+        for unit in filesize_units:
+            if size < 1024.0:
+                return '%1.0f %s' % (size, unit)
+            size /= 1024.0
+        return size
+
     def get_container_info(self, filepath):
         """Just a test of the path usability of the
          widget FileChooserListView
@@ -229,10 +243,24 @@ class WitnessAngelClientApp(App):
         #print("-----> STATING", filepath)
         if not filepath:
             return "Please select a container"
+        filename = os.path.basename(filepath)
         try:
-            return str(os.stat(filepath).st_size)
+            container = load_from_json_file(filepath)
+            metadata = extract_metadata_from_container(container)
+            if not metadata:
+                return "No metadata found in container"
+            info_lines = ["MEMBERS:"]
+            for member_name, member_metadata in sorted(metadata["members"].items()):
+                #TODO later add more info
+                nice_size = self.get_nice_size(member_metadata["size"])
+                info_lines.append("- %s (%s)" % (member_name, nice_size))
+            return "\n".join(info_lines)
+            #return str(os.stat(filepath).st_size)
         except FileNotFoundError:
-            return "This file was deleted"
+            return "This container was deleted"
+        except Exception as exc:
+            logging.error("Error when reading container %s: %r", filename, exc)
+            return "Container analysis failed"
 
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)

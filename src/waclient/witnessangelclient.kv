@@ -165,7 +165,7 @@ ScreenManager:
                 ConsoleOutput:
                     id: file_info
                     text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
-                    #height: max(self.parent.height, self.minimum_height)
+                    height: max(self.parent.height, self.minimum_height)
                     font_name: kivy_console.font_name
                     font_size: kivy_console.font_size - 1
                     foreground_color: kivy_console.foreground_color
