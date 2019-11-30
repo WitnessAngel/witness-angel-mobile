@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-
+import threading
 import webbrowser
 
+import sys
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.base import runTouchApp
@@ -49,6 +50,7 @@ class TransitionProgress(ProgressBar):
 class ConsoleOutput(TextInput):
 
     # __events__ = ('on_start', )
+    _add_text_is_in_progress = False
 
     def __init__(self, **kwargs):
         super(ConsoleOutput, self).__init__(**kwargs)
@@ -62,15 +64,24 @@ class ConsoleOutput(TextInput):
         self.parent.scroll_y = 0
 
     def add_text(self, text):
-        text += "\n"
-        is_locked = self.is_at_bottom()
-        self.text += text
-        self.parent.scroll_y = 0
-        if is_locked:
-            self.scroll_to_bottom()
-            # print("FORCE SCROLL", self.parent.scroll_y)
-            # self.parent.scroll_y = 1  # lock-to-bottom behaviour
-        ##print(output)
+        if self._add_text_is_in_progress:
+            return  # Logging recursion happened, typically due to GL events
+        self._add_text_is_in_progress = True
+        try:
+            text += "\n"
+            #print(">>>adding text", repr(text), "from", threading.get_ident(), "to", repr(self.text))
+            #import traceback
+            #traceback.print_stack(file=sys.stdout)
+            is_locked = self.is_at_bottom()
+            self.text += text
+            self.parent.scroll_y = 0
+            if is_locked:
+                self.scroll_to_bottom()
+                # print("FORCE SCROLL", self.parent.scroll_y)
+                # self.parent.scroll_y = 1  # lock-to-bottom behaviour
+        finally:
+            self._add_text_is_in_progress = False
+        #print("####", repr(self.text[:200]))
         # Clock.schedule_once(self.parent.scroll_y = 1)
 
     def my_on_start(self, *args, **kwargs):

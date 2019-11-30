@@ -143,8 +143,8 @@ ScreenManager:
 
             FileChooserListView:
                 id: filebrowser
-                on_selection: app.get_path(self.selection[0])
-                path: app.init_dir()
+                #on_selection: app.get_path(self.selection[0])
+                path: app.internal_containers_dir()
                 #rootpath: xxx
                 #filter: <lambda callbac khere>
 
@@ -153,7 +153,7 @@ ScreenManager:
                 min_size: 20
                 rescale_with_parent: False
                 Label:
-                    text: tr._("Please select a file") if str(filebrowser.selection) =='[]' else str(app.get_stat)
+                    text: tr._("Please select a file") if not filebrowser.selection else str(app.get_stat(filebrowser.selection[0]))
                     # Here we just print the stats of the folder to check if we can read a foler.
 
     Screen:  # This is and old demo of carousel!

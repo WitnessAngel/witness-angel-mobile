@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
-import functools
+
+
+import os, sys
 import logging
-import os
+os.environ["KIVY_NO_ARGS"] = "1"
+custom_kivy_stream_handler = logging.StreamHandler()
+sys._kivy_logging_handler = custom_kivy_stream_handler
+
+
+import functools
+
 import threading
 import time
 from pathlib import Path
@@ -10,6 +18,7 @@ import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 from oscpy.server import OSCThreadServer, ServerClass
 
+from waclient.common_config import INTERNAL_CONTAINERS_DIR
 from waclient.utilities import swallow_exception
 from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
@@ -208,16 +217,17 @@ class WitnessAngelClientApp(App):
         self.root.ids.recording_btn.state = expected_state
         self.root.ids.recording_btn.disabled = False
 
-    def get_path(self, sd_path):
-        """Called when a file is selected in the File Chooser Widget."""
-        print(Path(__file__).parents[2] / "data")
-        self.path = sd_path
+    #def get_path(self, sd_path):
+     #   """Called when a file is selected in the File Chooser Widget."""
+     #   print(Path(__file__).parents[2] / "data")
+     #   self.path = sd_path
 
-    def get_stat(self):
+    def get_stat(self, filepath):
         """Just a test of the path usability of the
          widget FileChooserListView
          """
-        return os.stat(self.path)
+        #print("-----> STATING", filepath)
+        return os.stat(filepath)
 
-    def init_dir(self):
-        return str(Path(__file__).parents[2] / "tests")
+    def internal_containers_dir(self):
+        return str(INTERNAL_CONTAINERS_DIR)
