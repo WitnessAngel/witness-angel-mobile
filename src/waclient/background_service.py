@@ -56,8 +56,8 @@ class BackgroundServer(object):
         return self._osc_client.send_message(address, values=values)
 
     def _load_config(self, filename=CONFIG_FILE):
-        config = ConfigParser(name='service')
-        logger.info(f"Loading config file {filename}")
+        logger.info(f"(Re)loading config file {filename}")
+        config = ConfigParser()  # No NAME here, sicne named parsers must be Singletons in process!
         try:
             if not os.path.exists(filename):
                 raise FileNotFoundError(filename)
@@ -65,7 +65,7 @@ class BackgroundServer(object):
         except ConfigParserError as exc:
             logger.error(f'Service: Ignored missing or corrupted config file {filename}, ignored ({exc!r})')
             raise
-        logger.info(f"Config file {filename} loaded")
+        #logger.info(f"Config file {filename} loaded")
         return config
 
     @osc.address_method('/ping')

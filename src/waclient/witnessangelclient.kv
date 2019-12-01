@@ -173,14 +173,15 @@ ScreenManager:
                 #Label:
                 #    text: tr._("Please select a file") if not filebrowser.selection else str(app.get_stat(filebrowser.selection[0]))
                     # Here we just print the stats of the folder to check if we can read a foler.
-                ConsoleOutput:
-                    id: file_info
-                    text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
-                    height: max(self.parent.height, self.minimum_height)
-                    font_name: kivy_console.font_name
-                    font_size: kivy_console.font_size - 1
-                    foreground_color: kivy_console.foreground_color
-                    background_color: kivy_console.background_color
+                ScrollView:
+                    ConsoleOutput:
+                        id: file_info
+                        text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
+                        height: max(self.parent.height, self.minimum_height)
+                        font_name: kivy_console.font_name
+                        font_size: kivy_console.font_size - 1
+                        foreground_color: kivy_console.foreground_color
+                        background_color: kivy_console.background_color
 
     Screen:  # This is and old demo of carousel!
         name: "settings"
