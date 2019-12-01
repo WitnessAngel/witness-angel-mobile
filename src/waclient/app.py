@@ -268,5 +268,23 @@ class WitnessAngelClientApp(App):
             logging.error("Error when reading container %s: %r", filename, exc)
             return "Container analysis failed"
 
+    def purge_all_containers(self):
+        containers_dir = self.internal_containers_dir()
+        logger.info("Purging all containers from %s", containers_dir)
+        for filename in os.listdir(self.internal_containers_dir()):
+            filepath = os.path.join(containers_dir, filename)
+            os.remove(filepath)
+        self.refresh_filebrowser()
+
+    def refresh_filebrowser(self):
+        #self.root.ids.filebrowser.files = []
+        self.root.ids.filebrowser._update_files()  # _trigger_update()
+        #if not self.root.ids.filebrowser.files:
+        #    self.root.ids.filebrowser.on_entries_cleared() # canvas.ask_update()
+
+        # TODO: test with latest Kivy, else open ticket regarding this part:
+        # "on_entries_cleared: treeview.root.nodes = []" not calling _trigger_layout()
+        self.root.ids.filebrowser.layout.ids.treeview._trigger_layout()  # TEMPORARY
+
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)
