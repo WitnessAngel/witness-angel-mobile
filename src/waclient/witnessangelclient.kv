@@ -103,13 +103,21 @@ ScreenManager:
     #                        text: 'Btn6'
     #                    ActionButton:
     #                        text: 'Btn7'
-                    ActionButton:
+
+                    ActionGroup:
+                        mode: "spinner"
                         icon: 'data/icons/settings3.png'
-                        on_press: app.open_settings()
+                        text: tr._('Settings')
+                        ActionButton:
+                            text: 'Encryption'
+                            on_press: root.current = "hardcoded_conf"
+                        ActionButton:
+                            text: tr._("Preferences")
+                            on_press: app.open_settings()
 
             ToggleButton:
                 id: recording_btn
-                text: tr._('Start Angel Witness') if self.state == 'normal' else tr._('Stop Angel Witness')
+                text: tr._('Start Witness Angel') if self.state == 'normal' else tr._('Stop Witness Angel')
                 pos_hint: {'center_x': 0.5}
                 size_hint: (0.7, 0.2)
                 on_state: app.switch_to_recording_state(is_recording=(self.state == "down"))
@@ -184,6 +192,39 @@ ScreenManager:
                         font_size: kivy_console.font_size - 1
                         foreground_color: kivy_console.foreground_color
                         background_color: kivy_console.background_color
+
+
+    Screen:
+        name: "hardcoded_conf"
+        BoxLayout:
+            orientation: 'vertical'
+
+            ActionBar:
+                pos_hint: {'top':1}
+                ActionView:
+                    ActionPrevious:
+                        title: tr._('Back')
+                        with_previous: True
+                        on_press: root.current = "dashboard"
+                    ActionOverflow:
+            Label:
+                text: tr._("Encryption mode")
+                size_hint: (None, 0.1)
+                pos_hint: {'center': 1}
+                text_size: (self.parent.width, self.height)
+                halign: "center"
+                valign: "middle"
+                #height: "20px"
+                size: self.texture_size
+            ScrollView:
+                ConsoleOutput:
+                    id: encryption_conf
+                    text: app.get_encryption_conf_text()
+                    height: max(self.parent.height, self.minimum_height)
+                    font_name: kivy_console.font_name
+                    font_size: kivy_console.font_size - 1
+                    foreground_color: kivy_console.foreground_color
+                    background_color: kivy_console.background_color
 
     Screen:  # This is and old demo of carousel!
         name: "settings"

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-
-
+import json
 import os, sys
 import logging
 
 from kivy.uix.filechooser import filesize_units
 
 from wacryptolib.container import extract_metadata_from_container
-from wacryptolib.utilities import load_from_json_file
+from wacryptolib.utilities import load_from_json_file, dump_to_json_str
 
 os.environ["KIVY_NO_ARGS"] = "1"
 
@@ -22,7 +21,7 @@ import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 from oscpy.server import OSCThreadServer, ServerClass
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, ENCRYPTION_CONF
 from waclient.utilities import swallow_exception
 from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
@@ -69,6 +68,7 @@ class WitnessAngelClientApp(App):
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
     language = None
+    service_querying_interval = 0.3  # To check when service is ready at start
 
     use_kivy_settings = False  # TODO disable this in prod
 
@@ -182,6 +182,9 @@ class WitnessAngelClientApp(App):
         # Push root logger traffic to GUI console
         logging.getLogger(None).addHandler(CallbackHandler(self.log_output))
 
+        self.root.ids.recording_btn.disabled = True
+        Clock.schedule_interval(self._request_recording_state, self.service_querying_interval)
+
         #import logging_tree
         #logging_tree.printout()
 
@@ -221,6 +224,9 @@ class WitnessAngelClientApp(App):
         callback = functools.partial(self.log_output, msg)
         Clock.schedule_once(callback)
 
+    def _request_recording_state(self, *args, **kwargs):
+        self.service_controller.broadcast_recording_state()
+
     @osc.address_method('/receive_recording_state')
     @swallow_exception
     def receive_recording_state(self, is_recording):
@@ -228,6 +234,7 @@ class WitnessAngelClientApp(App):
         expected_state = "down" if is_recording else "normal"
         self.root.ids.recording_btn.state = expected_state
         self.root.ids.recording_btn.disabled = False
+        Clock.unschedule(self._request_recording_state)
 
     #def get_path(self, sd_path):
      #   """Called when a file is selected in the File Chooser Widget."""
@@ -288,3 +295,6 @@ class WitnessAngelClientApp(App):
 
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)
+
+    def get_encryption_conf_text(self):
+        return dump_to_json_str(ENCRYPTION_CONF, indent=2)

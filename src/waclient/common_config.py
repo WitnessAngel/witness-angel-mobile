@@ -22,7 +22,7 @@ print("APP_DIR", repr(APP_DIR))
 INTERNAL_CONTAINERS_DIR = APP_DIR / ".wacontainers"
 INTERNAL_CONTAINERS_DIR.mkdir(exist_ok=True)
 
-ENCRYTION_CONF = dict(
+ENCRYPTION_CONF = dict(
     data_encryption_strata=[
         dict(
             data_encryption_algo="AES_CBC",

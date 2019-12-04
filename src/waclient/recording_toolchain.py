@@ -2,7 +2,7 @@ import functools
 
 from oscpy.server import OSCThreadServer
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, ENCRYTION_CONF
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, ENCRYPTION_CONF
 from waclient.sensors.gyroscope import get_periodic_value_provider as get_periodic_value_provider_gyroscope
 from wacryptolib.container import ContainerStorage
 from wacryptolib.sensor import TarfileAggregator, JsonAggregator, SensorsManager
@@ -35,7 +35,7 @@ def build_recording_toolchain(config):
                          container_member_duration_s=container_member_duration_s,
                          polling_interval_s=polling_interval_s)))
 
-    container_storage = ContainerStorage(encryption_conf=ENCRYTION_CONF,
+    container_storage = ContainerStorage(encryption_conf=ENCRYPTION_CONF,
                                          containers_dir=INTERNAL_CONTAINERS_DIR,
                                          max_containers_count=max_containers_count)
 
