@@ -77,6 +77,7 @@ class WitnessAngelClientApp(App):
     def __init__(self, **kwargs):
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         self.settings_cls = SettingsWithTabbedPanel
+        osc_starter_callback()  # Opens server port
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
@@ -176,7 +177,6 @@ class WitnessAngelClientApp(App):
         initialization (after build() has been called) but before the
         application has started running.
         '''
-        osc_starter_callback()  # Opens server port
 
         self.service_controller = ServiceController()
         self.service_controller.start_service()

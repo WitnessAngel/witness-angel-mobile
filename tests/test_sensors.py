@@ -30,7 +30,7 @@ def test_gyroscope_sensor():
         sensor_name="test_gyroscope",
     )
 
-    sensor = get_periodic_value_provider(json_aggregator=json_aggregator, default_poll_interval_s=0.1)
+    sensor = get_periodic_value_provider(json_aggregator=json_aggregator, polling_interval_s=0.1)
 
     sensor.start()
 
@@ -50,7 +50,7 @@ def test_gyroscope_sensor():
         sensor_entries = load_from_json_bytes(record["data"])
         assert len(sensor_entries) >= 3
         for sensor_entry in sensor_entries:
-            assert "rotation_x" in sensor_entry, sensor_entry
-            assert "rotation_y" in sensor_entry, sensor_entry
-            assert "rotation_z" in sensor_entry, sensor_entry
+            assert "rotation_rate_x" in sensor_entry, sensor_entry
+            assert "rotation_rate_y" in sensor_entry, sensor_entry
+            assert "rotation_rate_z" in sensor_entry, sensor_entry
 

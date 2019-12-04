@@ -3,14 +3,14 @@ import time
 
 from kivy.config import ConfigParser
 
-from tests._waclient_test_utilities import purge_test_containers
+from _waclient_test_utilities import purge_test_containers
 from waclient.common_config import INTERNAL_CONTAINERS_DIR
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from wacryptolib.sensor import TarfileAggregator
 from wacryptolib.utilities import load_from_json_bytes
 
 
-def test_nominal_recording_case():
+def test_nominal_recording_toolchain_case():
 
     config = ConfigParser()  # Empty but OK
 
@@ -56,5 +56,5 @@ def test_nominal_recording_case():
     gyroscope_data = load_from_json_bytes(json_bytestring)
 
     assert isinstance(gyroscope_data, list)
-    assert len(gyroscope_data) > 15
-    assert gyroscope_data[0] == {'rotation_x': None, 'rotation_y': None, 'rotation_z': None}
+    assert len(gyroscope_data) >= 4
+    assert gyroscope_data[0] == {'rotation_rate_x': None, 'rotation_rate_y': None, 'rotation_rate_z': None}

@@ -1,3 +1,4 @@
+"""
 import pytest
 from click.testing import CliRunner
 
@@ -34,3 +35,4 @@ def test_abort_with_invalid_lang(runner, mock_app):
     result = runner.invoke(main, ["-l", "foobar"])
     assert result.exit_code != 0
     assert not mock_app.called
+"""

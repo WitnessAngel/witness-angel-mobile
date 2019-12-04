@@ -1,6 +1,6 @@
 import time, os
 
-from tests._waclient_test_utilities import purge_test_containers, list_test_containers
+from _waclient_test_utilities import purge_test_containers, list_test_containers
 from waclient.service_controller import ServiceController
 
 
