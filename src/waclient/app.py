@@ -295,6 +295,10 @@ class WitnessAngelClientApp(App):
         # "on_entries_cleared: treeview.root.nodes = []" not calling _trigger_layout()
         self.root.ids.filebrowser.layout.ids.treeview._trigger_layout()  # TEMPORARY
 
+    def attempt_container_decryption(self, filepath):
+        filename = os.path.basename(filepath)
+        logger.info("Decryption requested for container %s", filename)
+
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)
 

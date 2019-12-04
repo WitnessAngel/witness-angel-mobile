@@ -165,11 +165,11 @@ ScreenManager:
                             text: ' '
                         ActionButton:
                             text: '/!\ PURGE'
-                            on_press: app.purge_all_containers()
+                            on_press: app.purge_all_containers(); filebrowser.selection = []
 
             FileChooserListView:
                 id: filebrowser
-                #on_selection: app.get_path(self.selection[0])
+                on_selection: decryption_request_btn.disabled = not bool(self.selection)
                 path: app.internal_containers_dir()
                 rootpath: app.internal_containers_dir()
                 filters: ["*.crypt"]
@@ -183,15 +183,24 @@ ScreenManager:
                 #Label:
                 #    text: tr._("Please select a file") if not filebrowser.selection else str(app.get_stat(filebrowser.selection[0]))
                     # Here we just print the stats of the folder to check if we can read a foler.
-                ScrollView:
-                    ConsoleOutput:
-                        id: file_info
-                        text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
-                        height: max(self.parent.height, self.minimum_height)
-                        font_name: kivy_console.font_name
-                        font_size: kivy_console.font_size - 1
-                        foreground_color: kivy_console.foreground_color
-                        background_color: kivy_console.background_color
+                BoxLayout:
+                    orientation: 'vertical'
+                    ScrollView:
+                        ConsoleOutput:
+                            id: file_info
+                            text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
+                            height: max(self.parent.height, self.minimum_height)
+                            font_name: kivy_console.font_name
+                            font_size: kivy_console.font_size - 1
+                            foreground_color: kivy_console.foreground_color
+                            background_color: kivy_console.background_color
+                    Button:
+                        id: decryption_request_btn
+                        disabled: True
+                        text: tr._('Request Decryption')
+                        pos_hint: {'center_x': 0.5}
+                        size_hint: (0.7, 0.2)
+                        on_press: app.attempt_container_decryption(filebrowser.selection[0]) ; self.disabled = True
 
 
     Screen:
