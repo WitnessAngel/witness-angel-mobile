@@ -142,6 +142,7 @@ ScreenManager:
                 pos_hint: {'top':1}
                 ActionView:
                     ActionPrevious:
+                        title: tr._('Back')
                         with_previous: True
                         on_press: root.current = "dashboard"
                     ActionOverflow:
@@ -165,6 +166,7 @@ ScreenManager:
                 rootpath: app.internal_containers_dir()
                 filters: ["*.crypt"]
                 multiselect: False
+                sort_func: lambda files, fs: sorted(files, reverse=True)
 
             Splitter:
                 sizable_from: 'top'

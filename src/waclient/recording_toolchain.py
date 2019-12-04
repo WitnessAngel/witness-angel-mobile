@@ -89,11 +89,11 @@ def stop_recording_toolchain(toolchain):
     sensors_manager.join()
 
     for idx, data_aggregator in enumerate(data_aggregators, start=1):
-        logger.info("Flushing data aggregator #%d", idx)
+        logger.info("Flushing '%s' data aggregator" % data_aggregator.sensor_name)
         data_aggregator.flush_dataset()
 
     for idx, tarfile_aggregator in enumerate(tarfile_aggregators, start=1):
-        logger.info("Flushing tarfile aggregator #%d", idx)
+        logger.info("Flushing tarfile aggregator" + (" #%d" % idx if (len(tarfile_aggregator) > 1) else ""))
         tarfile_aggregator.finalize_tarfile()
 
     #logger.info("stop_recording_toolchain exits")
