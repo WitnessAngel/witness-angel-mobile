@@ -27,7 +27,7 @@ def build_recording_toolchain(config):
     max_containers_count=get_conf_value("max_containers_count", 100, converter=int)
     container_recording_duration_s=get_conf_value("container_recording_duration_s", 60, converter=float)
     container_member_duration_s=get_conf_value("container_member_duration_s", 60, converter=float)
-    polling_interval_s=get_conf_value("polling_interval_s", 1.0, converter=float)
+    polling_interval_s=get_conf_value("polling_interval_s", 0.5, converter=float)
 
     logger.info("Toolchain configuration is %s",
                 str(dict(max_containers_count=max_containers_count,
@@ -82,10 +82,10 @@ def stop_recording_toolchain(toolchain):
     data_aggregators=toolchain["data_aggregators"]
     tarfile_aggregators=toolchain["tarfile_aggregators"]
 
-    logger.info("Stopping sensors manager")
+    #logger.info("Stopping sensors manager")
     sensors_manager.stop()
 
-    logger.info("Joining sensors manager")
+    #logger.info("Joining sensors manager")
     sensors_manager.join()
 
     for idx, data_aggregator in enumerate(data_aggregators, start=1):
@@ -93,7 +93,7 @@ def stop_recording_toolchain(toolchain):
         data_aggregator.flush_dataset()
 
     for idx, tarfile_aggregator in enumerate(tarfile_aggregators, start=1):
-        logger.info("Flushing tarfile aggregator" + (" #%d" % idx if (len(tarfile_aggregator) > 1) else ""))
+        logger.info("Flushing tarfile builder" + (" #%d" % idx if (len(tarfile_aggregators) > 1) else ""))
         tarfile_aggregator.finalize_tarfile()
 
     #logger.info("stop_recording_toolchain exits")
