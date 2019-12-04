@@ -34,7 +34,7 @@ class ServiceController:
         assert self._subprocess
         self._send_message("/stop_server")
         try:
-            self._subprocess.wait(timeout=30)
+            self._subprocess.wait(timeout=40)
         except subprocess.TimeoutExpired:
             logger.error("Service subprocess didn't exit gracefully, we kill it now")
             self._subprocess.kill()

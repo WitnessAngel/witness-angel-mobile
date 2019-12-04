@@ -46,7 +46,7 @@ TIMER_OPTIONS = {
 tr = Lang("en")
 
 
-osc = get_osc_server(is_master=True)
+osc, osc_starter_callback = get_osc_server(is_master=True)
 
 
 @ServerClass
@@ -176,6 +176,8 @@ class WitnessAngelClientApp(App):
         initialization (after build() has been called) but before the
         application has started running.
         '''
+        osc_starter_callback()  # Opens server port
+
         self.service_controller = ServiceController()
         self.service_controller.start_service()
 

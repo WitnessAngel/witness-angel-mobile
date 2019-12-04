@@ -21,7 +21,7 @@ from waclient.recording_toolchain import build_recording_toolchain, start_record
 from waclient.utilities import swallow_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
 
-osc = get_osc_server(is_master=False)
+osc, osc_starter_callback = get_osc_server(is_master=False)
 
 # FIXME what happens if exception on remote OSC endpoint ? CRASH!!
 # TODO add custom "local escrow resolver"
@@ -43,6 +43,7 @@ class BackgroundServer(object):
 
     def __init__(self):
         logger.info("Starting service")  # Will not be sent to App (too early)
+        osc_starter_callback()  # Opens server port
         self._osc_client = get_osc_client(to_master=True)
         logging.getLogger(None).addHandler(CallbackHandler(self._remote_logging_callback))
         self._termination_event = threading.Event()

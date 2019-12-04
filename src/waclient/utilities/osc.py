@@ -33,9 +33,11 @@ def get_osc_server(is_master=True):
     socket_options = _get_osc_socket_options(socket_index=socket_index)
 
     logger.info("Binding OSC server of %s process to socket %s" % (socket_name, socket_options))
-    server.listen(default=True, **socket_options)
 
-    return server
+    def starter_callback():
+        server.listen(default=True, **socket_options)
+
+    return server, starter_callback
 
 
 def get_osc_client(to_master=True):
