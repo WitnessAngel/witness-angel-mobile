@@ -5,7 +5,7 @@ from oscpy.server import OSCThreadServer
 from waclient.common_config import INTERNAL_CONTAINERS_DIR, ENCRYTION_CONF
 from waclient.sensors.gyroscope import get_periodic_value_provider as get_periodic_value_provider_gyroscope
 from wacryptolib.container import ContainerStorage
-from wacryptolib.sensor import TarfileAggregator, JsonAggregator, SensorManager
+from wacryptolib.sensor import TarfileAggregator, JsonAggregator, SensorsManager
 
 from kivy.logger import Logger as logger
 
@@ -36,7 +36,7 @@ def build_recording_toolchain(config):
                          polling_interval_s=polling_interval_s)))
 
     container_storage = ContainerStorage(encryption_conf=ENCRYTION_CONF,
-                                         output_dir=INTERNAL_CONTAINERS_DIR,
+                                         containers_dir=INTERNAL_CONTAINERS_DIR,
                                          max_containers_count=max_containers_count)
 
     tarfile_aggregator = TarfileAggregator(
@@ -50,7 +50,7 @@ def build_recording_toolchain(config):
     gyroscope_sensor = get_periodic_value_provider_gyroscope(json_aggregator=gyroscope_json_aggregator, polling_interval_s=polling_interval_s)
 
     sensors = [gyroscope_sensor]
-    sensors_manager = SensorManager(sensors=sensors)
+    sensors_manager = SensorsManager(sensors=sensors)
 
     toolchain = dict(sensors_manager=sensors_manager,
                     data_aggregators=[gyroscope_json_aggregator],

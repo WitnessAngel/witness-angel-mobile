@@ -23,7 +23,7 @@ def test_nominal_recording_case():
     purge_test_containers()
     # TODO - make this a PURGE() methods of storage!!!
     # CLEANUP of already existing containers
-    #for container_name in container_storage.list_container_names(as_sorted_relative_paths=True):
+    #for container_name in container_storage.list_container_names(sorted=True):
     #    container_storage._delete_container(container_name)
     #assert not len(container_storage)
 
@@ -40,7 +40,7 @@ def test_nominal_recording_case():
         time.sleep(1)
 
     assert len(container_storage) == 1  # Too quick recording to have container rotation
-    (container_name,) = container_storage.list_container_names(as_sorted_relative_paths=True)
+    (container_name,) = container_storage.list_container_names(as_sorted=True)
 
     tarfile_bytestring = container_storage.decrypt_container_from_storage(container_name)
 
