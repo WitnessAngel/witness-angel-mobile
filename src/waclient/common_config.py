@@ -36,6 +36,7 @@ except NotImplementedError:
 EXTERNAL_DATA_EXPORTS_DIR = EXTERNAL_APP_ROOT / "DataExports"
 EXTERNAL_DATA_EXPORTS_DIR.mkdir(exist_ok=True)
 
+FREE_KEY_TYPES = ["RSA", "DSA"]  # Must be the union of asymmetric encryption/signature keys below
 ENCRYPTION_CONF = dict(
     data_encryption_strata=[
         dict(
