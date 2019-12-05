@@ -13,14 +13,28 @@ PACKAGE_DIR = Path(__file__).parent
 CONFIG_FILE = PACKAGE_DIR / "witnessangelclient.ini"
 assert CONFIG_FILE.exists(), CONFIG_FILE
 
-APP_DIR = storagepath.get_application_dir()
-if not os.path.exists(APP_DIR):
-    APP_DIR = storagepath.get_home_dir()
-APP_DIR = Path(APP_DIR)
-print("APP_DIR", repr(APP_DIR))
+# Internal directories, especially protected on mobile devices
 
-INTERNAL_CONTAINERS_DIR = APP_DIR / ".wacontainers"
+INTERNAL_APP_ROOT = Path(storagepath.get_application_dir())
+if not os.path.exists(INTERNAL_APP_ROOT):
+    INTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelInternal"
+    INTERNAL_APP_ROOT.mkdir(exist_ok=True)
+
+INTERNAL_KEYS_DIR = INTERNAL_APP_ROOT / "KeyStorage"
+INTERNAL_KEYS_DIR.mkdir(exist_ok=True)
+
+INTERNAL_CONTAINERS_DIR = INTERNAL_APP_ROOT / "Containers"
 INTERNAL_CONTAINERS_DIR.mkdir(exist_ok=True)
+
+# External directories, shared by applications
+try:
+    EXTERNAL_APP_ROOT = Path(storagepath.get_sdcard_dir()) / "WitnessAngel"
+except NotImplementedError:
+    EXTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelExternal"
+    EXTERNAL_APP_ROOT.mkdir(exist_ok=True)
+
+EXTERNAL_DATA_EXPORTS_DIR = EXTERNAL_APP_ROOT / "DataExports"
+EXTERNAL_DATA_EXPORTS_DIR.mkdir(exist_ok=True)
 
 ENCRYPTION_CONF = dict(
     data_encryption_strata=[

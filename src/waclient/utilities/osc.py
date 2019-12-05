@@ -7,7 +7,7 @@ from kivy.utils import platform
 from oscpy.client import OSCClient
 from oscpy.server import OSCThreadServer
 
-from waclient.common_config import APP_DIR
+from waclient.common_config import INTERNAL_APP_ROOT
 
 
 def _osc_default_handler(address, *values):
@@ -18,7 +18,7 @@ def _get_osc_socket_options(socket_index):
     if platform == "win":
         socket_options = dict(address='127.0.0.1', port=6420+socket_index, family="inet")
     else:
-        socket_options = dict(address=str(APP_DIR / ".witnessangel%d.sock" % socket_index), family="unix")
+        socket_options = dict(address=str(INTERNAL_APP_ROOT / ".witnessangel%d.sock" % socket_index), family="unix")
     return socket_options
 
 
