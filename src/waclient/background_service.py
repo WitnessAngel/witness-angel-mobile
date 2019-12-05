@@ -86,8 +86,8 @@ class BackgroundServer(object):
             config = self._load_config()
             self._recording_toolchain = build_recording_toolchain(config)
         start_recording_toolchain(self._recording_toolchain)
-        self.broadcast_recording_state()
         logger.info("Recording started")
+        self.broadcast_recording_state()
 
     @property
     def is_recording(self):
@@ -106,10 +106,13 @@ class BackgroundServer(object):
             logger.warning("Ignoring call to service.stop_recording(), since recording is already stopped")
             return
         logger.info("Stopping recording")
-        stop_recording_toolchain(self._recording_toolchain)
-        self._recording_toolchain = None  # Will force a reload of config on next recording
-        self.broadcast_recording_state()
-        logger.info("Recording stopped")
+        try:
+            stop_recording_toolchain(self._recording_toolchain)
+            logger.info("Recording stopped")
+        finally:  # Trigger all this even if container flushing failed
+            self._recording_toolchain = None  # Will force a reload of config on next recording
+            self.broadcast_recording_state()
+
 
     @osc.address_method('/stop_server')
     @swallow_exception
