@@ -49,6 +49,8 @@ class TransitionProgress(ProgressBar):
 
 class ConsoleOutput(TextInput):
 
+    max_text_size = 10000
+
     # __events__ = ('on_start', )
     _add_text_is_in_progress = False
 
@@ -73,7 +75,16 @@ class ConsoleOutput(TextInput):
             #import traceback
             #traceback.print_stack(file=sys.stdout)
             is_locked = self.is_at_bottom()
+
             self.text += text
+
+            # TODO reajust scroll_y after that!
+            if len(self.text) > self.max_text_size:
+                lines = self.text.splitlines()
+                new_lines = lines[int(len(lines)/4):]  # Remove the first chunk of lines
+                new_text = "\n".join(new_lines) + "\n"
+                self.text = new_text
+
             self.parent.scroll_y = 0
             if is_locked:
                 self.scroll_to_bottom()
