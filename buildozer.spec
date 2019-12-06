@@ -1,16 +1,16 @@
 [app]
 
 # (str) Title of your application
-title = Witness Angel Client
+title = Witness Angel Demo
 
 # (str) Package name
-package.name = witness-angel-client
+package.name = WitnessAngelDemo
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = witness.angel
+package.domain = org.WhiteMirror
 
 # (str) Source code where the main.py live
-source.dir = witness-angel-client
+source.dir = src
 
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas
@@ -25,15 +25,15 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version.regex = __version__ = ['"](.*)['"]
-version.filename = %(source.dir)s/__init__.py
+version.regex = version = ['"](.*)['"]
+version.filename = pyproject.toml
 
 # (str) Application versioning (method 2)
 # version = 1.2.0
 
 # (list) Application requirements
 # comma seperated e.g. requirements = sqlite3,kivy
-requirements = kivy
+requirements = python3,sqlite3,kivy,pycryptodome,oscpy,git+https://github.com/kivy/plyer,multitimer,decorator,docutils,pygments
 
 # (list) Garden requirements
 #garden_requirements =
@@ -45,10 +45,10 @@ requirements = kivy
 #icon.filename = %(source.dir)s/data/icon.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
-orientation = landscape
+orientation = portrait
 
-# (bool) Indicate if the application should be fullscreen or not
-fullscreen = 1
+# (bool) Indicate if the application should be fullscreen or not (hide the status bar or not)
+fullscreen = 0
 
 
 #
@@ -56,13 +56,13 @@ fullscreen = 1
 #
 
 # (list) Permissions
-#android.permissions = INTERNET
+android.permissions = INTERNET,CAMERA,RECORD_AUDIO,WRITE_EXTERNAL_STORAGE,FOREGROUND_SERVICE,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION
 
-# (int) Android API to use
-#android.api = 14
+# (int) Android API to use (we want PERMISSION REQUESTS so api>=23)
+android.api = 26
 
 # (int) Minimum API required (8 = Android 2.2 devices)
-#android.minapi = 8
+android.minapi = 26
 
 # (int) Android SDK version to use
 #android.sdk = 21
@@ -112,9 +112,13 @@ fullscreen = 1
 # (str) XML file to include as an intent filters in <activity> tag
 #android.manifest.intent_filters =
 
-# (list) Android additionnal libraries to copy into libs/armeabi
+# (str) launchMode to set for the main activity
+#android.manifest.launch_mode = standard
+
+# (list) Android additional libraries to copy into libs/armeabi
 #android.add_libs_armeabi = libs/android/*.so
 #android.add_libs_armeabi_v7a = libs/android-v7/*.so
+#android.add_libs_arm64_v8a = libs/android-v8/*.so
 #android.add_libs_x86 = libs/android-x86/*.so
 #android.add_libs_mips = libs/android-mips/*.so
 
@@ -129,9 +133,35 @@ fullscreen = 1
 # project.properties automatically.)
 #android.library_references =
 
+# (list) Android shared libraries which will be added to AndroidManifest.xml using <uses-library> tag
+#android.uses_library =
+
+# (str) Android logcat filters to use
+#android.logcat_filters = *:S python:D
+
+# (bool) Copy library instead of making a libpymodules.so
+#android.copy_libs = 1
+
+# (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
+android.arch = armeabi-v7a
+
+
 #
 # iOS specific
 #
+
+# (str) Path to a custom kivy-ios folder
+#ios.kivy_ios_dir = ../kivy-ios
+# Alternately, specify the URL and branch of a git checkout:
+ios.kivy_ios_url = https://github.com/kivy/kivy-ios
+ios.kivy_ios_branch = master
+
+# Another platform dependency: ios-deploy
+# Uncomment to use a custom checkout
+#ios.ios_deploy_dir = ../ios_deploy
+# Or specify URL and branch
+ios.ios_deploy_url = https://github.com/phonegap/ios-deploy
+ios.ios_deploy_branch = 1.7.0
 
 # (str) Name of the certificate to use for signing the debug version
 # Get a list of available identities: buildozer ios list_identities
@@ -144,10 +174,17 @@ fullscreen = 1
 [buildozer]
 
 # (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
-log_level = 1
+log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
 warn_on_root = 1
+
+# (str) Path to build artifact storage, absolute or relative to spec file
+# BEWARE, we put it outside repo folder, since on virtual machine shared folders, symlinks often don't work
+build_dir = /tmp/.buildozer_files
+
+# (str) Path to build output (i.e. .apk, .ipa) storage
+# bin_dir = ./bin
 
 
 # -----------------------------------------------------------------------------
