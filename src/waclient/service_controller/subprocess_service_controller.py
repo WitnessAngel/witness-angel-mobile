@@ -19,7 +19,7 @@ class ServiceController:
                                             shell=False, cwd=ROOT_DIR)
         self._osc_client = get_osc_client(to_master=False)
         # TODO - wait for remote server to be pingable?
-        atexit.register(self.stop_service)  # Protection against ctrl-C
+        atexit.register(self.stop_service)  # Protection against brutal ctrl-C
 
     def _send_message(self, address, *values):
         logger.debug("Message sent to service: %s", address)
@@ -32,6 +32,7 @@ class ServiceController:
 
     def stop_service(self):
         assert self._subprocess
+        atexit.unregister(self.stop_service)  # No need anymore
         self._send_message("/stop_server")
         try:
             self._subprocess.wait(timeout=40)
