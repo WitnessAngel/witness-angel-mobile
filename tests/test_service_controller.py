@@ -19,8 +19,8 @@ def _test_service_controller(sleep_time_s, recording_iterations=1, skip_stop_rec
         print("OSC stats received through ping() call:", stats)
 
         for i in range(recording_iterations):
-            ctrl.start_recording()
-            ctrl.start_recording()  # Ignored
+            ctrl.start_recording(env="test")
+            ctrl.start_recording(env="test")  # Ignored
 
             time.sleep(sleep_time_s)
 

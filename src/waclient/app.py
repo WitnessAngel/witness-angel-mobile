@@ -21,7 +21,7 @@ import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 from oscpy.server import OSCThreadServer, ServerClass
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, ENCRYPTION_CONF
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, get_encryption_conf
 from waclient.utilities import swallow_exception
 from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
@@ -305,4 +305,4 @@ class WitnessAngelClientApp(App):
         return str(INTERNAL_CONTAINERS_DIR)
 
     def get_encryption_conf_text(self):
-        return dump_to_json_str(ENCRYPTION_CONF, indent=2)
+        return dump_to_json_str(get_encryption_conf(), indent=2)

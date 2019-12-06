@@ -18,7 +18,7 @@ from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.utilities.logging import CallbackHandler
 
-from waclient.common_config import CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR
+from waclient.common_config import CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR, get_encryption_conf
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from waclient.utilities import swallow_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
@@ -83,14 +83,15 @@ class BackgroundServer(object):
 
     @osc.address_method('/start_recording')
     @swallow_exception
-    def start_recording(self):
+    def start_recording(self, env=None):
+        encryption_conf = get_encryption_conf(env)
         if self.is_recording:
             logger.warning("Ignoring call to service.start_recording(), since recording is already started")
             return
         logger.info("Starting recording")
         if not self._recording_toolchain:
             config = self._load_config()
-            self._recording_toolchain = build_recording_toolchain(config, self._local_key_storage)
+            self._recording_toolchain = build_recording_toolchain(config, local_key_storage=self._local_key_storage, encryption_conf=encryption_conf)
         start_recording_toolchain(self._recording_toolchain)
         logger.info("Recording started")
         self.broadcast_recording_state()

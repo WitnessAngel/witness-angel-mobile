@@ -4,7 +4,7 @@ import time
 from kivy.config import ConfigParser
 
 from _waclient_test_utilities import purge_test_containers
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, INTERNAL_KEYS_DIR
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, INTERNAL_KEYS_DIR, get_encryption_conf
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from wacryptolib.key_storage import FilesystemKeyStorage
 from wacryptolib.sensor import TarfileAggregator
@@ -16,7 +16,8 @@ def test_nominal_recording_toolchain_case():
     config = ConfigParser()  # Empty but OK
 
     local_key_storage = FilesystemKeyStorage(keys_dir=INTERNAL_KEYS_DIR)
-    toolchain = build_recording_toolchain(config, local_key_storage=local_key_storage)
+    encryption_conf=get_encryption_conf("test")
+    toolchain = build_recording_toolchain(config, local_key_storage=local_key_storage, encryption_conf=encryption_conf)
     sensors_manager=toolchain["sensors_manager"]
     data_aggregators=toolchain["data_aggregators"]
     tarfile_aggregators=toolchain["tarfile_aggregators"]

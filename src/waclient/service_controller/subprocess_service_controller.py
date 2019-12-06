@@ -39,8 +39,8 @@ class ServiceController:
             logger.error("Service subprocess didn't exit gracefully, we kill it now")
             self._subprocess.kill()
 
-    def start_recording(self):
-        self._send_message("/start_recording")
+    def start_recording(self, env=""):
+        self._send_message("/start_recording", env)
 
     def stop_recording(self):
         self._send_message("/stop_recording")

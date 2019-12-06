@@ -37,10 +37,15 @@ EXTERNAL_DATA_EXPORTS_DIR = EXTERNAL_APP_ROOT / "DataExports"
 EXTERNAL_DATA_EXPORTS_DIR.mkdir(exist_ok=True)
 
 FREE_KEY_TYPES = ["RSA", "DSA"]  # Must be the union of asymmetric encryption/signature keys below
-ENCRYPTION_CONF = dict(
+
+
+_main_remote_escrow_url = "http://127.0.0.1:8000/json/"
+
+_PROD_ENCRYPTION_CONF = dict(
     data_encryption_strata=[
+        # First we encrypt with local key and sign via main remote escrow
         dict(
-            data_encryption_algo="AES_CBC",
+            data_encryption_algo="AES_EAX",
             key_encryption_strata=[
                 dict(
                     escrow_key_type="RSA",
@@ -50,18 +55,59 @@ ENCRYPTION_CONF = dict(
             ],
             data_signatures=[
                 dict(
+                    signature_key_type="RSA",
+                    message_prehash_algo="SHA512",
+                    signature_algo="PSS",
+                    signature_escrow=dict(url=_main_remote_escrow_url),
+                )
+            ],
+        ),
+        # Then we encrypt with escrow key and sign via local keys
+        dict(
+            data_encryption_algo="CHACHA20_POLY1305",
+            key_encryption_strata=[
+                dict(
+                    escrow_key_type="RSA",
+                    key_encryption_algo="RSA_OAEP",
+                    key_escrow=dict(url=_main_remote_escrow_url),
+                )
+            ],
+            data_signatures=[
+                dict(
                     signature_key_type="DSA",
                     message_prehash_algo="SHA256",
                     signature_algo="DSS",
                     signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 ),
+            ],
+        )
+    ]
+)
+
+_TEST_ENCRYPTION_CONF = dict(
+    data_encryption_strata=[
+        # We only encrypt/sign with local key, in test environment
+        dict(
+            data_encryption_algo="AES_EAX",
+            key_encryption_strata=[
+                dict(
+                    escrow_key_type="RSA",
+                    key_encryption_algo="RSA_OAEP",
+                    key_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                )
+            ],
+            data_signatures=[
                 dict(
                     signature_key_type="RSA",
                     message_prehash_algo="SHA512",
                     signature_algo="PSS",
-                    signature_escrow=dict(url="http://127.0.0.1:8000/json/"),
+                    signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 )
             ],
         )
     ]
 )
+
+
+def get_encryption_conf(env=""):
+    return _TEST_ENCRYPTION_CONF if (env and env.upper() == "TEST") else _PROD_ENCRYPTION_CONF

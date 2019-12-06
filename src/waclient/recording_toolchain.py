@@ -2,7 +2,7 @@ import functools
 
 from oscpy.server import OSCThreadServer
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, ENCRYPTION_CONF, INTERNAL_KEYS_DIR, FREE_KEY_TYPES
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, INTERNAL_KEYS_DIR, FREE_KEY_TYPES
 from waclient.sensors.gyroscope import get_periodic_value_provider as get_periodic_value_provider_gyroscope
 from wacryptolib.container import ContainerStorage
 from wacryptolib.escrow import get_free_keys_generator_worker
@@ -15,7 +15,7 @@ from kivy.logger import Logger as logger
 osc = OSCThreadServer(encoding="utf8")
 
 
-def build_recording_toolchain(config, local_key_storage):
+def build_recording_toolchain(config, local_key_storage, encryption_conf):
     """Instantiate the whole toolchain of sensors and aggregators, depending on the config."""
 
     def get_conf_value(*args, converter=None, **kwargs):
@@ -36,7 +36,7 @@ def build_recording_toolchain(config, local_key_storage):
                          container_member_duration_s=container_member_duration_s,
                          polling_interval_s=polling_interval_s)))
 
-    container_storage = ContainerStorage(encryption_conf=ENCRYPTION_CONF,
+    container_storage = ContainerStorage(encryption_conf=encryption_conf,
                                          containers_dir=INTERNAL_CONTAINERS_DIR,
                                          max_containers_count=max_containers_count,
                                          local_key_storage=local_key_storage)
