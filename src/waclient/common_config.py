@@ -51,8 +51,15 @@ ENCRYPTION_CONF = dict(
             data_signatures=[
                 dict(
                     signature_key_type="DSA",
+                    message_prehash_algo="SHA256",
                     signature_algo="DSS",
                     signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                ),
+                dict(
+                    signature_key_type="RSA",
+                    message_prehash_algo="SHA512",
+                    signature_algo="PSS",
+                    signature_escrow=dict(url="http://127.0.0.1:8000/json/"),
                 )
             ],
         )

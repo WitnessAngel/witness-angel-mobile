@@ -296,8 +296,10 @@ class WitnessAngelClientApp(App):
         self.root.ids.filebrowser.layout.ids.treeview._trigger_layout()  # TEMPORARY
 
     def attempt_container_decryption(self, filepath):
-        filename = os.path.basename(filepath)
-        logger.info("Decryption requested for container %s", filename)
+        assert isinstance(filepath, str), filepath
+        #container_name = os.path.basename(filepath)
+        #logger.info("Decryption requested for container %s", container_name)
+        self.service_controller.attempt_container_decryption(filepath)
 
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)

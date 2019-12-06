@@ -141,7 +141,7 @@ ScreenManager:
 
     Screen
         name: "containers"
-        on_pre_enter: app.refresh_filebrowser()
+        on_pre_enter: filebrowser.selection=[] ; app.refresh_filebrowser()
 
         BoxLayout:
             orientation: 'vertical'
@@ -165,7 +165,7 @@ ScreenManager:
                             text: ' '
                         ActionButton:
                             text: '/!\ PURGE'
-                            on_press: app.purge_all_containers(); filebrowser.selection = []
+                            on_press: filebrowser.selection = [] ; app.purge_all_containers()
 
             FileChooserListView:
                 id: filebrowser
@@ -200,7 +200,7 @@ ScreenManager:
                         text: tr._('Request Decryption')
                         pos_hint: {'center_x': 0.5}
                         size_hint: (0.7, 0.2)
-                        on_press: app.attempt_container_decryption(filebrowser.selection[0]) ; self.disabled = True
+                        on_press: app.attempt_container_decryption(filebrowser.selection[0]) ; self.disabled = True ; root.current = "dashboard"
 
 
     Screen:

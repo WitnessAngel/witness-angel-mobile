@@ -15,9 +15,7 @@ from kivy.logger import Logger as logger
 osc = OSCThreadServer(encoding="utf8")
 
 
-
-
-def build_recording_toolchain(config):
+def build_recording_toolchain(config, local_key_storage):
     """Instantiate the whole toolchain of sensors and aggregators, depending on the config."""
 
     def get_conf_value(*args, converter=None, **kwargs):
@@ -37,8 +35,6 @@ def build_recording_toolchain(config):
                          container_recording_duration_s=container_recording_duration_s,
                          container_member_duration_s=container_member_duration_s,
                          polling_interval_s=polling_interval_s)))
-
-    local_key_storage = FilesystemKeyStorage(keys_dir=INTERNAL_KEYS_DIR)
 
     container_storage = ContainerStorage(encryption_conf=ENCRYPTION_CONF,
                                          containers_dir=INTERNAL_CONTAINERS_DIR,

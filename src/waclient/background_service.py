@@ -1,3 +1,4 @@
+import io
 import os
 #os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
 
@@ -5,6 +6,7 @@ import contextlib
 import functools
 import logging
 import os
+import tarfile
 import threading
 from configparser import Error as ConfigParserError
 
@@ -16,10 +18,13 @@ from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.utilities.logging import CallbackHandler
 
-from waclient.common_config import CONFIG_FILE
+from waclient.common_config import CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from waclient.utilities import swallow_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
+from wacryptolib.container import decrypt_data_from_container
+from wacryptolib.key_storage import FilesystemKeyStorage
+from wacryptolib.utilities import load_from_json_file
 
 osc, osc_starter_callback = get_osc_server(is_master=False)
 
@@ -47,6 +52,7 @@ class BackgroundServer(object):
         self._osc_client = get_osc_client(to_master=True)
         logging.getLogger(None).addHandler(CallbackHandler(self._remote_logging_callback))
         self._termination_event = threading.Event()
+        self._local_key_storage = FilesystemKeyStorage(keys_dir=INTERNAL_KEYS_DIR)
         logger.info("Service started")
 
     def _remote_logging_callback(self, msg):
@@ -84,7 +90,7 @@ class BackgroundServer(object):
         logger.info("Starting recording")
         if not self._recording_toolchain:
             config = self._load_config()
-            self._recording_toolchain = build_recording_toolchain(config)
+            self._recording_toolchain = build_recording_toolchain(config, self._local_key_storage)
         start_recording_toolchain(self._recording_toolchain)
         logger.info("Recording started")
         self.broadcast_recording_state()
@@ -96,7 +102,7 @@ class BackgroundServer(object):
     @osc.address_method('/broadcast_recording_state')
     @swallow_exception
     def broadcast_recording_state(self):
-        logger.info("Broadcasting recording state")  # TODO make this DEBUG
+        logger.info("Broadcasting service state (is_recording=%s)" % self.is_recording)  # TODO make this DEBUG
         self._send_message("/receive_recording_state", self.is_recording)
 
     @osc.address_method('/stop_recording')
@@ -112,6 +118,24 @@ class BackgroundServer(object):
         finally:  # Trigger all this even if container flushing failed
             self._recording_toolchain = None  # Will force a reload of config on next recording
             self.broadcast_recording_state()
+
+    @osc.address_method('/attempt_container_decryption')
+    @swallow_exception
+    def attempt_container_decryption(self, container_filepath):
+        logger.info("Decryption requested for container %s", container_filepath)
+        target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(os.path.basename(container_filepath))
+        target_directory.mkdir(exist_ok=True)  # Double exports would replace colliding files
+        container = load_from_json_file(container_filepath)
+        tarfile_bytes = decrypt_data_from_container(container,
+                                           local_key_storage=self._local_key_storage)
+        tarfile_bytesio = io.BytesIO(tarfile_bytes)
+        tarfile_obj = tarfile.open(
+                        mode="r",  # TODO add gzip support here one day
+                        fileobj=tarfile_bytesio,
+                    )
+        # Beware, as root on unix systems it would apply chown/chmod
+        tarfile_obj.extractall(target_directory)
+        logger.info("Container content was successfully decrypted into folder %s", target_directory)
 
 
     @osc.address_method('/stop_server')

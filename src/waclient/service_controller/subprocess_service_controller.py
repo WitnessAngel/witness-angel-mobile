@@ -47,3 +47,8 @@ class ServiceController:
 
     def broadcast_recording_state(self):
         self._send_message("/broadcast_recording_state")
+
+    def attempt_container_decryption(self, container_filepath):
+        self._send_message("/attempt_container_decryption", container_filepath)
+
+
