@@ -18,7 +18,10 @@ def _get_osc_socket_options(socket_index):
     if platform == "win":
         socket_options = dict(address='127.0.0.1', port=6420+socket_index, family="inet")
     else:
-        socket_options = dict(address=str(INTERNAL_APP_ROOT / ".witnessangel%d.sock" % socket_index), family="unix")
+        socket_file = INTERNAL_APP_ROOT.joinpath(".witnessangel%d.sock" % socket_index)
+        if socket_file.exists():
+            socket_file.unlink()  # Else "Address already in use" error occurs!
+        socket_options = dict(address=str(socket_file), family="unix")
     return socket_options
 
 
