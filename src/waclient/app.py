@@ -2,6 +2,7 @@
 import json
 import os, sys
 import logging
+import shutil
 
 from kivy.uix.filechooser import filesize_units
 
@@ -21,9 +22,10 @@ import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 from oscpy.server import OSCThreadServer, ServerClass
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, get_encryption_conf
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, get_encryption_conf, request_single_permission, \
+    request_multiple_permissions, DEFAULT_CONFIG_TEMPLATE, APP_CONFIG_FILE
 from waclient.utilities import swallow_exception
-from waclient.utilities.i18n import Lang
+#from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.osc import get_osc_server
 
@@ -43,7 +45,11 @@ TIMER_OPTIONS = {
     "1/15 sec": 1 / 15.0,
 }
 
-tr = Lang("en")
+class A():
+
+    def _(self, a): return a
+
+tr = A()  #("en")
 
 
 osc, osc_starter_callback = get_osc_server(is_master=True)
@@ -68,16 +74,19 @@ class WitnessAngelClientApp(App):
     timer = BoundedNumericProperty(0, min=0, max=400)
     carousel = ObjectProperty(Carousel)
     language = None
-    service_querying_interval = 0.3  # To check when service is ready at start
+    service_querying_interval = 2  # To check when service is ready at start
 
     use_kivy_settings = False  # TODO disable this in prod
 
     _sock = None
 
     def __init__(self, **kwargs):
+        print("STARTING INIT OF WitnessAngelClientApp")
         super(WitnessAngelClientApp, self).__init__(**kwargs)
+        print("AFTER PARENT INIT OF WitnessAngelClientApp")
         self.settings_cls = SettingsWithTabbedPanel
         osc_starter_callback()  # Opens server port
+        print("FINISHED INIT OF WitnessAngelClientApp")
 
     def start_timer(self, *args, **kwargs):
         """Schedule the timer update routine and fade in the progress bar."""
@@ -107,8 +116,8 @@ class WitnessAngelClientApp(App):
             in the kv file of the app
         """
         # print ("CONFIG IS", self.config)
-        self.language = self.config.get("usersettings", "language")
-        tr.switch_lang(self.language)
+        self.language = self.config.getdefault("usersettings", "language", "en")
+        #tr.switch_lang(self.language)
 
         #user_interval = self.config.get("usersettings", "timer_interval")
         #self.timer_interval = TIMER_OPTIONS[user_interval]
@@ -125,6 +134,16 @@ class WitnessAngelClientApp(App):
 
         self._console_output = self.root.ids.kivy_console.console_output
         return self.root
+
+    def load_config(self):
+        # We create the initial configuration for the app if it doesn't exist
+        config_file = Path(self.get_application_config())
+        if not config_file.exists():
+            shutil.copy(DEFAULT_CONFIG_TEMPLATE, dst=config_file)
+        super().load_config()
+
+    def get_application_config(self, *args, **kwargs):
+        return APP_CONFIG_FILE
 
     def build_config(self, config):
         """Create a config file on disk and assign the ConfigParser object to
@@ -215,6 +234,7 @@ class WitnessAngelClientApp(App):
         #print(">--->>switch_to_recording_state", is_recording)
         self.root.ids.recording_btn.disabled = True
         if is_recording:
+            request_multiple_permissions(permissions=["RECORD_AUDIO", "CAMERA"]) # Might NOT be granted by user!
             self.service_controller.start_recording()
         else:
             self.service_controller.stop_recording()
