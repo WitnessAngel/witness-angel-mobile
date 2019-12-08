@@ -23,7 +23,7 @@ from kivy.uix.settings import SettingsWithTabbedPanel
 from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.common_config import INTERNAL_CONTAINERS_DIR, get_encryption_conf, request_single_permission, \
-    request_multiple_permissions, DEFAULT_CONFIG_TEMPLATE, APP_CONFIG_FILE
+    request_multiple_permissions, DEFAULT_CONFIG_TEMPLATE, APP_CONFIG_FILE, request_external_storage_dirs_access
 from waclient.utilities import swallow_exception
 #from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
@@ -143,7 +143,7 @@ class WitnessAngelClientApp(App):
         super().load_config()
 
     def get_application_config(self, *args, **kwargs):
-        return APP_CONFIG_FILE
+        return str(APP_CONFIG_FILE)  # IMPORTANT, stringify it for Kivy!
 
     def build_config(self, config):
         """Create a config file on disk and assign the ConfigParser object to
@@ -206,6 +206,8 @@ class WitnessAngelClientApp(App):
         self.root.ids.recording_btn.disabled = True
         Clock.schedule_interval(self._request_recording_state, self.service_querying_interval)
 
+        request_multiple_permissions(permissions=["WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO", "CAMERA"]) # Might NOT be granted by user!
+
         #import logging_tree
         #logging_tree.printout()
 
@@ -234,7 +236,6 @@ class WitnessAngelClientApp(App):
         #print(">--->>switch_to_recording_state", is_recording)
         self.root.ids.recording_btn.disabled = True
         if is_recording:
-            request_multiple_permissions(permissions=["RECORD_AUDIO", "CAMERA"]) # Might NOT be granted by user!
             self.service_controller.start_recording()
         else:
             self.service_controller.stop_recording()
@@ -319,6 +320,9 @@ class WitnessAngelClientApp(App):
         assert isinstance(filepath, str), filepath
         #container_name = os.path.basename(filepath)
         #logger.info("Decryption requested for container %s", container_name)
+        if not request_external_storage_dirs_access():
+            logger.warning("Access to external storage not granted by system yet.")
+            return
         self.service_controller.attempt_container_decryption(filepath)
 
     def internal_containers_dir(self):

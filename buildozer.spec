@@ -13,7 +13,7 @@ package.domain = org.WhiteMirror
 source.dir = src
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,kv,atlas,ini,json
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_dirs = tests, bin
 
 # (list) List of exclusions using pattern matching
-#source.exclude_patterns = license,images/*/*.jpg
+#source.exclude_patterns = license,images/*/*.jpg,conftest.pyc
 
 # (str) Application versioning (method 1)
 version.regex = version = ['"](.*)['"]

@@ -18,8 +18,7 @@ from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.utilities.logging import CallbackHandler
 
-from waclient.common_config import APP_CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR, get_encryption_conf, \
-    request_external_storage_dirs_access
+from waclient.common_config import APP_CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR, get_encryption_conf
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from waclient.utilities import swallow_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
@@ -130,9 +129,6 @@ class BackgroundServer(object):
     @swallow_exception
     def attempt_container_decryption(self, container_filepath):
         logger.info("Decryption requested for container %s", container_filepath)
-        if not request_external_storage_dirs_access():
-            logger.warning("Access to external storage refused by system, aborting container decryption.")
-            return
         target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(os.path.basename(container_filepath))
         target_directory.mkdir(exist_ok=True)  # Double exports would replace colliding files
         container = load_from_json_file(container_filepath)

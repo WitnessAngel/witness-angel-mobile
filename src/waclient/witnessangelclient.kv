@@ -67,9 +67,48 @@
             id: console_output
             height: max(self.parent.height, self.minimum_height)
             font_name: root.font_name
-            font_size: root.font_size - 1
+            font_size: root.font_size
             foreground_color: root.foreground_color
             background_color: root.background_color
+
+
+
+[FileListEntry@FloatLayout+TreeViewNode]:
+    locked: False
+    entries: []
+    path: ctx.path
+    # FIXME: is_selected is actually a read_only treeview property. In this
+    # case, however, we're doing this because treeview only has single-selection
+    # hardcoded in it. The fix to this would be to update treeview to allow
+    # multiple selection.
+    is_selected: self.path in ctx.controller().selection
+
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '36dp' if dp(1) > 1 else '24dp'
+    # Don't allow expansion of the ../ node
+    is_leaf: not ctx.isdir or ctx.name.endswith('..' + ctx.sep) or self.locked
+    on_touch_down: self.collide_point(*args[1].pos) and ctx.controller().entry_touched(self, args[1])
+    on_touch_up: self.collide_point(*args[1].pos) and ctx.controller().entry_released(self, args[1])
+
+    BoxLayout:
+        pos: root.pos
+        size_hint_x: None
+        width: root.width - dp(10)
+        Label:
+            id: filename
+            text_size: self.width, None
+            halign: 'left'
+            shorten: True
+            text: ctx.name.split(".")[0]
+            font_size: '13sp'
+        Label:
+            text_size: self.width, None
+            size_hint_x: None
+            halign: 'right'
+            text: '{}'.format(ctx.get_nice_size())
+            font_size: '13sp'
+
 
 ScreenManager:
 
@@ -121,6 +160,7 @@ ScreenManager:
                 pos_hint: {'center_x': 0.5}
                 size_hint: (0.7, 0.2)
                 on_state: app.switch_to_recording_state(is_recording=(self.state == "down"))
+                font_size: "30sp"
 
             KivyConsole:
                 id: kivy_console
@@ -191,7 +231,7 @@ ScreenManager:
                             text: app.get_container_info(filebrowser.selection[0] if filebrowser.selection else None)
                             height: max(self.parent.height, self.minimum_height)
                             font_name: kivy_console.font_name
-                            font_size: kivy_console.font_size - 1
+                            font_size: kivy_console.font_size
                             foreground_color: kivy_console.foreground_color
                             background_color: kivy_console.background_color
                     Button:
@@ -231,7 +271,7 @@ ScreenManager:
                     text: app.get_encryption_conf_text()
                     height: max(self.parent.height, self.minimum_height)
                     font_name: kivy_console.font_name
-                    font_size: kivy_console.font_size - 1
+                    font_size: kivy_console.font_size
                     foreground_color: kivy_console.foreground_color
                     background_color: kivy_console.background_color
 

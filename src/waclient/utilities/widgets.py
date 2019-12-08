@@ -132,7 +132,7 @@ class KivyConsole(BoxLayout):
     Default to 'DroidSansMono'
     """
 
-    font_size = NumericProperty(14)
+    font_size = NumericProperty('12sp')
     """Indicates the size of the font used for the console
 
     :data:`font_size` is a :class:`~kivy.properties.NumericProperty`,

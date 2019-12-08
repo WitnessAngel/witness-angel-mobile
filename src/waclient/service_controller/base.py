@@ -16,7 +16,7 @@ class ServiceControllerBase:
         try:
             return self._osc_client.send_message(address, values=values)
         except OSError as exc:
-            logger.warning("Could not send osc message %s%s to service: %r", address, values, exc)
+            logger.debug("Could not send osc message %s%s to service: %r", address, values, exc)
             return
 
     def ping(self):

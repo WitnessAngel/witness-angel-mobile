@@ -24,7 +24,8 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_CONFIG_TEMPLATE = Path(__file__).parent.joinpath("default_config_template.ini")
 print("DEFAULT_CONFIG_TEMPLATE >>>>>>", repr(DEFAULT_CONFIG_TEMPLATE))
 
-
+DEFAULT_CONFIG_SCHEMA = Path(__file__).parent.joinpath("user_settings_schema.json")
+print("DEFAULT_CONFIG_SCHEMA >>>>>>", repr(DEFAULT_CONFIG_SCHEMA))
 
 # Internal directories, especially protected on mobile devices
 
@@ -45,8 +46,8 @@ if IS_ANDROID:
         #print(">>>>>>>>>>>>>>>>>>>service", service)
         #print("service.getFilesDir()", service.getFilesDir().toString())
         INTERNAL_APP_ROOT = Path(service.getFilesDir().toString())
-    Context = autoclass('android.content.Context')
-    _EXTERNAL_APP_ROOT = Path(Context.getExternalFilesDirs().toString()) / "WitnessAngel"
+    Environment = autoclass('android.os.Environment')
+    _EXTERNAL_APP_ROOT = Path(Environment.getExternalStorageDirectory().toString()) / "WitnessAngel"
     """
     Environment = autoclass('android.os.Environment')
     print("Environment.getExternalStorageDirectory()", Environment.getExternalStorageDirectory().toString())
