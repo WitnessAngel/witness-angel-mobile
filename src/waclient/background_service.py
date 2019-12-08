@@ -18,7 +18,8 @@ from oscpy.server import OSCThreadServer, ServerClass
 
 from waclient.utilities.logging import CallbackHandler
 
-from waclient.common_config import CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR, get_encryption_conf
+from waclient.common_config import APP_CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR, get_encryption_conf, \
+    request_external_storage_dirs_access
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
 from waclient.utilities import swallow_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
@@ -56,13 +57,18 @@ class BackgroundServer(object):
         logger.info("Service started")
 
     def _remote_logging_callback(self, msg):
-        return self._osc_client.send_message("/log_output", values=["Service: "+ msg])
+        return self._send_message("/log_output", "Service: "+ msg)
 
     def _send_message(self, address, *values):
         logger.debug("Message sent from service to app: %s", address)
-        return self._osc_client.send_message(address, values=values)
+        try:
+            return self._osc_client.send_message(address, values=values)
+        except OSError as exc:
+            # NO LOGGING HERE, else it would loop due to custom logging handler
+            print("{SERVICE} Could not send osc message %s%s to app: %r" % (address, values, exc))
+            return
 
-    def _load_config(self, filename=CONFIG_FILE):
+    def _load_config(self, filename=APP_CONFIG_FILE):
         logger.info(f"(Re)loading config file {filename}")
         config = ConfigParser()  # No NAME here, sicne named parsers must be Singletons in process!
         try:
@@ -124,6 +130,9 @@ class BackgroundServer(object):
     @swallow_exception
     def attempt_container_decryption(self, container_filepath):
         logger.info("Decryption requested for container %s", container_filepath)
+        if not request_external_storage_dirs_access():
+            logger.warning("Access to external storage refused by system, aborting container decryption.")
+            return
         target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(os.path.basename(container_filepath))
         target_directory.mkdir(exist_ok=True)  # Double exports would replace colliding files
         container = load_from_json_file(container_filepath)
