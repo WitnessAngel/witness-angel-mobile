@@ -33,7 +33,7 @@ version.filename = pyproject.toml
 
 # (list) Application requirements
 # comma seperated e.g. requirements = sqlite3,kivy
-requirements = python3,sqlite3,kivy,pycryptodome,oscpy,git+https://github.com/kivy/plyer,multitimer,decorator,docutils,pygments
+requirements = python3,sqlite3,kivy,pycryptodome,oscpy,git+https://github.com/kivy/plyer,decorator,docutils,pygments,schema,click,pymongo,jsonrpc-requests,multitimer,uuid0,pytz,requests,pybase62
 
 # (list) Garden requirements
 #garden_requirements =
@@ -49,6 +49,11 @@ orientation = portrait
 
 # (bool) Indicate if the application should be fullscreen or not (hide the status bar or not)
 fullscreen = 0
+
+# (list) List of service to declare
+#services = NAME:ENTRYPOINT_TO_PY,NAME2:ENTRYPOINT2_TO_PY
+services = recordingservice:service.py
+##:sticky:foreground
 
 
 #
@@ -80,7 +85,7 @@ android.minapi = 26
 #android.sdk_path =
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
-#android.p4a_dir =
+#p4a.source_dir = /home/vbox/python-for-android
 
 # (list) python-for-android whitelist
 #android.p4a_whitelist =
