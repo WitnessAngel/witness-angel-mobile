@@ -6,7 +6,7 @@ import shutil
 
 from kivy.uix.filechooser import filesize_units
 
-from wacryptolib.container import extract_metadata_from_container
+from wacryptolib.container import extract_metadata_from_container, get_encryption_configuration_summary
 from wacryptolib.utilities import load_from_json_file, dump_to_json_str
 
 os.environ["KIVY_NO_ARGS"] = "1"
@@ -279,19 +279,31 @@ class WitnessAngelClientApp(App):
         #print("-----> STATING", filepath)
         if not filepath:
             return "Please select a container"
+
         filename = os.path.basename(filepath)
         try:
             container = load_from_json_file(filepath)
+
+            info_lines = []
+
             metadata = extract_metadata_from_container(container)
             if not metadata:
-                return "No metadata found in container"
-            info_lines = ["MEMBERS:"]
+                info_lines.append("No metadata found in container regarding inner files.")
+
+            info_lines.append("MEMBERS:")
             for member_name, member_metadata in sorted(metadata["members"].items()):
                 #TODO later add more info
                 nice_size = self.get_nice_size(member_metadata["size"])
                 info_lines.append("- %s (%s)" % (member_name, nice_size))
+
+            info_lines.append("")
+
+            info_lines.append("ALGORITHMS:")
+            summary = get_encryption_configuration_summary(container)
+            info_lines.append(summary)
+
             return "\n".join(info_lines)
-            #return str(os.stat(filepath).st_size)
+
         except FileNotFoundError:
             return "This container was deleted"
         except Exception as exc:
@@ -329,4 +341,5 @@ class WitnessAngelClientApp(App):
         return str(INTERNAL_CONTAINERS_DIR)
 
     def get_encryption_conf_text(self):
-        return dump_to_json_str(get_encryption_conf(), indent=2)
+        conf = get_encryption_conf()
+        return get_encryption_configuration_summary(conf)
