@@ -38,6 +38,7 @@ if IS_ANDROID:
     #print("mActivity.getFilesDir()", (mActivity.getFilesDir().toString()) if mActivity else None)
     if mActivity:
         INTERNAL_APP_ROOT = Path(mActivity.getFilesDir().toString())
+        INTERNAL_CACHE_DIR = Path(mActivity.getCacheDir().toString())
     else:
         # WE ARE IN SERVICE!!!
         service = autoclass('org.kivy.android.PythonService').mService
@@ -46,6 +47,7 @@ if IS_ANDROID:
         #print(">>>>>>>>>>>>>>>>>>>service", service)
         #print("service.getFilesDir()", service.getFilesDir().toString())
         INTERNAL_APP_ROOT = Path(service.getFilesDir().toString())
+        INTERNAL_CACHE_DIR = Path(service.getCacheDir().toString())
     Environment = autoclass('android.os.Environment')
     _EXTERNAL_APP_ROOT = Path(Environment.getExternalStorageDirectory().toString()) / "WitnessAngel"
     """
@@ -57,11 +59,13 @@ if IS_ANDROID:
 else:
     INTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelInternal"
     _EXTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelExternal"
+    INTERNAL_CACHE_DIR = Path(storagepath.get_home_dir()) / "WitnessAngelCache"
 INTERNAL_APP_ROOT.mkdir(exist_ok=True)
+INTERNAL_CACHE_DIR.mkdir(exist_ok=True)
 
 APP_CONFIG_FILE = INTERNAL_APP_ROOT / "app_config.ini"  # Might no exist yet
 
-print ("LOCAL PATH FOUND:", INTERNAL_APP_ROOT, _EXTERNAL_APP_ROOT)
+print ("LOCAL PATH FOUND:", INTERNAL_APP_ROOT, _EXTERNAL_APP_ROOT, INTERNAL_CACHE_DIR)
 
 '''
 INTERNAL_APP_ROOT = Path("/data/data/org.whitemirror.witnessangeldemo")  #Path(storagepath.get_application_dir())
@@ -123,7 +127,7 @@ def request_external_storage_dirs_access():
 
 
 
-FREE_KEY_TYPES = ["RSA", "DSA"]  # Must be the union of asymmetric encryption/signature keys below
+FREE_KEY_TYPES = ["RSA_OAEP", "DSA_DSS"]  # Must be the union of asymmetric encryption/signature keys below
 
 _main_remote_escrow_url = "http://127.0.0.1:8000/json/"
 
@@ -134,16 +138,14 @@ _PROD_ENCRYPTION_CONF = dict(
             data_encryption_algo="AES_EAX",
             key_encryption_strata=[
                 dict(
-                    escrow_key_type="RSA",
                     key_encryption_algo="RSA_OAEP",
                     key_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 )
             ],
             data_signatures=[
                 dict(
-                    signature_key_type="RSA",
                     message_prehash_algo="SHA512",
-                    signature_algo="PSS",
+                    signature_algo="DSA_DSS",
                     signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 )
             ],
@@ -155,16 +157,14 @@ _PROD_ENCRYPTION_CONF = dict(
             data_encryption_algo="AES_CBC",
             key_encryption_strata=[
                 dict(
-                    escrow_key_type="RSA",
                     key_encryption_algo="RSA_OAEP",
                     key_escrow=dict(url=_main_remote_escrow_url),
                 )
             ],
             data_signatures=[
                 dict(
-                    signature_key_type="DSA",
                     message_prehash_algo="SHA256",
-                    signature_algo="DSS",
+                    signature_algo="ECC_DSS",
                     signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 ),
             ],
@@ -179,16 +179,14 @@ _TEST_ENCRYPTION_CONF = dict(
             data_encryption_algo="AES_EAX",
             key_encryption_strata=[
                 dict(
-                    escrow_key_type="RSA",
                     key_encryption_algo="RSA_OAEP",
                     key_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 )
             ],
             data_signatures=[
                 dict(
-                    signature_key_type="RSA",
                     message_prehash_algo="SHA512",
-                    signature_algo="PSS",
+                    signature_algo="RSA_PSS",
                     signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 )
             ],
