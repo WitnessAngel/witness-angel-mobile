@@ -59,7 +59,7 @@ class BackgroundServer(object):
         return self._send_message("/log_output", "Service: "+ msg)
 
     def _send_message(self, address, *values):
-        logger.debug("Message sent from service to app: %s", address)
+        print("Message sent from service to app: %s", address)
         try:
             return self._osc_client.send_message(address, values=values)
         except OSError as exc:

@@ -4,7 +4,7 @@ from oscpy.server import OSCThreadServer
 
 from waclient.common_config import INTERNAL_CONTAINERS_DIR, INTERNAL_KEYS_DIR, FREE_KEY_TYPES
 from waclient.sensors.gyroscope import get_periodic_value_provider as get_periodic_value_provider_gyroscope
-from waclient.sensors.microphone import get_file_provider
+from waclient.sensors.microphone import get_file_provider as get_file_provider_microphone
 from wacryptolib.container import ContainerStorage
 from wacryptolib.escrow import get_free_keys_generator_worker
 from wacryptolib.key_storage import FilesystemKeyStorage
@@ -52,7 +52,8 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
 
     gyroscope_sensor = get_periodic_value_provider_gyroscope(json_aggregator=gyroscope_json_aggregator, polling_interval_s=polling_interval_s)
 
-    microphone_sensor = get_file_provider(tarfile_aggregator=tarfile_aggregator)
+    microphone_sensor = get_file_provider_microphone(interval_s=container_member_duration_s,
+                                                     tarfile_aggregator=tarfile_aggregator)
 
     sensors = [gyroscope_sensor, microphone_sensor]
     sensors_manager = SensorsManager(sensors=sensors)
