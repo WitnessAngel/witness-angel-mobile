@@ -2,7 +2,7 @@ import threading
 from datetime import timezone, datetime
 
 from waclient.common_config import IS_ANDROID, INTERNAL_CACHE_DIR
-from wacryptolib.sensor import TarfileAggregator
+from wacryptolib.sensor import TarfileRecordsAggregator
 from wacryptolib.utilities import PeriodicTaskHandler, synchronized
 
 from kivy.logger import Logger as logger
@@ -16,7 +16,7 @@ class MicrophoneSensor(PeriodicTaskHandler):
     _lock = threading.Lock()
     _current_start_time = None
 
-    def __init__(self, interval_s: int, tarfile_aggregator: TarfileAggregator):
+    def __init__(self, interval_s: int, tarfile_aggregator: TarfileRecordsAggregator):
         super().__init__(interval_s=interval_s, runonstart=False)
         self._tarfile_aggregator = tarfile_aggregator
 
@@ -111,7 +111,7 @@ class MicrophoneSensor(PeriodicTaskHandler):
         while switching output files.
         """
         if not self.is_running:
-            return  # Thread got called a list time after sensor stop, forget about it
+            return  # Thread looped one last time after sensor got stopped, forget about it
 
         logger.info("Changing the output file of microphone recorder")
         from_datetime = self._current_start_time

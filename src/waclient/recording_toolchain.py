@@ -8,7 +8,7 @@ from waclient.sensors.microphone import get_file_provider as get_file_provider_m
 from wacryptolib.container import ContainerStorage
 from wacryptolib.escrow import get_free_keys_generator_worker
 from wacryptolib.key_storage import FilesystemKeyStorage
-from wacryptolib.sensor import TarfileAggregator, JsonAggregator, SensorsManager
+from wacryptolib.sensor import TarfileRecordsAggregator, JsonDataAggregator, SensorsManager
 
 from kivy.logger import Logger as logger
 
@@ -42,10 +42,10 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
                                          max_containers_count=max_containers_count,
                                          local_key_storage=local_key_storage)
 
-    tarfile_aggregator = TarfileAggregator(
+    tarfile_aggregator = TarfileRecordsAggregator(
         container_storage=container_storage, max_duration_s=container_recording_duration_s)
 
-    gyroscope_json_aggregator = JsonAggregator(
+    gyroscope_json_aggregator = JsonDataAggregator(
         max_duration_s=container_member_duration_s,
         tarfile_aggregator=tarfile_aggregator,
         sensor_name="gyroscope")

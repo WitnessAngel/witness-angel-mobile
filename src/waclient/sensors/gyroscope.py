@@ -3,7 +3,7 @@ import importlib
 from plyer import gyroscope
 from plyer.utils import platform
 
-from wacryptolib.sensor import JsonAggregator, PeriodicValuePoller
+from wacryptolib.sensor import JsonDataAggregator, PeriodicValuePoller
 
 try:
     importlib.import_module('plyer.platforms.{}.{}'.format(platform, "gyroscope"))
