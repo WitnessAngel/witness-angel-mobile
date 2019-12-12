@@ -49,7 +49,7 @@ def test_nominal_recording_toolchain_case():
 
     tar_file = TarfileRecordsAggregator.read_tarfile_from_bytestring(tarfile_bytestring)
     tarfile_members = tar_file.getnames()
-    assert len(tarfile_members) == 2
+    assert len(tarfile_members) == 3
 
     # Gyroscope data
 
@@ -63,6 +63,16 @@ def test_nominal_recording_toolchain_case():
     assert len(gyroscope_data) >= 4
     assert gyroscope_data[0] == {'rotation_rate_x': None, 'rotation_rate_y': None, 'rotation_rate_z': None}
 
+    # GPS data
+
+    microphone_filenames = [m for m in tarfile_members if "gps" in m]
+    assert len(microphone_filenames) == 1
+    assert microphone_filenames[0].endswith(".json")
+
+    json_bytestring = tar_file.extractfile(microphone_filenames[0]).read()
+    gyroscope_data = load_from_json_bytes(json_bytestring)
+    assert gyroscope_data == [{'x': 66}]  # Single fake data pushed by sensor
+
     # Microphone data
 
     microphone_filenames = [m for m in tarfile_members if "microphone" in m]
@@ -71,4 +81,6 @@ def test_nominal_recording_toolchain_case():
 
     mp4_bytestring = tar_file.extractfile(microphone_filenames[0]).read()
     assert mp4_bytestring == b"fake_microphone_recording_data"
+
+
 

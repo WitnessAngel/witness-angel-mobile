@@ -1,3 +1,4 @@
+import sys
 from logging import Handler
 
 
@@ -13,5 +14,7 @@ class CallbackHandler(Handler):
             self._gui_console_callback(msg)
         except Exception as exc:
             print("Warning: exception in CallbackHandler when emitting record", record, "->", exc)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
 
 

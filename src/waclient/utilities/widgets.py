@@ -60,6 +60,7 @@ class ConsoleOutput(TextInput):
         app.bind(on_start=self.my_on_start)
 
     def is_at_bottom(self):
+        #print(">>>>>self.parent.scroll_y ", self.parent.scroll_y)
         return self.parent.scroll_y <= 0.05
 
     def scroll_to_bottom(self):
@@ -70,11 +71,12 @@ class ConsoleOutput(TextInput):
             return  # Logging recursion happened, typically due to GL events
         self._add_text_is_in_progress = True
         try:
+            is_locked = self.is_at_bottom()
+
             text += "\n"
             #print(">>>adding text", repr(text), "from", threading.get_ident(), "to", repr(self.text))
             #import traceback
             #traceback.print_stack(file=sys.stdout)
-            is_locked = self.is_at_bottom()
 
             self.text += text
 
@@ -85,10 +87,10 @@ class ConsoleOutput(TextInput):
                 new_text = "\n".join(new_lines) + "\n"
                 self.text = new_text
 
-            self.parent.scroll_y = 0
+            ##self.parent.scroll_y = 0
             if is_locked:
                 self.scroll_to_bottom()
-                # print("FORCE SCROLL", self.parent.scroll_y)
+                #print("FORCE SCROLL", self.parent.scroll_y)
                 # self.parent.scroll_y = 1  # lock-to-bottom behaviour
         finally:
             self._add_text_is_in_progress = False
