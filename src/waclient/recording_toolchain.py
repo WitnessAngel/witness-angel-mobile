@@ -2,7 +2,7 @@ import functools
 
 from oscpy.server import OSCThreadServer
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, INTERNAL_KEYS_DIR, FREE_KEY_TYPES
+from waclient.common_config import INTERNAL_CONTAINERS_DIR, INTERNAL_KEYS_DIR, FREE_KEY_TYPES, IS_ANDROID
 from waclient.sensors.gps import get_periodic_value_provider as get_periodic_value_provider_gps
 from waclient.sensors.gyroscope import get_periodic_value_provider as get_periodic_value_provider_gyroscope
 from waclient.sensors.microphone import get_file_provider as get_file_provider_microphone
@@ -17,8 +17,16 @@ from kivy.logger import Logger as logger
 osc = OSCThreadServer(encoding="utf8")
 
 
+if IS_ANDROID:
+    # Due to bug in JNI, we must ensure some classes are found first from MAIN process thread!
+    from jnius import autoclass
+    autoclass('org.jnius.NativeInvocationHandler')
+
+
 def build_recording_toolchain(config, local_key_storage, encryption_conf):
     """Instantiate the whole toolchain of sensors and aggregators, depending on the config."""
+
+    # TODO make this part more resilient against exceptions
 
     def get_conf_value(*args, converter=None, **kwargs):
         value = config.getdefault("usersettings", *args, **kwargs)

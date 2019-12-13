@@ -206,7 +206,7 @@ class WitnessAngelClientApp(App):
         self.root.ids.recording_btn.disabled = True
         Clock.schedule_interval(self._request_recording_state, self.service_querying_interval)
 
-        request_multiple_permissions(permissions=["WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO", "CAMERA"]) # Might NOT be granted by user!
+        request_multiple_permissions(permissions=["WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO", "CAMERA", "ACCESS_FINE_LOCATION"]) # Might NOT be granted by user!
 
         #import logging_tree
         #logging_tree.printout()

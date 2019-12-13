@@ -1,9 +1,12 @@
 import importlib
+import threading
 
 from plyer import gyroscope
 from plyer.utils import platform
 
 from wacryptolib.sensor import JsonDataAggregator, PeriodicValuePoller
+
+from wacryptolib.utilities import synchronized
 
 try:
     importlib.import_module('plyer.platforms.{}.{}'.format(platform, "gyroscope"))
@@ -11,25 +14,49 @@ try:
 except ImportError:
     gyroscope_is_implemented = False
 
-def get_periodic_value_provider(json_aggregator, polling_interval_s):
 
-    def get_gyroscope_rotation():
-        rotation_rate = None
+#print(">>>>>>>>>>>>>>>>>>>>gyroscope_is_implemented", gyroscope_is_implemented)
+
+
+class GyroscopeValueProvider(PeriodicValuePoller):
+
+    _gyroscope_is_enabled = False
+    _lock = threading.Lock()
+
+    @synchronized
+    def start(self):
+        super().start()
         if gyroscope_is_implemented:
-            try:
-                rotation_rate = gyroscope.rotation
-            except NotImplementedError:
-                pass  # TODO logging or warnings here?
-        if rotation_rate is None:
+            gyroscope.enable()
+        self._gyroscope_is_enabled = True
+
+    @synchronized
+    def stop(self):
+        super().stop()
+        if gyroscope_is_implemented:
+            gyroscope.disable()
+        self._gyroscope_is_enabled = False
+
+    @synchronized
+    def _task_func(self):
+        if not self.is_running:
+            return  # End of recording
+        assert self._gyroscope_is_enabled # Sanity check for desktop platform
+        if gyroscope_is_implemented:
+            rotation_rate = gyroscope.rotation
+        else:
             rotation_rate = (None, None, None)
 
         rotation_dict = {"rotation_rate_x": rotation_rate[0],
                          "rotation_rate_y": rotation_rate[1],
                          "rotation_rate_z": rotation_rate[2]}
-        print("> got rotation rate", rotation_dict)
+        #print("> got rotation rate", rotation_dict)
         return rotation_dict
 
-    poller = PeriodicValuePoller(
-        interval_s=polling_interval_s, task_func=get_gyroscope_rotation, json_aggregator=json_aggregator)
+
+def get_periodic_value_provider(json_aggregator, polling_interval_s):
+
+    poller = GyroscopeValueProvider(
+        interval_s=polling_interval_s, json_aggregator=json_aggregator)
 
     return poller
