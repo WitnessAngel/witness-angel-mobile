@@ -148,6 +148,5 @@ class MicrophoneSensor(PeriodicTaskHandler):
         logger.info("Stopped microphone media recorder")
 
 
-
-def get_file_provider(interval_s, tarfile_aggregator):
+def get_microphone_sensor(interval_s, tarfile_aggregator):
     return MicrophoneSensor(interval_s=interval_s, tarfile_aggregator=tarfile_aggregator)

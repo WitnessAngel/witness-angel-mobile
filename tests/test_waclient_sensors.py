@@ -20,7 +20,7 @@ class FakeTarfileRecordsAggregator(TarfileRecordsAggregator):
 
 def test_gyroscope_sensor():
 
-    from waclient.sensors.gyroscope import get_periodic_value_provider
+    from waclient.sensors.gyroscope import get_gyroscope_sensor
 
     fake_tarfile_aggregator = FakeTarfileRecordsAggregator()
 
@@ -30,7 +30,7 @@ def test_gyroscope_sensor():
         sensor_name="test_gyroscope",
     )
 
-    sensor = get_periodic_value_provider(json_aggregator=json_aggregator, polling_interval_s=0.1)
+    sensor = get_gyroscope_sensor(json_aggregator=json_aggregator, polling_interval_s=0.1)
 
     sensor.start()
 
@@ -54,3 +54,5 @@ def test_gyroscope_sensor():
             assert "rotation_rate_y" in sensor_entry, sensor_entry
             assert "rotation_rate_z" in sensor_entry, sensor_entry
 
+
+# TODO complete with microphone and gps sensors!!

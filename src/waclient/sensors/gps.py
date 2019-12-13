@@ -5,7 +5,7 @@ from plyer import gps
 from plyer.utils import platform
 
 from wacryptolib.sensor import JsonDataAggregator, PeriodicValuePoller, PeriodicValueMixin
-from wacryptolib.utilities import TaskRunnerStateMachineBase
+from wacryptolib.utilities import TaskRunnerStateMachineBase, synchronized
 
 from kivy.logger import Logger as logger
 
@@ -21,7 +21,7 @@ print(">>>>>>>>>>gps_is_implemented", gps_is_implemented)
 
 class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
 
-    # No need for threading lock in this class, start/stop and background threads don't interfere.
+    _lock = threading.Lock()
 
     def __init__(self, interval_s: int, **kwargs):
         super().__init__(**kwargs)
@@ -34,16 +34,21 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
                 traceback.print_exc()
                 raise
 
+    @synchronized
     def _on_location(self, **kwargs):
         """Called by GPS thread, multiples keys/value are provided
         (typically: lon, lat, speed, bearing, altitude, and accuracy)
         """
-        self._offloaded_add_data(data_dict=kwargs)
+        if self.is_running:  # Else, its' a final call after a stop()?
+            self._offloaded_add_data(data_dict=kwargs)
 
+    @synchronized
     def _on_status(self, **kwargs):
         """Called by GPS thread, "message-type" and "status" parameters are provided."""
-        self._offloaded_add_data(data_dict=kwargs)
+        if self.is_running:  # Else, its' a final call after a stop()?
+            self._offloaded_add_data(data_dict=kwargs)
 
+    @synchronized
     def start(self):
         super().start()
         if gps_is_implemented:
@@ -53,12 +58,13 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
             # Simulate a single push of GPS data
             self._offloaded_add_data(dict(x=66))
 
+    @synchronized
     def stop(self):
         super().stop()
         if gps_is_implemented:
             gps.stop()
 
 
-def get_periodic_value_provider(json_aggregator, polling_interval_s):
-    poller = GpsValueProvider(interval_s=polling_interval_s, json_aggregator=json_aggregator)
-    return poller
+def get_gps_sensor(json_aggregator, polling_interval_s):
+    sensor = GpsValueProvider(interval_s=polling_interval_s, json_aggregator=json_aggregator)
+    return sensor

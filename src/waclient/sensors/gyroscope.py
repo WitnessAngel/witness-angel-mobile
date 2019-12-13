@@ -42,10 +42,11 @@ class GyroscopeValueProvider(PeriodicValuePoller):
         if not self.is_running:
             return  # End of recording
         assert self._gyroscope_is_enabled # Sanity check for desktop platform
+
         if gyroscope_is_implemented:
             rotation_rate = gyroscope.rotation
         else:
-            rotation_rate = (None, None, None)
+            rotation_rate = (None, None, None)  # Fake values
 
         rotation_dict = {"rotation_rate_x": rotation_rate[0],
                          "rotation_rate_y": rotation_rate[1],
@@ -54,9 +55,6 @@ class GyroscopeValueProvider(PeriodicValuePoller):
         return rotation_dict
 
 
-def get_periodic_value_provider(json_aggregator, polling_interval_s):
-
-    poller = GyroscopeValueProvider(
-        interval_s=polling_interval_s, json_aggregator=json_aggregator)
-
-    return poller
+def get_gyroscope_sensor(json_aggregator, polling_interval_s):
+    sensor = GyroscopeValueProvider(interval_s=polling_interval_s, json_aggregator=json_aggregator)
+    return sensor
