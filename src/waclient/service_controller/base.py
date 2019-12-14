@@ -15,7 +15,9 @@ class ServiceControllerBase:
         print("Message sent to service: %s", address)
         try:
             return self._osc_client.send_message(address, values=values)
-        except OSError as exc:
+        except ConnectionError:
+            pass  # Normal at start of app...
+        except Exception as exc:
             logger.debug("Could not send osc message %s%s to service: %r", address, values, exc)
             return
 
