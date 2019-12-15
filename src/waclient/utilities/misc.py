@@ -4,7 +4,7 @@ from kivy.logger import Logger as logger
 
 
 @decorator
-def swallow_exception(f, *args, **kwargs):
+def safe_catch_unhandled_exception(f, *args, **kwargs):
     try:
         return f(*args, **kwargs)
     except Exception as exc:

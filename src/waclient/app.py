@@ -34,7 +34,7 @@ from waclient.common_config import (
     APP_CONFIG_FILE,
     request_external_storage_dirs_access,
 )
-from waclient.utilities import swallow_exception
+from waclient.utilities.misc import safe_catch_unhandled_exception
 
 # from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
@@ -260,7 +260,7 @@ class WitnessAngelClientApp(App):
         # TODO - schedule here broadcast_recording_state() calls if OSC is not safe enough..
 
     @osc.address_method("/log_output")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def _post_log_output(self, msg):
         callback = functools.partial(self.log_output, msg)
         Clock.schedule_once(callback)
@@ -269,7 +269,7 @@ class WitnessAngelClientApp(App):
         self.service_controller.broadcast_recording_state()
 
     @osc.address_method("/receive_recording_state")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def receive_recording_state(self, is_recording):
         # print(">>>>>receive_recording_state", is_recording)
         expected_state = "down" if is_recording else "normal"

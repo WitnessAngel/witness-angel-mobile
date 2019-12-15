@@ -30,7 +30,7 @@ from waclient.recording_toolchain import (
     start_recording_toolchain,
     stop_recording_toolchain,
 )
-from waclient.utilities.misc import swallow_exception
+from waclient.utilities.misc import safe_catch_unhandled_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
 from wacryptolib.container import decrypt_data_from_container
 from wacryptolib.key_storage import FilesystemKeyStorage
@@ -102,13 +102,13 @@ class BackgroundServer(object):
         return config
 
     @osc.address_method("/ping")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def ping(self):
         logger.info("Ping successful!")
         self._send_message("/log_output", "Pong")
 
     @osc.address_method("/start_recording")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def start_recording(self, env=None):
         try:
             encryption_conf = get_encryption_conf(env)
@@ -138,7 +138,7 @@ class BackgroundServer(object):
         )
 
     @osc.address_method("/broadcast_recording_state")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def broadcast_recording_state(self):
         logger.info(
             "Broadcasting service state (is_recording=%s)" % self.is_recording
@@ -146,7 +146,7 @@ class BackgroundServer(object):
         self._send_message("/receive_recording_state", self.is_recording)
 
     @osc.address_method("/stop_recording")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def stop_recording(self):
         if not self.is_recording:
             logger.warning(
@@ -164,7 +164,7 @@ class BackgroundServer(object):
             self.broadcast_recording_state()
 
     @osc.address_method("/attempt_container_decryption")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def attempt_container_decryption(self, container_filepath):
         logger.info("Decryption requested for container %s", container_filepath)
         target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(
@@ -189,7 +189,7 @@ class BackgroundServer(object):
         )
 
     @osc.address_method("/stop_server")
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def stop_server(self):
         logger.info("Stopping service")
 
@@ -203,7 +203,7 @@ class BackgroundServer(object):
         self._termination_event.set()
         logger.info("Service stopped")
 
-    @swallow_exception
+    @safe_catch_unhandled_exception
     def join(self):
         """
         Wait for the termination of the background server
