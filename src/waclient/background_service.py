@@ -20,7 +20,7 @@ from waclient.utilities.logging import CallbackHandler
 
 from waclient.common_config import APP_CONFIG_FILE, INTERNAL_KEYS_DIR, EXTERNAL_DATA_EXPORTS_DIR, get_encryption_conf
 from waclient.recording_toolchain import build_recording_toolchain, start_recording_toolchain, stop_recording_toolchain
-from waclient.utilities import swallow_exception
+from waclient.utilities.misc import swallow_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
 from wacryptolib.container import decrypt_data_from_container
 from wacryptolib.key_storage import FilesystemKeyStorage

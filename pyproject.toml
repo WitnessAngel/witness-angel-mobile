@@ -31,7 +31,7 @@ exclude = ["_build"]
 python = ">=3.6"
 
 # Main utilities
-wacryptolib = "^0.3.0"
+wacryptolib = "^0.4.0"
 kivy = "=1.11.1"
 decorator = "^4.4"
 docutils = "^0.15.2"
