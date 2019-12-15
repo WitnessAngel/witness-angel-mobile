@@ -6,7 +6,8 @@
 Welcome to Witness Angel Client's documentation!
 ======================================================
 
-A sleek slideshow app that supports swipe gestures.
+TODO TODO
+
 
 Basics
 ------
@@ -24,8 +25,6 @@ API Reference
 
 .. toctree::
    :maxdepth: 2
-
-   witness-angel-client
 
 
 Indices and tables

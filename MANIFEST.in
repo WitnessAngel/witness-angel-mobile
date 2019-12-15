@@ -1,3 +1,0 @@
-include LICENSE README.rst
-include */user_settings.json */*.kv
-recursive-include data **/*.mo

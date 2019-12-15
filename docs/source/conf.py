@@ -48,7 +48,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"Witness Angel Client"
-copyright = u"2015, Pascal Chambon"
+copyright = u"2019, Pascal Chambon"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
