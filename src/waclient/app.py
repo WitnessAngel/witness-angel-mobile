@@ -6,7 +6,10 @@ import shutil
 
 from kivy.uix.filechooser import filesize_units
 
-from wacryptolib.container import extract_metadata_from_container, get_encryption_configuration_summary
+from wacryptolib.container import (
+    extract_metadata_from_container,
+    get_encryption_configuration_summary,
+)
 from wacryptolib.utilities import load_from_json_file, dump_to_json_str
 
 os.environ["KIVY_NO_ARGS"] = "1"
@@ -22,10 +25,18 @@ import kivy
 from kivy.uix.settings import SettingsWithTabbedPanel
 from oscpy.server import OSCThreadServer, ServerClass
 
-from waclient.common_config import INTERNAL_CONTAINERS_DIR, get_encryption_conf, request_single_permission, \
-    request_multiple_permissions, DEFAULT_CONFIG_TEMPLATE, APP_CONFIG_FILE, request_external_storage_dirs_access
+from waclient.common_config import (
+    INTERNAL_CONTAINERS_DIR,
+    get_encryption_conf,
+    request_single_permission,
+    request_multiple_permissions,
+    DEFAULT_CONFIG_TEMPLATE,
+    APP_CONFIG_FILE,
+    request_external_storage_dirs_access,
+)
 from waclient.utilities import swallow_exception
-#from waclient.utilities.i18n import Lang
+
+# from waclient.utilities.i18n import Lang
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.osc import get_osc_server
 
@@ -39,17 +50,15 @@ from kivy.uix.carousel import Carousel
 from os.path import join, dirname
 from waclient.service_controller import ServiceController
 
-TIMER_OPTIONS = {
-    "1/60 sec": 1 / 60.0,
-    "1/30 sec": 1 / 30.0,
-    "1/15 sec": 1 / 15.0,
-}
+TIMER_OPTIONS = {"1/60 sec": 1 / 60.0, "1/30 sec": 1 / 30.0, "1/15 sec": 1 / 15.0}
 
-class A():
 
-    def _(self, a): return a
+class A:
+    def _(self, a):
+        return a
 
-tr = A()  #("en")
+
+tr = A()  # ("en")
 
 
 osc, osc_starter_callback = get_osc_server(is_master=True)
@@ -117,10 +126,10 @@ class WitnessAngelClientApp(App):
         """
         # print ("CONFIG IS", self.config)
         self.language = self.config.getdefault("usersettings", "language", "en")
-        #tr.switch_lang(self.language)
+        # tr.switch_lang(self.language)
 
-        #user_interval = self.config.get("usersettings", "timer_interval")
-        #self.timer_interval = TIMER_OPTIONS[user_interval]
+        # user_interval = self.config.get("usersettings", "timer_interval")
+        # self.timer_interval = TIMER_OPTIONS[user_interval]
 
         self.carousel = self.root.ids.carousel
         self.progress_bar = self.root.ids.progress_bar
@@ -160,7 +169,7 @@ class WitnessAngelClientApp(App):
         """Read the user settings and create a panel from it."""
         settings_file = join(dirname(__file__), "user_settings_schema.json")
         settings.add_json_panel(
-                title=self.title, config=self.config, filename=settings_file
+            title=self.title, config=self.config, filename=settings_file
         )
 
     def on_config_change(self, config, section, key, value):
@@ -192,10 +201,10 @@ class WitnessAngelClientApp(App):
         pass
 
     def on_start(self):
-        '''Event handler for the `on_start` event which is fired after
+        """Event handler for the `on_start` event which is fired after
         initialization (after build() has been called) but before the
         application has started running.
-        '''
+        """
 
         self.service_controller = ServiceController()
         self.service_controller.start_service()
@@ -204,18 +213,27 @@ class WitnessAngelClientApp(App):
         logging.getLogger(None).addHandler(CallbackHandler(self.log_output))
 
         self.root.ids.recording_btn.disabled = True
-        Clock.schedule_interval(self._request_recording_state, self.service_querying_interval)
+        Clock.schedule_interval(
+            self._request_recording_state, self.service_querying_interval
+        )
 
-        request_multiple_permissions(permissions=["WRITE_EXTERNAL_STORAGE", "RECORD_AUDIO", "CAMERA", "ACCESS_FINE_LOCATION"]) # Might NOT be granted by user!
+        request_multiple_permissions(
+            permissions=[
+                "WRITE_EXTERNAL_STORAGE",
+                "RECORD_AUDIO",
+                "CAMERA",
+                "ACCESS_FINE_LOCATION",
+            ]
+        )  # Might NOT be granted by user!
 
-        #import logging_tree
-        #logging_tree.printout()
+        # import logging_tree
+        # logging_tree.printout()
 
     def on_stop(self):
-        '''Event handler for the `on_stop` event which is fired when the
+        """Event handler for the `on_stop` event which is fired when the
         application has finished running (i.e. the window is about to be
         closed).
-        '''
+        """
         self.service_controller.stop_service()  # Will wait for termination else kill
 
     def _update_timer(self, dt):
@@ -233,7 +251,7 @@ class WitnessAngelClientApp(App):
         self._console_output.add_text(msg)
 
     def switch_to_recording_state(self, is_recording):
-        #print(">--->>switch_to_recording_state", is_recording)
+        # print(">--->>switch_to_recording_state", is_recording)
         self.root.ids.recording_btn.disabled = True
         if is_recording:
             self.service_controller.start_recording()
@@ -241,7 +259,7 @@ class WitnessAngelClientApp(App):
             self.service_controller.stop_recording()
         # TODO - schedule here broadcast_recording_state() calls if OSC is not safe enough..
 
-    @osc.address_method('/log_output')
+    @osc.address_method("/log_output")
     @swallow_exception
     def _post_log_output(self, msg):
         callback = functools.partial(self.log_output, msg)
@@ -250,25 +268,25 @@ class WitnessAngelClientApp(App):
     def _request_recording_state(self, *args, **kwargs):
         self.service_controller.broadcast_recording_state()
 
-    @osc.address_method('/receive_recording_state')
+    @osc.address_method("/receive_recording_state")
     @swallow_exception
     def receive_recording_state(self, is_recording):
-        #print(">>>>>receive_recording_state", is_recording)
+        # print(">>>>>receive_recording_state", is_recording)
         expected_state = "down" if is_recording else "normal"
         self.root.ids.recording_btn.state = expected_state
         self.root.ids.recording_btn.disabled = False
         Clock.unschedule(self._request_recording_state)
 
-    #def get_path(self, sd_path):
-     #   """Called when a file is selected in the File Chooser Widget."""
-     #   print(Path(__file__).parents[2] / "data")
-     #   self.path = sd_path
+    # def get_path(self, sd_path):
+    #   """Called when a file is selected in the File Chooser Widget."""
+    #   print(Path(__file__).parents[2] / "data")
+    #   self.path = sd_path
 
     @staticmethod
     def get_nice_size(size):
         for unit in filesize_units:
             if size < 1024.0:
-                return '%1.0f %s' % (size, unit)
+                return "%1.0f %s" % (size, unit)
             size /= 1024.0
         return size
 
@@ -276,7 +294,7 @@ class WitnessAngelClientApp(App):
         """Just a test of the path usability of the
          widget FileChooserListView
          """
-        #print("-----> STATING", filepath)
+        # print("-----> STATING", filepath)
         if not filepath:
             return "Please select a container"
 
@@ -288,11 +306,13 @@ class WitnessAngelClientApp(App):
 
             metadata = extract_metadata_from_container(container)
             if not metadata:
-                info_lines.append("No metadata found in container regarding inner files.")
+                info_lines.append(
+                    "No metadata found in container regarding inner files."
+                )
 
             info_lines.append("MEMBERS:")
             for member_name, member_metadata in sorted(metadata["members"].items()):
-                #TODO later add more info
+                # TODO later add more info
                 nice_size = self.get_nice_size(member_metadata["size"])
                 info_lines.append("- %s (%s)" % (member_name, nice_size))
 
@@ -319,9 +339,9 @@ class WitnessAngelClientApp(App):
         self.refresh_filebrowser()
 
     def refresh_filebrowser(self):
-        #self.root.ids.filebrowser.files = []
+        # self.root.ids.filebrowser.files = []
         self.root.ids.filebrowser._update_files()  # _trigger_update()
-        #if not self.root.ids.filebrowser.files:
+        # if not self.root.ids.filebrowser.files:
         #    self.root.ids.filebrowser.on_entries_cleared() # canvas.ask_update()
 
         # TODO: test with latest Kivy, else open ticket regarding this part:
@@ -330,8 +350,8 @@ class WitnessAngelClientApp(App):
 
     def attempt_container_decryption(self, filepath):
         assert isinstance(filepath, str), filepath
-        #container_name = os.path.basename(filepath)
-        #logger.info("Decryption requested for container %s", container_name)
+        # container_name = os.path.basename(filepath)
+        # logger.info("Decryption requested for container %s", container_name)
         if not request_external_storage_dirs_access():
             logger.warning("Access to external storage not granted by system yet.")
             return

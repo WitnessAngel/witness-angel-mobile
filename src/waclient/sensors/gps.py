@@ -4,13 +4,17 @@ import threading
 from plyer import gps
 from plyer.utils import platform
 
-from wacryptolib.sensor import JsonDataAggregator, PeriodicValuePoller, PeriodicValueMixin
+from wacryptolib.sensor import (
+    JsonDataAggregator,
+    PeriodicValuePoller,
+    PeriodicValueMixin,
+)
 from wacryptolib.utilities import TaskRunnerStateMachineBase, synchronized
 
 from kivy.logger import Logger as logger
 
 try:
-    importlib.import_module('plyer.platforms.{}.{}'.format(platform, "gps"))
+    importlib.import_module("plyer.platforms.{}.{}".format(platform, "gps"))
     gps_is_implemented = True
 except ImportError:
     gps_is_implemented = False
@@ -31,6 +35,7 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
                 gps.configure(on_location=self._on_location, on_status=self._on_status)
             except Exception:
                 import traceback
+
                 traceback.print_exc()
                 raise
 
@@ -52,8 +57,10 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
     def start(self):
         super().start()
         if gps_is_implemented:
-            gps.start(minTime=self._interval_s * 1000,  # In milliseconds (float)
-                      minDistance=1)  # In meters (float)
+            gps.start(
+                minTime=self._interval_s * 1000,  # In milliseconds (float)
+                minDistance=1,
+            )  # In meters (float)
         else:
             # Simulate a single push of GPS data
             self._offloaded_add_data(dict(x=66))
@@ -66,5 +73,7 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
 
 
 def get_gps_sensor(json_aggregator, polling_interval_s):
-    sensor = GpsValueProvider(interval_s=polling_interval_s, json_aggregator=json_aggregator)
+    sensor = GpsValueProvider(
+        interval_s=polling_interval_s, json_aggregator=json_aggregator
+    )
     return sensor

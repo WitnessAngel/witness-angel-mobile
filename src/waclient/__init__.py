@@ -1,4 +1,3 @@
-
 import sys, logging
 
 custom_kivy_stream_handler = logging.StreamHandler()
@@ -15,5 +14,5 @@ logging.Logger.manager.root = logging.root
 logging.root.setLevel(logging.DEBUG)
 logging.disable(0)
 
-#import logging_tree
-#logging_tree.printout()
+# import logging_tree
+# logging_tree.printout()

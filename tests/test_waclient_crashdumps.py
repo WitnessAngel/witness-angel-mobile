@@ -10,17 +10,14 @@ from waclient.utilities.crashdumps import generate_crashdump
 @responses.activate
 def test_generate_crashdump():
 
-    fake_url =  "http://mock/crashdumps/"
+    fake_url = "http://mock/crashdumps/"
 
     def callback_success(request):
-        return (
-            200,
-            {},
-            u'OK',
-        )
+        return (200, {}, u"OK")
+
     responses.add_callback(
         responses.POST,
-            fake_url,
+        fake_url,
         content_type="application/x-www-form-urlencoded",
         callback=callback_success,
     )
@@ -37,7 +34,7 @@ def test_generate_crashdump():
 
     assert "SOFTWARE" in report
     assert "Thîngs hâppened" in report
-    #print(report)
+    # print(report)
 
     with pytest.raises(ConnectionError):
         generate_crashdump(exc_info, target_url="http://doesnotexist/")

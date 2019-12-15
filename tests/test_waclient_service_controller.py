@@ -4,7 +4,14 @@ from _waclient_test_utilities import purge_test_containers, list_test_containers
 from waclient.service_controller import ServiceController
 
 
-def _test_service_controller(sleep_time_s, recording_iterations=1, skip_stop_recording=False, kill_instead_of_stop_service=False, expected_return_code=0, expected_containers_count=1):
+def _test_service_controller(
+    sleep_time_s,
+    recording_iterations=1,
+    skip_stop_recording=False,
+    kill_instead_of_stop_service=False,
+    expected_return_code=0,
+    expected_containers_count=1,
+):
 
     ctrl = ServiceController()
     purge_test_containers()
@@ -45,7 +52,10 @@ def _test_service_controller(sleep_time_s, recording_iterations=1, skip_stop_rec
 
     container_filepaths = list_test_containers()
     assert len(container_filepaths) == expected_containers_count
-    assert all(os.stat(container_filepath).st_size > 100 for container_filepath in container_filepaths)
+    assert all(
+        os.stat(container_filepath).st_size > 100
+        for container_filepath in container_filepaths
+    )
 
 
 def test_service_controller_simple_case():
@@ -53,7 +63,9 @@ def test_service_controller_simple_case():
 
 
 def test_service_controller_multiple_recordings():
-    _test_service_controller(sleep_time_s=2, recording_iterations=2, expected_containers_count=2)
+    _test_service_controller(
+        sleep_time_s=2, recording_iterations=2, expected_containers_count=2
+    )
 
 
 def test_service_controller_automatic_recording_shutdown():
@@ -63,4 +75,10 @@ def test_service_controller_automatic_recording_shutdown():
 
 def test_service_controller_violent_shutdown():
     # When brutally killing
-    _test_service_controller(sleep_time_s=2, skip_stop_recording=True, kill_instead_of_stop_service=True, expected_return_code=1, expected_containers_count=0)
+    _test_service_controller(
+        sleep_time_s=2,
+        skip_stop_recording=True,
+        kill_instead_of_stop_service=True,
+        expected_return_code=1,
+        expected_containers_count=0,
+    )

@@ -1,6 +1,6 @@
-
 import os
 from waclient.app import WitnessAngelClientApp
+
 
 def main():
     WitnessAngelClientApp().run()

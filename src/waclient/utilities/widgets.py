@@ -60,7 +60,7 @@ class ConsoleOutput(TextInput):
         app.bind(on_start=self.my_on_start)
 
     def is_at_bottom(self):
-        #print(">>>>>self.parent.scroll_y ", self.parent.scroll_y)
+        # print(">>>>>self.parent.scroll_y ", self.parent.scroll_y)
         return self.parent.scroll_y <= 0.05
 
     def scroll_to_bottom(self):
@@ -74,33 +74,35 @@ class ConsoleOutput(TextInput):
             is_locked = self.is_at_bottom()
 
             text += "\n"
-            #print(">>>adding text", repr(text), "from", threading.get_ident(), "to", repr(self.text))
-            #import traceback
-            #traceback.print_stack(file=sys.stdout)
+            # print(">>>adding text", repr(text), "from", threading.get_ident(), "to", repr(self.text))
+            # import traceback
+            # traceback.print_stack(file=sys.stdout)
 
             self.text += text
 
             # TODO reajust scroll_y after that!
             if len(self.text) > self.max_text_size:
                 lines = self.text.splitlines()
-                new_lines = lines[int(len(lines)/4):]  # Remove the first chunk of lines
+                new_lines = lines[
+                    int(len(lines) / 4) :
+                ]  # Remove the first chunk of lines
                 new_text = "\n".join(new_lines) + "\n"
                 self.text = new_text
 
             ##self.parent.scroll_y = 0
             if is_locked:
                 self.scroll_to_bottom()
-                #print("FORCE SCROLL", self.parent.scroll_y)
+                # print("FORCE SCROLL", self.parent.scroll_y)
                 # self.parent.scroll_y = 1  # lock-to-bottom behaviour
         finally:
             self._add_text_is_in_progress = False
-        #print("####", repr(self.text[:200]))
+        # print("####", repr(self.text[:200]))
         # Clock.schedule_once(self.parent.scroll_y = 1)
 
     def my_on_start(self, *args, **kwargs):
         pass
-        #print(">MY ON START", args, kwargs, self.parent)
-        #self.add_text("\n".join(str(i) for i in range(50)))
+        # print(">MY ON START", args, kwargs, self.parent)
+        # self.add_text("\n".join(str(i) for i in range(50)))
 
 
 class KivyConsole(BoxLayout):
@@ -134,7 +136,7 @@ class KivyConsole(BoxLayout):
     Default to 'DroidSansMono'
     """
 
-    font_size = NumericProperty('12sp')
+    font_size = NumericProperty("12sp")
     """Indicates the size of the font used for the console
 
     :data:`font_size` is a :class:`~kivy.properties.NumericProperty`,

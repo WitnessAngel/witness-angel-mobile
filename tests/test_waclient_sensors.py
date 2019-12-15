@@ -5,7 +5,6 @@ from wacryptolib.utilities import load_from_json_bytes
 
 
 class FakeTarfileRecordsAggregator(TarfileRecordsAggregator):
-
     def __init__(self):
         self._test_records = []
 
@@ -30,7 +29,9 @@ def test_gyroscope_sensor():
         sensor_name="test_gyroscope",
     )
 
-    sensor = get_gyroscope_sensor(json_aggregator=json_aggregator, polling_interval_s=0.1)
+    sensor = get_gyroscope_sensor(
+        json_aggregator=json_aggregator, polling_interval_s=0.1
+    )
 
     sensor.start()
 

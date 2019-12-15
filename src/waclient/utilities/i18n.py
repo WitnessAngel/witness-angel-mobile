@@ -45,7 +45,9 @@ class Lang(Observable):
     def switch_lang(self, lang):
         # instanciate a gettext
         locales = gettext.translation(
-                "witness-angel-client", LOCALE_DIR, languages=[lang]  # FIXME change dir lookup
+            "witness-angel-client",
+            LOCALE_DIR,
+            languages=[lang],  # FIXME change dir lookup
         )
         self.ugettext = locales.gettext
 

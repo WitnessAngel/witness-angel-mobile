@@ -13,11 +13,14 @@ class ServiceController(ServiceControllerBase):
     def start_service(self):
         assert not self._subprocess
         from waclient.common_config import ROOT_DIR
-        self._subprocess = subprocess.Popen([sys.executable, "-m", "waclient.background_service"],
-                                            shell=False, cwd=ROOT_DIR)
+
+        self._subprocess = subprocess.Popen(
+            [sys.executable, "-m", "waclient.background_service"],
+            shell=False,
+            cwd=ROOT_DIR,
+        )
         # TODO - wait for remote server to be pingable?
         atexit.register(self.stop_service)  # Protection against brutal ctrl-C
-
 
     def stop_service(self):
         assert self._subprocess  # Else, workflow error
@@ -28,5 +31,3 @@ class ServiceController(ServiceControllerBase):
         except subprocess.TimeoutExpired:
             logger.error("Service subprocess didn't exit gracefully, we kill it now")
             self._subprocess.kill()
-
-
