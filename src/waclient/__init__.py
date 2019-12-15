@@ -1,9 +1,11 @@
-import sys, logging
+import logging
+import sys
+import os
+
 
 custom_kivy_stream_handler = logging.StreamHandler()
 sys._kivy_logging_handler = custom_kivy_stream_handler
-
-from kivy.logger import Logger
+from kivy.logger import Logger as logger
 
 # Finish ugly monkey-patching by Kivy
 assert logging.getLogger("kivy") is logging.root

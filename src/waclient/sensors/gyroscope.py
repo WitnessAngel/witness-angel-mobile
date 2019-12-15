@@ -4,8 +4,7 @@ import threading
 from plyer import gyroscope
 from plyer.utils import platform
 
-from wacryptolib.sensor import JsonDataAggregator, PeriodicValuePoller
-
+from wacryptolib.sensor import PeriodicValuePoller
 from wacryptolib.utilities import synchronized
 
 try:

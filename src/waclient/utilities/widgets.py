@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import threading
 import webbrowser
 
-import sys
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.base import runTouchApp
@@ -17,19 +15,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.progressbar import ProgressBar
 from kivy.uix.textinput import TextInput
-
-
-class RefLabel(Label):
-    """Simple that opens a contained url in the webbrowser."""
-
-    def on_ref_press(self, url):
-        """Callback which is being run when the user clicks on a ref in the
-        label.
-
-        :param str url: URL to be opened in the webbrowser
-        """
-        Logger.info("Opening '{url}' in webbrowser.".format(url=url))
-        webbrowser.open(url)
 
 
 class TransitionProgress(ProgressBar):

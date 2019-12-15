@@ -1,6 +1,7 @@
-import sys, subprocess
-
 import atexit
+import subprocess
+import sys
+
 from kivy.logger import Logger as logger
 
 from waclient.service_controller.base import ServiceControllerBase

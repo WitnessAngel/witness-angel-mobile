@@ -1,10 +1,7 @@
-import functools
-
 from oscpy.server import OSCThreadServer
 
 from waclient.common_config import (
     INTERNAL_CONTAINERS_DIR,
-    INTERNAL_KEYS_DIR,
     FREE_KEY_TYPES,
     IS_ANDROID,
 )
@@ -13,7 +10,6 @@ from waclient.sensors.gyroscope import get_gyroscope_sensor
 from waclient.sensors.microphone import get_microphone_sensor
 from wacryptolib.container import ContainerStorage
 from wacryptolib.escrow import get_free_keys_generator_worker
-from wacryptolib.key_storage import FilesystemKeyStorage
 from wacryptolib.sensor import (
     TarfileRecordsAggregator,
     JsonDataAggregator,
@@ -21,7 +17,24 @@ from wacryptolib.sensor import (
 )
 
 from kivy.logger import Logger as logger
+from kivy.logger import Logger as logger
 
+from oscpy.server import OSCThreadServer
+from waclient.common_config import (
+    INTERNAL_CONTAINERS_DIR,
+    FREE_KEY_TYPES,
+    IS_ANDROID,
+)
+from waclient.sensors.gps import get_gps_sensor
+from waclient.sensors.gyroscope import get_gyroscope_sensor
+from waclient.sensors.microphone import get_microphone_sensor
+from wacryptolib.container import ContainerStorage
+from wacryptolib.escrow import get_free_keys_generator_worker
+from wacryptolib.sensor import (
+    TarfileRecordsAggregator,
+    JsonDataAggregator,
+    SensorsManager,
+)
 
 osc = OSCThreadServer(encoding="utf8")
 

@@ -1,4 +1,3 @@
-import os
 import socket
 from pathlib import Path
 
@@ -8,7 +7,6 @@ from kivy.utils import platform
 # TODO factorize and use unix socks when possible
 from oscpy.client import OSCClient
 from oscpy.server import OSCThreadServer
-
 from waclient.common_config import INTERNAL_APP_ROOT
 
 

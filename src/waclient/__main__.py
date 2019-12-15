@@ -1,4 +1,3 @@
-import os
 from waclient.app import WitnessAngelClientApp
 
 

@@ -1,11 +1,11 @@
 import threading
 from datetime import timezone, datetime
 
+from kivy.logger import Logger as logger
+
 from waclient.common_config import IS_ANDROID, INTERNAL_CACHE_DIR
 from wacryptolib.sensor import TarfileRecordsAggregator
 from wacryptolib.utilities import PeriodicTaskHandler, synchronized
-
-from kivy.logger import Logger as logger
 
 
 class MicrophoneSensor(PeriodicTaskHandler):

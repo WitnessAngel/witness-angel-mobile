@@ -1,12 +1,11 @@
 import os
 from pathlib import Path
+from typing import List
 
 from kivy import platform
 from plyer import storagepath
-from typing import List
 
 from wacryptolib.escrow import LOCAL_ESCROW_PLACEHOLDER
-
 
 ACTIVITY_CLASS = "org.kivy.android.PythonActivity"
 SERVICE_CLASS = "org.whitemirror.witnessangeldemo.ServiceRecordingservice"
@@ -135,7 +134,7 @@ FREE_KEY_TYPES = [
     "DSA_DSS",
 ]  # Must be the union of asymmetric encryption/signature keys below
 
-_main_remote_escrow_url = "http://127.0.0.1:8000/json/"
+_main_remote_escrow_url = "https://waescrow.prolifik.net/json/"
 
 _PROD_ENCRYPTION_CONF = dict(
     data_encryption_strata=[
@@ -154,10 +153,7 @@ _PROD_ENCRYPTION_CONF = dict(
                     signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
                 )
             ],
-        )
-    ]
-)
-"""
+        ),
         # Then we encrypt with escrow key and sign via local keys
         dict(
             data_encryption_algo="AES_CBC",
@@ -176,7 +172,7 @@ _PROD_ENCRYPTION_CONF = dict(
             ],
         )
     ]
-)"""
+)
 
 _TEST_ENCRYPTION_CONF = dict(
     data_encryption_strata=[

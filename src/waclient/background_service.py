@@ -1,24 +1,14 @@
 import io
-import os
-
-# os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
-
-import contextlib
-import functools
 import logging
 import os
 import tarfile
 import threading
 from configparser import Error as ConfigParserError
 
-from decorator import decorator
 from kivy.config import ConfigParser
 from kivy.logger import Logger as logger
-from oscpy.client import OSCClient
-from oscpy.server import OSCThreadServer, ServerClass
 
-from waclient.utilities.logging import CallbackHandler
-
+from oscpy.server import ServerClass
 from waclient.common_config import (
     APP_CONFIG_FILE,
     INTERNAL_KEYS_DIR,
@@ -30,11 +20,14 @@ from waclient.recording_toolchain import (
     start_recording_toolchain,
     stop_recording_toolchain,
 )
+from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
 from wacryptolib.container import decrypt_data_from_container
 from wacryptolib.key_storage import FilesystemKeyStorage
 from wacryptolib.utilities import load_from_json_file
+
+# os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
 
 osc, osc_starter_callback = get_osc_server(is_master=False)
 

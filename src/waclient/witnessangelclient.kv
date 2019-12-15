@@ -6,56 +6,11 @@
 #:import tr waclient.app.tr
 #:import KivyConsole waclient.utilities.widgets.KivyConsole
 
-#:set link_clr '222222'
-#:set kivy_github 'https://github.com/kivy/kivy'
-#:set cookiecutter_github 'https://github.com/audreyr/cookiecutter'
-#:set cookiedozer_github 'https://github.com/hackebrot/cookiedozer'
-#:set repo_github 'https://github.com/pakal/witness-angel-client'
-#:set fsize 15
-
-<Slide@BoxLayout>:
-    bg_hex_clr: '000000'
-    orientation: 'vertical'
-    canvas.before:
-        Color:
-            rgba: to_rgba(root.bg_hex_clr)
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-
-<RefLabel>:
-    halign: 'center'
-    font_size: fsize
-    markup: True
-
-
-<TransitionProgress>:
-    size_hint: 0.8, 0.1
-    value: app.timer
-
-
-<TabbedPanelHeader>:
-    font_size: '15sp'
-
-
-
-<InterfaceWithTabbedPanel>:
-    tabbedpanel: tp
-    TabbedPanel:
-        id: tp
-        size: root.size
-        pos: root.pos
-        #do_default_tab: False
-        background_color: (0,0,0,1)
-        tab_width: '200dp'  # ADDED THIS
-
 
 <ConsoleOutput>:
     readonly: True
     padding: 6, 6
     size_hint: (1, None)
-
 
 <KivyConsole>:
     console_output: console_output
@@ -70,7 +25,6 @@
             font_size: root.font_size
             foreground_color: root.foreground_color
             background_color: root.background_color
-
 
 
 [FileListEntry@FloatLayout+TreeViewNode]:
@@ -128,21 +82,9 @@ ScreenManager:
                     ActionOverflow:
                     #ActionButton:
                     #    icon: 'atlas://data/images/defaulttheme/overflow'
-                    #ActionButton:
-                    #    text: tr._('LogTest')
-                    #    on_release: app.log_output("Time: %d" % time())
                     ActionButton:
                         text: tr._('Containers')
                         on_release: root.current = "containers"
-    #                ActionGroup:
-    #                    text: 'Group1'
-    #                    ActionButton:
-    #                        text: 'Btn5'
-    #                    ActionButton:
-    #                        text: 'Btn6'
-    #                    ActionButton:
-    #                        text: 'Btn7'
-
                     ActionGroup:
                         mode: "spinner"
                         icon: 'data/icons/settings3.png'
@@ -172,12 +114,6 @@ ScreenManager:
                         #self.x+1,self.y+1,self.width-1,self.height-1
                         #dash_offset: 5
                         #dash_length: 3
-     #       Button:
-     #           text: "I'm another label"
-     #           pos_hint: {'center_x': 0.5}
-     #           size_hint: (0.7, 0.6)
-     #           on_press: root.current = 'settings'
-
 
     Screen
         name: "containers"
@@ -210,8 +146,8 @@ ScreenManager:
             FileChooserListView:
                 id: filebrowser
                 on_selection: decryption_request_btn.disabled = not bool(self.selection)
-                path: app.internal_containers_dir()
-                rootpath: app.internal_containers_dir()
+                path: app.internal_containers_dir
+                rootpath: app.internal_containers_dir
                 filters: ["*.crypt"]
                 multiselect: False
                 sort_func: lambda files, fs: sorted(files, reverse=True)
@@ -220,9 +156,6 @@ ScreenManager:
                 sizable_from: 'top'
                 min_size: 20
                 rescale_with_parent: False
-                #Label:
-                #    text: tr._("Please select a file") if not filebrowser.selection else str(app.get_stat(filebrowser.selection[0]))
-                    # Here we just print the stats of the folder to check if we can read a foler.
                 BoxLayout:
                     orientation: 'vertical'
                     ScrollView:
@@ -241,7 +174,6 @@ ScreenManager:
                         pos_hint: {'center_x': 0.5}
                         size_hint: (0.7, 0.2)
                         on_press: app.attempt_container_decryption(filebrowser.selection[0]) ; self.disabled = True ; root.current = "dashboard"
-
 
     Screen:
         name: "hardcoded_conf"
@@ -275,65 +207,7 @@ ScreenManager:
                     foreground_color: kivy_console.foreground_color
                     background_color: kivy_console.background_color
 
-    Screen:  # This is and old demo of carousel!
-        name: "settings"
-        AnchorLayout:
-            anchor_y: 'bottom'
-            Carousel:
-                id: carousel
-                loop: True
-                Slide:
-                    name: 'hello'
-                    bg_hex_clr: '154152'
-                    Label:
-                        text: tr._("'Witness Angel Client'\n\nA sleek slideshow app that supports swipe gestures.")
-                Slide:
-                    name: 'kivy'
-                    spacing: 10
-                    bg_hex_clr: '057173'
-                    Label:
-                        text_size: self.size
-                        valign: 'bottom'
-                        text: tr._("This app uses Kivy, a Python Framework for NUI Development.")
-                    RefLabel:
-                        text_size: self.size
-                        valign: 'top'
-                        text:
-                            "[ref={kivy_github}][color={link_clr}]{kivy_github}[/color][/ref]" \
-                            "".format(**locals())
-                Slide:
-                    name: 'cookiecutterdozer'
-                    spacing: 10
-                    bg_hex_clr: '487353'
-                    Label:
-                        valign: 'bottom'
-                        text_size: self.size
-                        text: tr._("It was generated with the Python command-line utility\nCookiecutter along with Cookiedozer.")
-                    RefLabel:
-                        valign: 'top'
-                        text_size: self.size
-                        text:
-                            "[ref={cookiecutter_github}][color={link_clr}]{cookiecutter_github}[/color][/ref]\n" \
-                            "[ref={cookiedozer_github}][color={link_clr}]{cookiedozer_github}[/color][/ref]\n" \
-                            "".format(**locals())
-                Slide:
-                    name: 'license'
-                    bg_hex_clr: 'C2872E'
-                    Label:
-                        text: tr._("Distributed under the terms of the MIT license,\n'Witness Angel Client' is free and open source software.")
-                Slide:
-                    name: 'github'
-                    spacing: 10
-                    bg_hex_clr: 'AB3E2B'
-                    Label:
-                        valign: 'bottom'
-                        text_size: self.size
-                        text: tr._("Fork me on GitHub")
-                    RefLabel:
-                        valign: 'top'
-                        text_size: self.size
-                        text:
-                            "[ref={repo_github}][color={link_clr}]{repo_github}[/color][/ref]" \
-                            "".format(**locals())
-            TransitionProgress:
-                id: progress_bar
+    #Screen:  # OBSOLETE
+    #    name: "settings"
+    #    AnchorLayout:
+    #        anchor_y: 'bottom'

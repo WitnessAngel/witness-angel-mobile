@@ -5,13 +5,9 @@ from plyer import gps
 from plyer.utils import platform
 
 from wacryptolib.sensor import (
-    JsonDataAggregator,
-    PeriodicValuePoller,
     PeriodicValueMixin,
 )
 from wacryptolib.utilities import TaskRunnerStateMachineBase, synchronized
-
-from kivy.logger import Logger as logger
 
 try:
     importlib.import_module("plyer.platforms.{}.{}".format(platform, "gps"))
