@@ -37,6 +37,6 @@
         "section": "usersettings",
         "key": "language",
         "options": ["en"],
-        "desc": "The display language of the application."
+        "desc": "The display language of the application (not functional yet)."
     }
 ]

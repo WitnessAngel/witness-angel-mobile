@@ -280,3 +280,7 @@ class WitnessAngelClientApp(App):
         """Return the global conf for container encryption."""
         conf = get_encryption_conf()
         return get_encryption_configuration_summary(conf)
+
+
+def main():
+    WitnessAngelClientApp().run()

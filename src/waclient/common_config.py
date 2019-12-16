@@ -7,56 +7,47 @@ from plyer import storagepath
 
 from wacryptolib.escrow import LOCAL_ESCROW_PLACEHOLDER
 
+
 ACTIVITY_CLASS = "org.kivy.android.PythonActivity"
 SERVICE_CLASS = "org.whitemirror.witnessangeldemo.ServiceRecordingservice"
 SERVICE_START_ARGUMENT = ""
 
+IS_ANDROID = (platform == "android")
 
-print("COMMON CONFIG __file__ >>>>>>", repr(__file__), os.getcwd())
+WACLIENT_TYPE = os.environ.get("WACLIENT_TYPE", "<UNKNOWN>")
 
-ROOT_DIR = Path(__file__).parents[1]
-print("ROOT_DIR >>>>>>", repr(ROOT_DIR))
 
-PACKAGE_DIR = Path(__file__).resolve().parent
+# Source/conf/asset related directories
 
-DEFAULT_CONFIG_TEMPLATE = Path(__file__).parent.joinpath("default_config_template.ini")
-print("DEFAULT_CONFIG_TEMPLATE >>>>>>", repr(DEFAULT_CONFIG_TEMPLATE))
+WACLIENT_PACKAGE_DIR = Path(__file__).resolve().parent
 
-DEFAULT_CONFIG_SCHEMA = Path(__file__).parent.joinpath("user_settings_schema.json")
-print("DEFAULT_CONFIG_SCHEMA >>>>>>", repr(DEFAULT_CONFIG_SCHEMA))
+SRC_ROOT_DIR = WACLIENT_PACKAGE_DIR.parent
 
-# Internal directories, especially protected on mobile devices
+DEFAULT_CONFIG_TEMPLATE = WACLIENT_PACKAGE_DIR.joinpath("default_config_template.ini")
 
-IS_ANDROID = platform == "android"
+DEFAULT_CONFIG_SCHEMA = WACLIENT_PACKAGE_DIR.joinpath("user_settings_schema.json")
+
+
+# Internal directories, specifically protected on mobile devices
 
 
 if IS_ANDROID:
     from jnius import autoclass
     from android import mActivity
 
-    # print("mActivity.getFilesDir()", (mActivity.getFilesDir().toString()) if mActivity else None)
     if mActivity:
+        # WE ARE IN MAIN APP (safer than WACLIENT_TYPE)
         INTERNAL_APP_ROOT = Path(mActivity.getFilesDir().toString())
         INTERNAL_CACHE_DIR = Path(mActivity.getCacheDir().toString())
     else:
         # WE ARE IN SERVICE!!!
         service = autoclass("org.kivy.android.PythonService").mService
-        # service_class = autoclass(SERVICE_CLASS)
-        # service = service_class.mService
-        # print(">>>>>>>>>>>>>>>>>>>service", service)
-        # print("service.getFilesDir()", service.getFilesDir().toString())
         INTERNAL_APP_ROOT = Path(service.getFilesDir().toString())
         INTERNAL_CACHE_DIR = Path(service.getCacheDir().toString())
     Environment = autoclass("android.os.Environment")
     _EXTERNAL_APP_ROOT = (
         Path(Environment.getExternalStorageDirectory().toString()) / "WitnessAngel"
     )
-    """
-    Environment = autoclass('android.os.Environment')
-    print("Environment.getExternalStorageDirectory()", Environment.getExternalStorageDirectory().toString())
-    
-    #print("Context.getExternalFilesDirs()", Context.getExternalFilesDirs(XXXXX))
-    """
 else:
     INTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelInternal"
     _EXTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelExternal"
@@ -66,36 +57,28 @@ INTERNAL_CACHE_DIR.mkdir(exist_ok=True)
 
 APP_CONFIG_FILE = INTERNAL_APP_ROOT / "app_config.ini"  # Might no exist yet
 
-print("LOCAL PATH FOUND:", INTERNAL_APP_ROOT, _EXTERNAL_APP_ROOT, INTERNAL_CACHE_DIR)
-
-"""
-INTERNAL_APP_ROOT = Path("/data/data/org.whitemirror.witnessangeldemo")  #Path(storagepath.get_application_dir())
-print("TRYING APP FOLDER1", INTERNAL_APP_ROOT)
-if not os.path.exists(INTERNAL_APP_ROOT):
-
-    print("TRYING APP FOLDER2", INTERNAL_APP_ROOT)
-    INTERNAL_APP_ROOT.mkdir(exist_ok=True)
-"""
-
 INTERNAL_KEYS_DIR = INTERNAL_APP_ROOT / "KeyStorage"
-# print("TRYING INTERNAL_KEYS_DIR", INTERNAL_KEYS_DIR)
 INTERNAL_KEYS_DIR.mkdir(exist_ok=True)
 
 INTERNAL_CONTAINERS_DIR = INTERNAL_APP_ROOT / "Containers"
 INTERNAL_CONTAINERS_DIR.mkdir(exist_ok=True)
 
+EXTERNAL_DATA_EXPORTS_DIR = _EXTERNAL_APP_ROOT / "DataExports"  # Might no exist yet (and require permissions!)
 
-EXTERNAL_DATA_EXPORTS_DIR = _EXTERNAL_APP_ROOT / "DataExports"  # Might no exist yet
 
-"""
-# External directories, shared by applications
-try:
-    #storagepath.get_sdcard_dir()
-    _EXTERNAL_APP_ROOT = Path("/storage/emulated/0/WitnessAngel")
-    if not os.path.exists(_EXTERNAL_APP_ROOT):
-        raise NotImplementedError
-except NotImplementedError:
-"""
+_folders_summary = dict(
+        WACLIENT_TYPE=WACLIENT_TYPE,
+        IS_ANDROID=IS_ANDROID,
+        CWD=os.getcwd(),
+        SRC_ROOT_DIR=SRC_ROOT_DIR,
+        WACLIENT_PACKAGE_DIR=WACLIENT_PACKAGE_DIR,
+        INTERNAL_APP_ROOT=INTERNAL_APP_ROOT,
+        INTERNAL_CACHE_DIR=INTERNAL_CACHE_DIR,
+        INTERNAL_KEYS_DIR=INTERNAL_KEYS_DIR,
+        INTERNAL_CONTAINERS_DIR=INTERNAL_CONTAINERS_DIR,
+        EXTERNAL_DATA_EXPORTS_DIR=EXTERNAL_DATA_EXPORTS_DIR,
+)
+print(">>>>>>>>>>> SUMMARY OF WACLIENT COMMON CONFIGURATION:", str(_folders_summary))
 
 
 def request_multiple_permissions(permissions: List[str]) -> List[bool]:
@@ -129,9 +112,10 @@ def request_external_storage_dirs_access():
     return res
 
 
-FREE_KEY_TYPES = [
+PREGENERATED_KEY_TYPES = [
     "RSA_OAEP",
     "DSA_DSS",
+    "ECC_DSS",
 ]  # Must be the union of asymmetric encryption/signature keys below
 
 _main_remote_escrow_url = "https://waescrow.prolifik.net/json/"

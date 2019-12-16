@@ -2,7 +2,7 @@ from oscpy.server import OSCThreadServer
 
 from waclient.common_config import (
     INTERNAL_CONTAINERS_DIR,
-    FREE_KEY_TYPES,
+    PREGENERATED_KEY_TYPES,
     IS_ANDROID,
 )
 from waclient.sensors.gps import get_gps_sensor
@@ -22,7 +22,7 @@ from kivy.logger import Logger as logger
 from oscpy.server import OSCThreadServer
 from waclient.common_config import (
     INTERNAL_CONTAINERS_DIR,
-    FREE_KEY_TYPES,
+    PREGENERATED_KEY_TYPES,
     IS_ANDROID,
 )
 from waclient.sensors.gps import get_gps_sensor
@@ -132,7 +132,7 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
         sleep_on_overflow_s=0.5
         * max_free_keys_per_type
         * container_member_duration_s,  # TODO make it configurable?
-        key_types=FREE_KEY_TYPES,
+        key_types=PREGENERATED_KEY_TYPES,
     )
 
     toolchain = dict(

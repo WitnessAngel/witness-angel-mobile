@@ -210,7 +210,3 @@ def main():
     server = BackgroundServer()
     server.join()
     logger.info("Service process exits")
-
-
-if __name__ == "__main__":
-    main()

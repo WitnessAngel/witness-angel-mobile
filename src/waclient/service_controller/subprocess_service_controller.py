@@ -13,12 +13,12 @@ class ServiceController(ServiceControllerBase):
 
     def start_service(self):
         assert not self._subprocess
-        from waclient.common_config import ROOT_DIR
+        from waclient.common_config import SRC_ROOT_DIR
 
         self._subprocess = subprocess.Popen(
-            [sys.executable, "-m", "waclient.background_service"],
+            [sys.executable, "service.py"],
             shell=False,
-            cwd=ROOT_DIR,
+            cwd=SRC_ROOT_DIR,
         )
         # TODO - wait for remote server to be pingable?
         atexit.register(self.stop_service)  # Protection against brutal ctrl-C
