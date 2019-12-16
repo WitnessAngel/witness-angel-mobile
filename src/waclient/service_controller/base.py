@@ -17,9 +17,7 @@ class ServiceControllerBase:
         except ConnectionError:
             pass  # Normal at start of app...
         except Exception as exc:
-            logger.debug(
-                "Could not send osc message %s%s to service: %r", address, values, exc
-            )
+            print("Could not send osc message %s%s to service: %r" % (address, values, exc))
             return
 
     def ping(self):

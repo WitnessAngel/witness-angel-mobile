@@ -10,7 +10,7 @@ kivy.require("1.8.0")
 from kivy.lang import Observable
 
 LOCALE_DIR = Path(__file__).parents[3] / "data" / "locales"
-print("LOCALE DIR", LOCALE_DIR)
+print("@@@@@@@@@ LOCALE DIR", LOCALE_DIR)
 
 
 class Lang(Observable):

@@ -18,6 +18,5 @@ class CallbackHandler(Handler):
                 "->",
                 exc,
             )
-            import traceback
-
-            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)

@@ -14,9 +14,6 @@ except ImportError:
     gyroscope_is_implemented = False
 
 
-# print(">>>>>>>>>>>>>>>>>>>>gyroscope_is_implemented", gyroscope_is_implemented)
-
-
 class GyroscopeValueProvider(PeriodicValuePoller):
 
     _gyroscope_is_enabled = False

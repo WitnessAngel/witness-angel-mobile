@@ -186,7 +186,8 @@ ScreenManager:
                 pos_hint: {'top':1}
                 ActionView:
                     ActionPrevious:
-                        title: tr._('Back')
+                        #title: tr._('Back')
+                        app_icon: app.get_app_icon()
                         with_previous: True
                         on_press: root.current = "dashboard"
                     ActionOverflow:

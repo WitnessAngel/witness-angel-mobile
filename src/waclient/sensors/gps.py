@@ -16,9 +16,6 @@ except ImportError:
     gps_is_implemented = False
 
 
-print(">>>>>>>>>>gps_is_implemented", gps_is_implemented)
-
-
 class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
 
     _lock = threading.Lock()
