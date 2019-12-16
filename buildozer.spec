@@ -13,7 +13,7 @@ package.domain = org.WhiteMirror
 source.dir = src
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,ini,json
+source.include_exts = py,png,jpg,kv,atlas,ini,json,mo
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = spec
@@ -42,7 +42,7 @@ requirements = python3,sqlite3,kivy,pycryptodome,oscpy,git+https://github.com/ki
 #presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/data/icons/witness_angel_logo_512.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = portrait
