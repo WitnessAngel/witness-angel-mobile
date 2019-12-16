@@ -1,14 +1,14 @@
-import os
-import traceback
-
-import requests
 
 
 def generate_crashdump(exc_info, target_url):
 
-    is_service = bool(os.environ.get("PYTHON_SERVICE_ARGUMENT", ""))
+    import os
+    import traceback
+    import requests
 
-    system_info = {"SOFTWARE": "WACLIENT", "IS_SERVICE": is_service}
+    WACLIENT_TYPE = os.environ.get("WACLIENT_TYPE", "<NOTFOUND>")
+
+    system_info = {"SOFTWARE": "WACLIENT", "WACLIENT_TYPE": WACLIENT_TYPE}
 
     try:
         from jnius import autoclass
