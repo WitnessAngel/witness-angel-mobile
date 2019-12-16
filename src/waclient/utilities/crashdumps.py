@@ -1,6 +1,6 @@
 
 
-def generate_crashdump(exc_info, target_url):
+def generate_and_send_crashdump(exc_info, target_url):
 
     import os
     import traceback

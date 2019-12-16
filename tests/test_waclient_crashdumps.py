@@ -4,7 +4,7 @@ import pytest
 import responses
 from requests import ConnectionError
 
-from waclient.utilities.crashdumps import generate_crashdump
+from waclient.utilities.crashdumps import generate_and_send_crashdump
 
 
 @responses.activate
@@ -28,7 +28,7 @@ def test_generate_crashdump():
         exc_info = sys.exc_info()
 
     assert len(responses.calls) == 0
-    report = generate_crashdump(exc_info, target_url=fake_url)
+    report = generate_and_send_crashdump(exc_info, target_url=fake_url)
     assert len(responses.calls) == 1
     assert responses.calls[0].request.url == fake_url
 
@@ -37,4 +37,4 @@ def test_generate_crashdump():
     # print(report)
 
     with pytest.raises(ConnectionError):
-        generate_crashdump(exc_info, target_url="http://doesnotexist/")
+        generate_and_send_crashdump(exc_info, target_url="http://doesnotexist/")
