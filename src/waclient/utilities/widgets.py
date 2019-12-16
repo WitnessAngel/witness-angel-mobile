@@ -36,36 +36,32 @@ class ConsoleOutput(TextInput):
 
     max_text_size = 10000
 
-    # __events__ = ('on_start', )
     _add_text_is_in_progress = False
 
     def __init__(self, **kwargs):
         super(ConsoleOutput, self).__init__(**kwargs)
         app = App.get_running_app()
-        app.bind(on_start=self.my_on_start)
 
-    def is_at_bottom(self):
-        # print(">>>>>self.parent.scroll_y ", self.parent.scroll_y)
-        return self.parent.scroll_y <= 0.05
+    def is_locked(self):
+        return ((self.parent.height >= self.height) or
+                (self.parent.scroll_y <= 0.05))
 
     def scroll_to_bottom(self):
         self.parent.scroll_y = 0
 
     def add_text(self, text):
+
         if self._add_text_is_in_progress:
-            return  # Logging recursion happened, typically due to GL events
+            return  # Logging recursion cna happen, due to Kivy GL events
+
         self._add_text_is_in_progress = True
         try:
-            is_locked = self.is_at_bottom()
+            is_locked = self.is_locked()
 
             text += "\n"
-            # print(">>>adding text", repr(text), "from", threading.get_ident(), "to", repr(self.text))
-            # import traceback
-            # traceback.print_stack(file=sys.stdout)
-
             self.text += text
 
-            # TODO reajust scroll_y after that!
+            # TODO reajust scroll_y after that?
             if len(self.text) > self.max_text_size:
                 lines = self.text.splitlines()
                 new_lines = lines[
@@ -74,20 +70,11 @@ class ConsoleOutput(TextInput):
                 new_text = "\n".join(new_lines) + "\n"
                 self.text = new_text
 
-            ##self.parent.scroll_y = 0
             if is_locked:
                 self.scroll_to_bottom()
-                # print("FORCE SCROLL", self.parent.scroll_y)
-                # self.parent.scroll_y = 1  # lock-to-bottom behaviour
+
         finally:
             self._add_text_is_in_progress = False
-        # print("####", repr(self.text[:200]))
-        # Clock.schedule_once(self.parent.scroll_y = 1)
-
-    def my_on_start(self, *args, **kwargs):
-        pass
-        # print(">MY ON START", args, kwargs, self.parent)
-        # self.add_text("\n".join(str(i) for i in range(50)))
 
 
 class KivyConsole(BoxLayout):
