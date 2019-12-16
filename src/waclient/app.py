@@ -27,7 +27,7 @@ from waclient.common_config import (
     DEFAULT_CONFIG_TEMPLATE,
     APP_CONFIG_FILE,
     request_external_storage_dirs_access,
-)
+    SRC_ROOT_DIR)
 from waclient.service_controller import ServiceController
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
@@ -76,11 +76,15 @@ class WitnessAngelClientApp(App):
         osc_starter_callback()  # Opens server port
         print("FINISHED INIT OF WitnessAngelClientApp")
 
+    def get_app_icon(self):
+        return self.get_asset_abspath("data/icons/witness_angel_logo_256.png")
+
     def build(self):
         """Initialize the GUI based on the kv file and set up events.
 
         Returns the root widget of the app.
         """
+        self.icon = self.get_app_icon()
         self.language = self.config.getdefault("usersettings", "language", "en")
         # tr.switch_lang(self.language)  TODO LATER
 
@@ -167,6 +171,10 @@ class WitnessAngelClientApp(App):
     @property
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)
+
+    def get_asset_abspath(self, asset_relpath):
+        """Return the absolute path to an asset like "data/icons/myimage.png"."""
+        return str(SRC_ROOT_DIR.joinpath(asset_relpath))
 
     def on_stop(self):
         """Event handler for the `on_stop` event which is fired when the

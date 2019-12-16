@@ -29,7 +29,7 @@
         "section": "usersettings",
         "key": "polling_interval_s",
         "options": ["0.5", "1", "5", "10", "30"],
-        "desc": "Min interval between value retrievals (gps, sensors...)."
+        "desc": "Min interval in seconds between value retrievals (gps, sensors...)."
     },
     {
         "title": "Language",
@@ -37,6 +37,6 @@
         "section": "usersettings",
         "key": "language",
         "options": ["en"],
-        "desc": "The display language of the application (not functional yet)."
+        "desc": "Display language of the application (not functional yet)."
     }
 ]
