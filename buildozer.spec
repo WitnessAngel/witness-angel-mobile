@@ -66,7 +66,7 @@ android.permissions = INTERNET,CAMERA,RECORD_AUDIO,WRITE_EXTERNAL_STORAGE,FOREGR
 # (int) Android API to use (we want PERMISSION REQUESTS so api>=23)
 android.api = 26
 
-# (int) Minimum API required (8 = Android 2.2 devices)
+# (int) Minimum API required (v26 = Android 8.0 Oreo devices)
 android.minapi = 26
 
 # (int) Android SDK version to use
@@ -85,7 +85,7 @@ android.minapi = 26
 #android.sdk_path =
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
-#p4a.source_dir = /home/vbox/python-for-android
+p4a.source_dir = /home/vbox/fork_python-for-android
 
 # (list) python-for-android whitelist
 #android.p4a_whitelist =
@@ -186,7 +186,7 @@ warn_on_root = 1
 
 # (str) Path to build artifact storage, absolute or relative to spec file
 # BEWARE, we put it outside repo folder, since on virtual machine shared folders, symlinks often don't work
-build_dir = /tmp/.buildozer_files
+build_dir = /home/vbox/.buildozer_files_waclient
 
 # (str) Path to build output (i.e. .apk, .ipa) storage
 # bin_dir = ./bin
