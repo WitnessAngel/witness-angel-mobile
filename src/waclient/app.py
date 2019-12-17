@@ -250,6 +250,11 @@ class WitnessAngelClientApp(App):
 
             info_lines.append("")
 
+            info_lines.append("KEYCHAIN ID:")
+            info_lines.append(str(container.get("keychain_uid", "<not found>")))
+
+            info_lines.append("")
+
             info_lines.append("ALGORITHMS:")
             summary = get_encryption_configuration_summary(container)
             info_lines.append(summary)
