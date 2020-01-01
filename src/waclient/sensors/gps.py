@@ -18,7 +18,7 @@ except ImportError:
 
 class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
 
-    _lock = threading.Lock()
+    _lock = threading.RLock()  # Recursive due to PC testcase...
 
     def __init__(self, interval_s: int, **kwargs):
         super().__init__(**kwargs)
@@ -37,14 +37,18 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
         """Called by GPS thread, multiples keys/value are provided
         (typically: lon, lat, speed, bearing, altitude, and accuracy)
         """
-        if self.is_running:  # Else, its' a final call after a stop()?
+        if self.is_running:  # Else, its' a final call after a st_nominal_recording_toolchain_caseop()?
             self._offloaded_add_data(data_dict=kwargs)
 
     @synchronized
-    def _on_status(self, **kwargs):
-        """Called by GPS thread, "message-type" and "status" parameters are provided."""
+    def _on_status(self, message_type, status):
+        """Called by GPS thread, "message_type" and "status" parameters are provided.
+
+        Examples of message_type: "provider-enabled", "provider-disabled", "provider-status"
+        (the latter having a status formatted as "provider: substatus".
+        """
         if self.is_running:  # Else, its' a final call after a stop()?
-            self._offloaded_add_data(data_dict=kwargs)
+            self._offloaded_add_data(data_dict=dict(message_type=message_type, status=status))
 
     @synchronized
     def start(self):
@@ -56,7 +60,8 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
             )  # In meters (float)
         else:
             # Simulate a single push of GPS data
-            self._offloaded_add_data(dict(x=66))
+            self._on_location(altitude=2.2)
+            self._on_status("some_message_type", "some_status_value")
 
     @synchronized
     def stop(self):

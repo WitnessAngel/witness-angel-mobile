@@ -35,12 +35,14 @@ def _test_service_controller(
                 ctrl.stop_recording()
                 ctrl.stop_recording()  # Ignored
 
+            time.sleep(sleep_time_s)
+
         if kill_instead_of_stop_service:
             ctrl._subprocess.terminate()
         else:
             ctrl.stop_service()
 
-        termination_sleep_s = 20 if skip_stop_recording else 2
+        termination_sleep_s = 40 if skip_stop_recording else 2
         time.sleep(termination_sleep_s)  # Let the process terminate
         assert ctrl._subprocess.poll() == expected_return_code
 

@@ -87,7 +87,8 @@ def test_nominal_recording_toolchain_case():
 
     json_bytestring = tar_file.extractfile(microphone_filenames[0]).read()
     gyroscope_data = load_from_json_bytes(json_bytestring)
-    assert gyroscope_data == [{"x": 66}]  # Single fake data pushed by sensor
+    # Fake data pushed by sensor
+    assert gyroscope_data == [{'altitude': 2.2}, {'message_type': 'some_message_type', 'status': 'some_status_value'}]
 
     # Microphone data
 
