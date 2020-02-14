@@ -3,6 +3,7 @@ import logging
 import os
 import tarfile
 import threading
+from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import Error as ConfigParserError
 
 from kivy.config import ConfigParser
@@ -36,6 +37,11 @@ osc, osc_starter_callback = get_osc_server(is_master=False)
 # TODO add exception swallowers, and logging pushed to frontend app (if present)
 
 
+THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
+    max_workers=1, thread_name_prefix="service_worker"  # SINGLE worker for now, to avoid concurrency
+)
+
+
 @ServerClass
 class BackgroundServer(object):
 
@@ -50,6 +56,8 @@ class BackgroundServer(object):
     _sock = None
 
     _recording_toolchain = None
+
+    _status_change_in_progress = False  # Set to True while recording is starting/stopping
 
     def __init__(self):
         logger.info("Starting service")  # Will not be sent to App (too early)
@@ -77,6 +85,9 @@ class BackgroundServer(object):
             )
             return
 
+    def _offload_task(self, method, *args, **kwargs):
+        return THREAD_POOL_EXECUTOR.submit(method, *args, **kwargs)
+
     def _load_config(self, filename=APP_CONFIG_FILE):
         logger.info(f"(Re)loading config file {filename}")
         config = (
@@ -100,9 +111,8 @@ class BackgroundServer(object):
         logger.info("Ping successful!")
         self._send_message("/log_output", "Pong")
 
-    @osc.address_method("/start_recording")
     @safe_catch_unhandled_exception
-    def start_recording(self, env=None):
+    def _offloaded_start_recording(self, env):
         try:
             encryption_conf = get_encryption_conf(env)
             if self.is_recording:
@@ -121,7 +131,14 @@ class BackgroundServer(object):
             start_recording_toolchain(self._recording_toolchain)
             logger.info("Recording started")
         finally:
+            self._status_change_in_progress = False
             self.broadcast_recording_state()  # Even on error
+
+    @osc.address_method("/start_recording")
+    @safe_catch_unhandled_exception
+    def start_recording(self, env=None):
+        self._status_change_in_progress = True
+        return self._offload_task(self._offloaded_start_recording, env=env)
 
     @property
     def is_recording(self):
@@ -133,14 +150,21 @@ class BackgroundServer(object):
     @osc.address_method("/broadcast_recording_state")
     @safe_catch_unhandled_exception
     def broadcast_recording_state(self):
+        """
+        Broadcasts a TERNARY state, with the special value "" if a status change is in progress
+        (since OSC doesn't like None values...)
+        """
+        if self._status_change_in_progress:
+            is_recording = ""
+        else:
+            is_recording = self.is_recording
         logger.info(
-            "Broadcasting service state (is_recording=%s)" % self.is_recording
+            "Broadcasting service state (is_recording=%s)" % is_recording
         )  # TODO make this DEBUG
-        self._send_message("/receive_recording_state", self.is_recording)
+        self._send_message("/receive_recording_state", is_recording)
 
-    @osc.address_method("/stop_recording")
     @safe_catch_unhandled_exception
-    def stop_recording(self):
+    def _offloaded_stop_recording(self):
         if not self.is_recording:
             logger.warning(
                 "Ignoring call to service.stop_recording(), since recording is already stopped"
@@ -154,11 +178,17 @@ class BackgroundServer(object):
             self._recording_toolchain = (
                 None
             )  # Will force a reload of config on next recording
+            self._status_change_in_progress = False
             self.broadcast_recording_state()
 
-    @osc.address_method("/attempt_container_decryption")
+    @osc.address_method("/stop_recording")
     @safe_catch_unhandled_exception
-    def attempt_container_decryption(self, container_filepath):
+    def stop_recording(self):
+        self._status_change_in_progress = True
+        return self._offload_task(self._offloaded_stop_recording)
+
+    @safe_catch_unhandled_exception
+    def _offloaded_attempt_container_decryption(self, container_filepath):
         logger.info("Decryption requested for container %s", container_filepath)
         target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(
             os.path.basename(container_filepath)
@@ -181,6 +211,11 @@ class BackgroundServer(object):
             target_directory,
         )
 
+    @osc.address_method("/attempt_container_decryption")
+    @safe_catch_unhandled_exception
+    def attempt_container_decryption(self, container_filepath):
+        return self._offload_task(self._offloaded_attempt_container_decryption, container_filepath=container_filepath)
+
     @osc.address_method("/stop_server")
     @safe_catch_unhandled_exception
     def stop_server(self):
@@ -190,7 +225,7 @@ class BackgroundServer(object):
             logger.info(
                 "Recording is in progress, we stop it as part of service shutdown"
             )
-            self.stop_recording()
+            self.stop_recording().result(timeout=30)   # SYNCHRONOUS CALL (but through threadpool still)
 
         osc.stop_all()
         self._termination_event.set()
