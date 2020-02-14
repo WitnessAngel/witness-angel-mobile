@@ -62,13 +62,15 @@ class WitnessAngelClientApp(App):
 
     title = "Witness Angel"
 
-    service_querying_interval = 2  # To check when service is ready, at app start
+    service_querying_interval = 1  # To check when service is ready, at app start
 
     use_kivy_settings = False  # No need
 
     language = None
 
+
     def __init__(self, **kwargs):
+        self._unanswered_service_state_requests = 0  # Used to detect a service not responding anymore to status requests
         print("STARTING INIT OF WitnessAngelClientApp")
         super(WitnessAngelClientApp, self).__init__(**kwargs)
         print("AFTER PARENT INIT OF WitnessAngelClientApp")
@@ -146,15 +148,17 @@ class WitnessAngelClientApp(App):
         """
 
         self.service_controller = ServiceController()
-        self.service_controller.start_service()
 
         # Redirect root logger traffic to GUI console
         logging.getLogger(None).addHandler(CallbackHandler(self.log_output))
 
         self.root.ids.recording_btn.disabled = True
+
+        # Constantly check the state of background service
         Clock.schedule_interval(
             self._request_recording_state, self.service_querying_interval
         )
+        self._request_recording_state()  # Immediate first iteration
 
         request_multiple_permissions(
             permissions=[
@@ -195,7 +199,6 @@ class WitnessAngelClientApp(App):
             self.service_controller.start_recording()
         else:
             self.service_controller.stop_recording()
-        # TODO - schedule here some delayed broadcast_recording_state() calls if OSC is not safe enough
 
     @osc.address_method("/log_output")
     @safe_catch_unhandled_exception
@@ -205,16 +208,25 @@ class WitnessAngelClientApp(App):
 
     def _request_recording_state(self, *args, **kwargs):
         """Ask the service for an update on its recording state."""
-        self.service_controller.broadcast_recording_state()
+        self._unanswered_service_state_requests += 1
+        if self._unanswered_service_state_requests > 2:
+            self._unanswered_service_state_requests = -10  # Leave some time for the service to go online
+            logger.info("Launching recorder service")
+            self.service_controller.start_service()
+        else:
+            self.service_controller.broadcast_recording_state()
 
     @osc.address_method("/receive_recording_state")
     @safe_catch_unhandled_exception
     def receive_recording_state(self, is_recording):
-        # print(">>>>>receive_recording_state", is_recording)
-        expected_state = "down" if is_recording else "normal"
-        self.root.ids.recording_btn.state = expected_state
-        self.root.ids.recording_btn.disabled = False
-        Clock.unschedule(self._request_recording_state)
+        #print(">>>>> app receive_recording_state", repr(is_recording))
+        self._unanswered_service_state_requests = 0  # RESET
+        if is_recording == "":  # Special case (ternary value, but None is not supported by OSC)
+            self.root.ids.recording_btn.disabled = True
+        else:
+            expected_state = "down" if is_recording else "normal"
+            self.root.ids.recording_btn.state = expected_state
+            self.root.ids.recording_btn.disabled = False
 
     @staticmethod
     def get_nice_size(size):

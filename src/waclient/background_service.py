@@ -116,9 +116,7 @@ class BackgroundServer(object):
         try:
             encryption_conf = get_encryption_conf(env)
             if self.is_recording:
-                logger.warning(
-                    "Ignoring call to service.start_recording(), since recording is already started"
-                )
+                #logger.debug("Ignoring redundant call to service.start_recording()")
                 return
             logger.info("Starting recording")
             if not self._recording_toolchain:
@@ -158,20 +156,16 @@ class BackgroundServer(object):
             is_recording = ""
         else:
             is_recording = self.is_recording
-        logger.info(
-            "Broadcasting service state (is_recording=%s)" % is_recording
-        )  # TODO make this DEBUG
+        #logger.debug("Broadcasting service state (is_recording=%r)" % is_recording)
         self._send_message("/receive_recording_state", is_recording)
 
     @safe_catch_unhandled_exception
     def _offloaded_stop_recording(self):
-        if not self.is_recording:
-            logger.warning(
-                "Ignoring call to service.stop_recording(), since recording is already stopped"
-            )
-            return
-        logger.info("Stopping recording")
         try:
+            if not self.is_recording:
+                #logger.debug("Ignoring redundant call to service.stop_recording()")
+                return
+            logger.info("Stopping recording")
             stop_recording_toolchain(self._recording_toolchain)
             logger.info("Recording stopped")
         finally:  # Trigger all this even if container flushing failed

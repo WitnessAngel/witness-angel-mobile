@@ -12,9 +12,10 @@ class ServiceController(ServiceControllerBase):
     _subprocess = None
 
     def start_service(self):
-        assert not self._subprocess
+
         from waclient.common_config import SRC_ROOT_DIR
 
+        # "self._subprocess" might already exist but have crashed
         self._subprocess = subprocess.Popen(
             [sys.executable, "service.py"],
             shell=False,
