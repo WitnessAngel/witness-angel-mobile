@@ -24,6 +24,8 @@ Use `pytest` to launch unit-tests (its default arguments are in `setup.cfg`); yo
 
 Use the `Black <https://black.readthedocs.io/en/stable/>`_ formatter to format your python code.
 
+Use `python src/main.py` to launch the main GUI (which in turn will launch the service).
+
 To compile app to Android, we'll use Buildozer and its python-for-android backend (https://buildozer.readthedocs.io/en/latest/).
 
 
