@@ -96,20 +96,15 @@ class WitnessAngelClientApp(App):
         return self.root
 
     def load_config(self):
-        # We create the initial configuration for the app if it doesn't exist
-        config_file = Path(self.get_application_config())
-        if not config_file.exists():
-            shutil.copy(DEFAULT_CONFIG_TEMPLATE, dst=config_file)
+        # Hook here if needed
         super().load_config()
 
     def get_application_config(self, *args, **kwargs):
         return str(APP_CONFIG_FILE)  # IMPORTANT, stringify it for Kivy!
 
     def build_config(self, config):
-        """Create a config file on disk and assign the ConfigParser object to
-        `self.config`.
-        """
-        config.add_section("usersettings")  # Just to please Kivy
+        """Populate config with default values, before the loading of user preferences."""
+        config.read(str(DEFAULT_CONFIG_TEMPLATE))
 
     def build_settings(self, settings):
         """Read the user settings schema and create a panel from it."""

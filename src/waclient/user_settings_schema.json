@@ -32,6 +32,13 @@
         "desc": "Min interval in seconds between value retrievals (gps, sensors...)."
     },
     {
+        "title": "Persistent service",
+        "type": "bool",
+        "section": "usersettings",
+        "key": "daemonize_service",
+        "desc": "Keep recording in background when app is closed."
+    },
+    {
         "title": "Language",
         "type": "options",
         "section": "usersettings",
