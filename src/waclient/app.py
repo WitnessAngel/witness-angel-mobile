@@ -16,8 +16,6 @@ kivy.require("1.8.0")
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger as logger
-from kivy.properties import BoundedNumericProperty, ObjectProperty
-from kivy.uix.carousel import Carousel
 from kivy.uix.filechooser import filesize_units
 from kivy.uix.settings import SettingsWithTabbedPanel
 
@@ -29,7 +27,7 @@ from waclient.common_config import (
     DEFAULT_CONFIG_TEMPLATE,
     APP_CONFIG_FILE,
     request_external_storage_dirs_access,
-    SRC_ROOT_DIR)
+    SRC_ROOT_DIR, WIP_RECORDING_MARKER)
 from waclient.service_controller import ServiceController
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
@@ -196,10 +194,19 @@ class WitnessAngelClientApp(App):
         self._console_output.add_text(msg)
 
     def switch_to_recording_state(self, is_recording):
+        """
+        Might be called as a reaction to the service broadcasting a changed state.
+         Wlet it propagate anyway in this case, the service will just ignore the duplicated command.
+        """
         self.root.ids.recording_btn.disabled = True
         if is_recording:
+            WIP_RECORDING_MARKER.touch(exist_ok=True)
             self.service_controller.start_recording()
         else:
+            try:
+                WIP_RECORDING_MARKER.unlink()
+            except FileNotFoundError:
+                pass
             self.service_controller.stop_recording()
 
     @osc.address_method("/log_output")

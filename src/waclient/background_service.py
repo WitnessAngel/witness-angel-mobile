@@ -15,7 +15,7 @@ from waclient.common_config import (
     INTERNAL_KEYS_DIR,
     EXTERNAL_DATA_EXPORTS_DIR,
     get_encryption_conf,
-    IS_ANDROID)
+    IS_ANDROID, WIP_RECORDING_MARKER)
 from waclient.recording_toolchain import (
     build_recording_toolchain,
     start_recording_toolchain,
@@ -73,7 +73,9 @@ class BackgroundServer(object):
         # Initial setup of service according to persisted config
         config = self._load_config()
         daemonize_service = config.getboolean("usersettings", "daemonize_service")
-        self._offloaded_switch_daemonize_service(daemonize_service)
+        self.switch_daemonize_service(daemonize_service)
+        if WIP_RECORDING_MARKER.exists():
+            self.start_recording()  # Autorecord e.g. after a restart due to closing of main android Activity
 
     def _remote_logging_callback(self, msg):
         return self._send_message("/log_output", "Service: " + msg)
@@ -123,7 +125,7 @@ class BackgroundServer(object):
         if IS_ANDROID:
             from jnius import autoclass
             PythonService = autoclass('org.kivy.android.PythonService')
-            PythonService.mService.setAutoRestartService(False)
+            PythonService.mService.setAutoRestartService(value)
         # Nothing to do for desktop platforms
 
     @osc.address_method("/switch_daemonize_service")
