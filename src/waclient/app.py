@@ -97,7 +97,7 @@ class WitnessAngelClientApp(App):
 
     def load_config(self):
         # Hook here if needed
-        super().load_config()
+        return super().load_config()
 
     def get_application_config(self, *args, **kwargs):
         return str(APP_CONFIG_FILE)  # IMPORTANT, stringify it for Kivy!
@@ -116,15 +116,13 @@ class WitnessAngelClientApp(App):
     def on_config_change(self, config, section, key, value):
         """Called when the user changes a config value via the settings panel.
         """
-        pass
-        """
         if config is self.config:
             token = (section, key)
-            if token == ("usersettings", "timer_interval"):
-                self.timer_interval = TIMER_OPTIONS[value]
-            elif token == ("usersettings", "language"):
-                tr.switch_lang(value)
-        """
+            if token == ("usersettings", "daemonize_service"):
+                self.switch_daemonize_service(int(value))  # Passed as STR!!
+
+    def switch_daemonize_service(self, value):
+        self.service_controller.switch_daemonize_service(value)
 
     def on_pause(self):
         """Enables the user to switch to another application, causing the app to wait
@@ -171,6 +169,9 @@ class WitnessAngelClientApp(App):
         # import logging_tree
         # logging_tree.printout()
 
+    def get_daemonize_service(self):
+        return self.config.getboolean("usersettings", "daemonize_service")
+
     @property
     def internal_containers_dir(self):
         return str(INTERNAL_CONTAINERS_DIR)
@@ -185,7 +186,8 @@ class WitnessAngelClientApp(App):
         closed).
         """
         atexit.unregister(self.on_stop)  # Not needed anymore
-        self.service_controller.stop_service()  # Will wait for termination, else kill it
+        if not self.get_daemonize_service():
+            self.service_controller.stop_service()  # Will wait for termination, then kill it
 
     def log_output(self, msg, *args, **kwargs):
         """

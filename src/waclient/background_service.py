@@ -15,7 +15,7 @@ from waclient.common_config import (
     INTERNAL_KEYS_DIR,
     EXTERNAL_DATA_EXPORTS_DIR,
     get_encryption_conf,
-)
+    IS_ANDROID)
 from waclient.recording_toolchain import (
     build_recording_toolchain,
     start_recording_toolchain,
@@ -70,6 +70,11 @@ class BackgroundServer(object):
         self._local_key_storage = FilesystemKeyStorage(keys_dir=INTERNAL_KEYS_DIR)
         logger.info("Service started")
 
+        # Initial setup of service according to persisted config
+        config = self._load_config()
+        daemonize_service = config.getboolean("usersettings", "daemonize_service")
+        self._offloaded_switch_daemonize_service(daemonize_service)
+
     def _remote_logging_callback(self, msg):
         return self._send_message("/log_output", "Service: " + msg)
 
@@ -110,6 +115,21 @@ class BackgroundServer(object):
     def ping(self):
         logger.info("Ping successful!")
         self._send_message("/log_output", "Pong")
+
+    @safe_catch_unhandled_exception
+    def _offloaded_switch_daemonize_service(self, value):
+        value = bool(value)  # Normalize from possible integer
+        logger.info("Switching service persistence to %s", value)
+        if IS_ANDROID:
+            from jnius import autoclass
+            PythonService = autoclass('org.kivy.android.PythonService')
+            PythonService.mService.setAutoRestartService(False)
+        # Nothing to do for desktop platforms
+
+    @osc.address_method("/switch_daemonize_service")
+    @safe_catch_unhandled_exception
+    def switch_daemonize_service(self, value):
+        return self._offload_task(self._offloaded_switch_daemonize_service, value=value)
 
     @safe_catch_unhandled_exception
     def _offloaded_start_recording(self, env):

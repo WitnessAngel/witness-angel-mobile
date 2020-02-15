@@ -23,6 +23,10 @@ class ServiceControllerBase:
     def ping(self):
         return self._send_message("/ping")
 
+    def switch_daemonize_service(self, value):
+        assert value in (True, False), repr(value)
+        self._send_message("/switch_daemonize_service", value)
+
     def start_recording(self, env=""):
         self._send_message("/start_recording", env)
 
