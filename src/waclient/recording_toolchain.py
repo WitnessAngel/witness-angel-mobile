@@ -47,7 +47,10 @@ if IS_ANDROID:
 
 
 def build_recording_toolchain(config, local_key_storage, encryption_conf):
-    """Instantiate the whole toolchain of sensors and aggregators, depending on the config."""
+    """Instantiate the whole toolchain of sensors and aggregators, depending on the config.
+
+    Returns None if no toolchain is enabled by config.
+    """
 
     # TODO make this part more resilient against exceptions
 
@@ -56,6 +59,15 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
         if converter:
             value = converter(value)
         return value
+
+    # BEFORE ANYTHING we ensure that it's worth building all the nodes below
+    # Note that values are stored as "0" or "1", so bool() is not a proper converter
+    record_gyroscope = get_conf_value("record_gyroscope", False, converter=int)
+    record_gps = get_conf_value("record_gps", False, converter=int)
+    record_microphone = get_conf_value("record_microphone", False, converter=int)
+    if not any([record_gyroscope, record_gps, record_microphone]):
+        logger.warning("No sensor is enabled, aborting recorder setup")
+        return None
 
     max_containers_count = get_conf_value("max_containers_count", 100, converter=int)
     container_recording_duration_s = get_conf_value(
@@ -109,19 +121,27 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
 
     # Sensors level
 
-    gyroscope_sensor = get_gyroscope_sensor(
-        json_aggregator=gyroscope_json_aggregator, polling_interval_s=polling_interval_s
-    )
+    sensors= []
 
-    gps_sensor = get_gps_sensor(
-        polling_interval_s=polling_interval_s, json_aggregator=gps_json_aggregator
-    )
+    if record_gyroscope:
+        gyroscope_sensor = get_gyroscope_sensor(
+            json_aggregator=gyroscope_json_aggregator, polling_interval_s=polling_interval_s
+        )
+        sensors.append(gyroscope_sensor)
 
-    microphone_sensor = get_microphone_sensor(
-        interval_s=container_member_duration_s, tarfile_aggregator=tarfile_aggregator
-    )
+    if record_gps:
+        gps_sensor = get_gps_sensor(
+            polling_interval_s=polling_interval_s, json_aggregator=gps_json_aggregator
+        )
+        sensors.append(gps_sensor)
 
-    sensors = [gyroscope_sensor, gps_sensor, microphone_sensor]
+    if record_microphone:
+        microphone_sensor = get_microphone_sensor(
+            interval_s=container_member_duration_s, tarfile_aggregator=tarfile_aggregator
+        )
+        sensors.append(microphone_sensor)
+
+    assert sensors, sensors  # By construction, it can't be empty
     sensors_manager = SensorsManager(sensors=sensors)
 
     # Off-band workers

@@ -96,7 +96,7 @@ class BackgroundServer(object):
         return THREAD_POOL_EXECUTOR.submit(method, *args, **kwargs)
 
     def _load_config(self, filename=APP_CONFIG_FILE):
-        logger.info(f"(Re)loading config file {filename}")
+        logger.info(f"Reloading config file {filename}")
         config = (
             ConfigParser()
         )  # No NAME here, sicne named parsers must be Singletons in process!
@@ -148,8 +148,9 @@ class BackgroundServer(object):
                     local_key_storage=self._local_key_storage,
                     encryption_conf=encryption_conf,
                 )
-            start_recording_toolchain(self._recording_toolchain)
-            logger.info("Recording started")
+            if self._recording_toolchain:  # Else we just let cancellation occur
+                start_recording_toolchain(self._recording_toolchain)
+                logger.info("Recording started")
         finally:
             self._status_change_in_progress = False
             self.broadcast_recording_state()  # Even on error
