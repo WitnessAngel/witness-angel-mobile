@@ -95,7 +95,9 @@ class WitnessAngelClientApp(App):
 
     def load_config(self):
         # Hook here if needed
-        return super().load_config()
+        APP_CONFIG_FILE.touch(exist_ok=True)  # For initial creation
+        config = super().load_config()
+        return config
 
     def get_application_config(self, *args, **kwargs):
         return str(APP_CONFIG_FILE)  # IMPORTANT, stringify it for Kivy!

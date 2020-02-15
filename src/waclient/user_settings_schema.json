@@ -1,5 +1,33 @@
 [
     {
+        "title": "Persistent service",
+        "type": "bool",
+        "section": "usersettings",
+        "key": "daemonize_service",
+        "desc": "Keep recording in background when app is closed."
+    },
+    {
+        "title": "Record microphone",
+        "type": "bool",
+        "section": "usersettings",
+        "key": "record_microphone",
+        "desc": "Enable the recording of surrounding audio."
+    },
+    {
+        "title": "Record GPS",
+        "type": "bool",
+        "section": "usersettings",
+        "key": "record_gps",
+        "desc": "Enable the recording of fine-grained device location."
+    },
+    {
+        "title": "Record gyroscope",
+        "type": "bool",
+        "section": "usersettings",
+        "key": "record_gyroscope",
+        "desc": "Enable the recording of device rotation movements."
+    },
+    {
         "title": "Max containers count",
         "type": "options",
         "section": "usersettings",
@@ -31,13 +59,7 @@
         "options": ["0.5", "1", "5", "10", "30"],
         "desc": "Min interval in seconds between value retrievals (gps, sensors...)."
     },
-    {
-        "title": "Persistent service",
-        "type": "bool",
-        "section": "usersettings",
-        "key": "daemonize_service",
-        "desc": "Keep recording in background when app is closed."
-    },
+
     {
         "title": "Language",
         "type": "options",

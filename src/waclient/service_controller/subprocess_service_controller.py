@@ -20,10 +20,10 @@ class ServiceController(ServiceControllerBase):
         )
 
     def stop_service(self):
-        assert self._subprocess  # Else, workflow error
         self._send_message("/stop_server")
-        try:
-            self._subprocess.wait(timeout=40)
-        except subprocess.TimeoutExpired:
-            logger.error("Service subprocess didn't exit gracefully, we kill it now")
-            self._subprocess.kill()
+        if self._subprocess:  # Else, service already existed at App launch... give up
+            try:
+                self._subprocess.wait(timeout=40)
+            except subprocess.TimeoutExpired:
+                logger.error("Service subprocess didn't exit gracefully, we kill it now")
+                self._subprocess.kill()
