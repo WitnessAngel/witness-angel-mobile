@@ -6,6 +6,8 @@ import shutil
 from os.path import join, dirname
 from pathlib import Path
 
+import atexit
+
 os.environ["KIVY_NO_ARGS"] = "1"
 
 import kivy
@@ -169,6 +171,8 @@ class WitnessAngelClientApp(App):
             ]
         )  # These permissions might NOT be granted by user!
 
+        atexit.register(self.on_stop)  # Cleanup in case of crash
+
         # import logging_tree
         # logging_tree.printout()
 
@@ -185,6 +189,7 @@ class WitnessAngelClientApp(App):
         application has finished running (i.e. the window is about to be
         closed).
         """
+        atexit.unregister(self.on_stop)  # Not needed anymore
         self.service_controller.stop_service()  # Will wait for termination, else kill it
 
     def log_output(self, msg, *args, **kwargs):
