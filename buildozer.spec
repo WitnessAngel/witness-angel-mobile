@@ -152,6 +152,32 @@ android.arch = armeabi-v7a
 
 
 #
+# Python for android (p4a) specific
+#
+
+# (str) python-for-android fork to use, defaults to upstream (kivy)
+#p4a.fork = kivy
+
+# (str) python-for-android branch to use, defaults to master
+#p4a.branch = master
+
+# (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
+#p4a.source_dir =
+
+# (str) The directory in which python-for-android should look for your own build recipes (if any)
+#p4a.local_recipes =
+
+# (str) Filename to the hook for p4a
+p4a.hook = build_tools/buildozer_hook.py
+
+# (str) Bootstrap to use for android builds
+# p4a.bootstrap = sdl2
+
+# (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
+#p4a.port =
+
+
+#
 # iOS specific
 #
 
