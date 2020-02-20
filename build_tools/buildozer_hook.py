@@ -31,6 +31,10 @@ def get_app_build_directory():
 def inject_boot_receiver_into_android_manifest_template():
 
     injected_chunk = '''
+    
+    <service android:name="org.whitemirror.witnessangeldemo.MyBootBroadcastReceiver"
+                     android:process=":service_bootbroadcastreceiver" />
+                     
     <receiver android:name="org.whitemirror.witnessangeldemo.MyBootBroadcastReceiver" android:exported="true" android:enabled="true">
         <intent-filter>
             <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -70,10 +74,29 @@ def add_java_boot_service_file_to_build():
     )
 
 
+def complete_apk_blacklist():
+    """Needed until Buildozer supports "--blacklist" option."""
+
+    blacklist_additions = ["# custom entries added by buildozer_hooks.py", "Crypto/SelfTest/*"]
+    logger.info("Completing blacklist.txt with entries %s" % str(blacklist_additions))
+
+    app_build_directory = get_app_build_directory()
+
+    blacklist_file = app_build_directory / "blacklist.txt"
+
+    existing_entries = blacklist_file.read_text(encoding="utf8").splitlines()
+
+    for blacklist_addition in blacklist_additions:
+        if blacklist_addition not in existing_entries:
+            existing_entries.append(blacklist_addition)
+
+    blacklist_file.write_text("\n".join(existing_entries), encoding="utf8")
+
 
 def before_apk_build(p4a_toolchain):
     inject_boot_receiver_into_android_manifest_template()
     add_java_boot_service_file_to_build()
+    complete_apk_blacklist()
 
 
 def after_apk_build(p4a_toolchain):
@@ -82,7 +105,6 @@ def after_apk_build(p4a_toolchain):
 
 def before_apk_assemble(p4a_toolchain):
     pass
-
 
 def after_apk_assemble(p4a_toolchain):
     pass
