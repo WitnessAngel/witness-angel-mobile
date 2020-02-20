@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 
 from kivy import platform
+
 from plyer import storagepath
 
 from wacryptolib.escrow import LOCAL_ESCROW_PLACEHOLDER
@@ -13,8 +14,8 @@ PACKAGE_NAME = "org.whitemirror.witnessangeldemo"
 ACTIVITY_CLASS = "org.kivy.android.PythonActivity"
 SERVICE_CLASS = "%s.ServiceRecordingservice" % PACKAGE_NAME
 SERVICE_START_ARGUMENT = ""
-REQUESTED_PERMISSIONS = [
-    "WRITE_EXTERNAL_STORAGE",
+DEFAULT_REQUESTED_PERMISSIONS = [
+    # "WRITE_EXTERNAL_STORAGE" => DELAYED PERMISSIONS
     "RECORD_AUDIO",
     "CAMERA",
     "ACCESS_FINE_LOCATION"
@@ -44,17 +45,21 @@ if IS_ANDROID:
 
     if mActivity:
         # WE ARE IN MAIN APP (safer than WACLIENT_TYPE)
-        INTERNAL_APP_ROOT = Path(mActivity.getFilesDir().toString())
-        INTERNAL_CACHE_DIR = Path(mActivity.getCacheDir().toString())
+        CONTEXT = mActivity
     else:
         # WE ARE IN SERVICE!!!
-        service = autoclass("org.kivy.android.PythonService").mService
-        INTERNAL_APP_ROOT = Path(service.getFilesDir().toString())
-        INTERNAL_CACHE_DIR = Path(service.getCacheDir().toString())
+        CONTEXT = autoclass("org.kivy.android.PythonService").mService
+
+    INTERNAL_APP_ROOT = Path(CONTEXT.getFilesDir().toString())
+    INTERNAL_CACHE_DIR = Path(CONTEXT.getCacheDir().toString())
     Environment = autoclass("android.os.Environment")
     _EXTERNAL_APP_ROOT = (
         Path(Environment.getExternalStorageDirectory().toString()) / "WitnessAngel"
     )
+
+    PackageManager = autoclass('android.content.pm.PackageManager')  # Precached for permission checking
+
+
 else:
     INTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelInternal"
     _EXTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelExternal"
@@ -95,7 +100,6 @@ def request_multiple_permissions(permissions: List[str]) -> List[bool]:
     """Returns nothing."""
     if IS_ANDROID:
         from android.permissions import request_permissions, Permission
-
         permission_objs = [
             getattr(Permission, permission) for permission in permissions
         ]
@@ -105,22 +109,39 @@ def request_multiple_permissions(permissions: List[str]) -> List[bool]:
 
 
 def request_single_permission(permission: str) -> bool:
-    """Returns True iff permission was immediately granted."""
-    assert permission in REQUESTED_PERMISSIONS, permission
-    if IS_ANDROID:
-        from android.permissions import check_permission, Permission
+    """Returns nothing."""
+    request_multiple_permissions([permission])
 
-        request_multiple_permissions([permission])
-        return check_permission(getattr(Permission, permission))
+
+def has_single_permission(permission: str) -> bool:
+    """Returns True iff permission was granted."""
+    from kivy.logger import Logger as logger  # Delayed import
+    if IS_ANDROID:
+        # THIS ONLY WORKS FOR ACTIVITIES: from android.permissions import check_permission, Permission
+        from jnius import autoclass
+        res = CONTEXT.checkSelfPermission(permission)
+        return (res == PackageManager.PERMISSION_GRANTED)
     return True  # For desktop OS
+
+
+def warn_if_permission_missing(permission: str) -> bool:
+    """Returns True iff a warning was emitted and permission is missing."""
+    from kivy.logger import Logger as logger  # Delayed import
+    if IS_ANDROID:
+        if not has_single_permission(permission=permission):
+            logger.warning("Missing permission %s, canceling use of corresponding sensor" % permission)
+            return True
+    return False
 
 
 def request_external_storage_dirs_access():
     """Ask for write permission and create missing directories."""
-    res = request_single_permission("WRITE_EXTERNAL_STORAGE")
-    if res:
+    perm = "WRITE_EXTERNAL_STORAGE"
+    request_single_permission(perm)
+    if has_single_permission(perm):
         EXTERNAL_DATA_EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    return res
+        return True
+    return False
 
 
 PREGENERATED_KEY_TYPES = [

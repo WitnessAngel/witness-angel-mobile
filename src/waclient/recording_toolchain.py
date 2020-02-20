@@ -1,10 +1,12 @@
-from oscpy.server import OSCThreadServer
 
+from kivy.logger import Logger as logger
+
+from oscpy.server import OSCThreadServer
 from waclient.common_config import (
     INTERNAL_CONTAINERS_DIR,
     PREGENERATED_KEY_TYPES,
     IS_ANDROID,
-)
+    warn_if_permission_missing)
 from waclient.sensors.gps import get_gps_sensor
 from waclient.sensors.gyroscope import get_gyroscope_sensor
 from waclient.sensors.microphone import get_microphone_sensor
@@ -16,25 +18,6 @@ from wacryptolib.sensor import (
     SensorsManager,
 )
 
-from kivy.logger import Logger as logger
-from kivy.logger import Logger as logger
-
-from oscpy.server import OSCThreadServer
-from waclient.common_config import (
-    INTERNAL_CONTAINERS_DIR,
-    PREGENERATED_KEY_TYPES,
-    IS_ANDROID,
-)
-from waclient.sensors.gps import get_gps_sensor
-from waclient.sensors.gyroscope import get_gyroscope_sensor
-from waclient.sensors.microphone import get_microphone_sensor
-from wacryptolib.container import ContainerStorage
-from wacryptolib.escrow import get_free_keys_generator_worker
-from wacryptolib.sensor import (
-    TarfileRecordsAggregator,
-    JsonDataAggregator,
-    SensorsManager,
-)
 
 osc = OSCThreadServer(encoding="utf8")
 
@@ -123,19 +106,19 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
 
     sensors= []
 
-    if record_gyroscope:
+    if record_gyroscope:  # No need for specific permission!
         gyroscope_sensor = get_gyroscope_sensor(
             json_aggregator=gyroscope_json_aggregator, polling_interval_s=polling_interval_s
         )
         sensors.append(gyroscope_sensor)
 
-    if record_gps:
+    if record_gps and not warn_if_permission_missing("ACCESS_FINE_LOCATION"):
         gps_sensor = get_gps_sensor(
             polling_interval_s=polling_interval_s, json_aggregator=gps_json_aggregator
         )
         sensors.append(gps_sensor)
 
-    if record_microphone:
+    if record_microphone and not warn_if_permission_missing("RECORD_AUDIO"):
         microphone_sensor = get_microphone_sensor(
             interval_s=container_member_duration_s, tarfile_aggregator=tarfile_aggregator
         )

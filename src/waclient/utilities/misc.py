@@ -11,7 +11,8 @@ def safe_catch_unhandled_exception(f, *args, **kwargs):
     except Exception as exc:
         try:
             logger.error(
-                f"Caught unhandled exception in call of function {f!r}: {exc!r}"
+                f"Caught unhandled exception in call of function {f!r}: {exc!r}",
+                exc_info=True
             )
             #import traceback
             #traceback.print_exc(file=sys.stdout)  # Important, since stderr is hooked by Kivy!

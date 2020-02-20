@@ -15,7 +15,7 @@ from waclient.common_config import (
     INTERNAL_KEYS_DIR,
     EXTERNAL_DATA_EXPORTS_DIR,
     get_encryption_conf,
-    IS_ANDROID, WIP_RECORDING_MARKER)
+    IS_ANDROID, WIP_RECORDING_MARKER, CONTEXT)
 from waclient.recording_toolchain import (
     build_recording_toolchain,
     start_recording_toolchain,
@@ -43,14 +43,11 @@ THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
 
 
 if IS_ANDROID:
-    from jnius import autoclass
-    PythonService = autoclass('org.kivy.android.PythonService')
-    context = PythonService.mService
     from waclient.android_utils import build_notification_channel, build_notification
-    build_notification_channel(context, "MY BELLE NOTIFICATION")
-    notification = build_notification(context, title="Mon Titre", message="salutttt", ticker="msg for impaired people")
+    build_notification_channel(CONTEXT, "MY BELLE NOTIFICATION")
+    notification = build_notification(CONTEXT, title="Mon Titre", message="salutttt", ticker="msg for impaired people")
     notification_uid = 1
-    context.startForeground(notification_uid, notification)
+    CONTEXT.startForeground(notification_uid, notification)
 
 
 
