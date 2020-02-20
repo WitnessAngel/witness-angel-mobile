@@ -42,6 +42,18 @@ THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
 )
 
 
+if IS_ANDROID:
+    from jnius import autoclass
+    PythonService = autoclass('org.kivy.android.PythonService')
+    context = PythonService.mService
+    from waclient.android_utils import build_notification_channel, build_notification
+    build_notification_channel(context, "MY BELLE NOTIFICATION")
+    notification = build_notification(context, title="Mon Titre", message="salutttt", ticker="msg for impaired people")
+    notification_uid = 1
+    context.startForeground(notification_uid, notification)
+
+
+
 @ServerClass
 class BackgroundServer(object):
 

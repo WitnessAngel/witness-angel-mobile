@@ -94,7 +94,7 @@ def complete_apk_blacklist():
 
 
 def before_apk_build(p4a_toolchain):
-    inject_boot_receiver_into_android_manifest_template()
+    ###inject_boot_receiver_into_android_manifest_template()
     add_java_boot_service_file_to_build()
     complete_apk_blacklist()
 

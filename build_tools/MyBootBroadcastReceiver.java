@@ -22,7 +22,7 @@ public class MyBootBroadcastReceiver extends BroadcastReceiver {
         ix.putExtra("pythonPath", app_root + ":" + app_root + "/lib");
         ix.putExtra("pythonServiceArgument", "");
         ix.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startService(ix);
+        context.startForegroundService(ix);
         System.err.println("\n\n LEAVING MyBootBroadcastReceiver \n\n");
     }
 }
