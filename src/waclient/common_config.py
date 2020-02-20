@@ -8,8 +8,10 @@ from plyer import storagepath
 from wacryptolib.escrow import LOCAL_ESCROW_PLACEHOLDER
 
 
+PACKAGE_NAME = "org.whitemirror.witnessangeldemo"
+
 ACTIVITY_CLASS = "org.kivy.android.PythonActivity"
-SERVICE_CLASS = "org.whitemirror.witnessangeldemo.ServiceRecordingservice"
+SERVICE_CLASS = "%s.ServiceRecordingservice" % PACKAGE_NAME
 SERVICE_START_ARGUMENT = ""
 
 IS_ANDROID = (platform == "android")
