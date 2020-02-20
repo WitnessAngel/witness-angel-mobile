@@ -27,7 +27,7 @@ from waclient.common_config import (
     DEFAULT_CONFIG_TEMPLATE,
     APP_CONFIG_FILE,
     request_external_storage_dirs_access,
-    SRC_ROOT_DIR, WIP_RECORDING_MARKER)
+    SRC_ROOT_DIR, WIP_RECORDING_MARKER, REQUESTED_PERMISSIONS)
 from waclient.service_controller import ServiceController
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
@@ -105,6 +105,8 @@ class WitnessAngelClientApp(App):
     def build_config(self, config):
         """Populate config with default values, before the loading of user preferences."""
         config.read(str(DEFAULT_CONFIG_TEMPLATE))
+        config.filename = self.get_application_config()
+        config.write()
 
     def build_settings(self, settings):
         """Read the user settings schema and create a panel from it."""
@@ -156,12 +158,7 @@ class WitnessAngelClientApp(App):
         self._request_recording_state()  # Immediate first iteration
 
         request_multiple_permissions(
-            permissions=[
-                "WRITE_EXTERNAL_STORAGE",
-                "RECORD_AUDIO",
-                "CAMERA",
-                "ACCESS_FINE_LOCATION",
-            ]
+            permissions=REQUESTED_PERMISSIONS
         )  # These permissions might NOT be granted by user!
 
         atexit.register(self.on_stop)  # Cleanup in case of crash

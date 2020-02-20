@@ -13,7 +13,12 @@ PACKAGE_NAME = "org.whitemirror.witnessangeldemo"
 ACTIVITY_CLASS = "org.kivy.android.PythonActivity"
 SERVICE_CLASS = "%s.ServiceRecordingservice" % PACKAGE_NAME
 SERVICE_START_ARGUMENT = ""
-
+REQUESTED_PERMISSIONS = [
+    "WRITE_EXTERNAL_STORAGE",
+    "RECORD_AUDIO",
+    "CAMERA",
+    "ACCESS_FINE_LOCATION"
+]
 IS_ANDROID = (platform == "android")
 
 WACLIENT_TYPE = os.environ.get("WACLIENT_TYPE", "<UNKNOWN>")
@@ -101,6 +106,7 @@ def request_multiple_permissions(permissions: List[str]) -> List[bool]:
 
 def request_single_permission(permission: str) -> bool:
     """Returns True iff permission was immediately granted."""
+    assert permission in REQUESTED_PERMISSIONS, permission
     if IS_ANDROID:
         from android.permissions import check_permission, Permission
 
