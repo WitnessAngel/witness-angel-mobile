@@ -61,7 +61,8 @@ services = recordingservice:service.py
 #
 
 # (list) Permissions
-android.permissions = INTERNET,CAMERA,RECORD_AUDIO,WRITE_EXTERNAL_STORAGE,FOREGROUND_SERVICE,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,RECEIVE_BOOT_COMPLETED
+# WRITE_EXTERNAL_STORAGE is already enabled in AndroidManifest.tmpl.xml by default
+android.permissions = INTERNET,CAMERA,RECORD_AUDIO,FOREGROUND_SERVICE,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,RECEIVE_BOOT_COMPLETED
 
 # (int) Android API to use (we want PERMISSION REQUESTS so api>=23)
 android.api = 26

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import time
 from typing import List
 
 from kivy import platform
@@ -14,12 +15,13 @@ PACKAGE_NAME = "org.whitemirror.witnessangeldemo"
 ACTIVITY_CLASS = "org.kivy.android.PythonActivity"
 SERVICE_CLASS = "%s.ServiceRecordingservice" % PACKAGE_NAME
 SERVICE_START_ARGUMENT = ""
-DEFAULT_REQUESTED_PERMISSIONS = [
+DEFAULT_REQUESTED_PERMISSIONS_MAPPER = {
+    # Gyroscope needs no permissions
     # "WRITE_EXTERNAL_STORAGE" => DELAYED PERMISSIONS
-    "RECORD_AUDIO",
-    "CAMERA",
-    "ACCESS_FINE_LOCATION"
-]
+    "record_microphone": "RECORD_AUDIO",
+    # TODO "CAMERA",
+    "record_gps": "ACCESS_FINE_LOCATION"
+}
 IS_ANDROID = (platform == "android")
 
 WACLIENT_TYPE = os.environ.get("WACLIENT_TYPE", "<UNKNOWN>")
@@ -100,11 +102,11 @@ def request_multiple_permissions(permissions: List[str]) -> List[bool]:
     """Returns nothing."""
     if IS_ANDROID:
         from android.permissions import request_permissions, Permission
-        permission_objs = [
+        permissions_qualified_names = [
             getattr(Permission, permission) for permission in permissions
         ]
         request_permissions(
-            permission_objs
+                permissions_qualified_names
         )  # Might freeze app while showing user a popup
 
 
@@ -117,9 +119,12 @@ def has_single_permission(permission: str) -> bool:
     """Returns True iff permission was granted."""
     from kivy.logger import Logger as logger  # Delayed import
     if IS_ANDROID:
-        # THIS ONLY WORKS FOR ACTIVITIES: from android.permissions import check_permission, Permission
+        # THIS ONLY WORKS FOR ACTIVITIES: "from android.permissions import check_permission, Permission"
         from jnius import autoclass
-        res = CONTEXT.checkSelfPermission(permission)
+        from android.permissions import Permission
+        permission_qualified_name = getattr(Permission, permission)  # e.g. android.permission.ACCESS_FINE_LOCATION
+        res = CONTEXT.checkSelfPermission(permission_qualified_name)
+        #logger.info("checkSelfPermission returned %r (vs %s) for %s" % (res, PackageManager.PERMISSION_GRANTED, permission))
         return (res == PackageManager.PERMISSION_GRANTED)
     return True  # For desktop OS
 
@@ -129,16 +134,21 @@ def warn_if_permission_missing(permission: str) -> bool:
     from kivy.logger import Logger as logger  # Delayed import
     if IS_ANDROID:
         if not has_single_permission(permission=permission):
-            logger.warning("Missing permission %s, canceling use of corresponding sensor" % permission)
+            logger.warning("Missing permission %s, cancelling use of corresponding sensor" % permission)
             return True
     return False
 
 
 def request_external_storage_dirs_access():
     """Ask for write permission and create missing directories."""
-    perm = "WRITE_EXTERNAL_STORAGE"
-    request_single_permission(perm)
-    if has_single_permission(perm):
+    from kivy.logger import Logger as logger  # Delayed import
+    permission = "WRITE_EXTERNAL_STORAGE"
+    request_single_permission(permission)
+    # FIXME remove this ugly sleep() hack and move this to Service
+    time.sleep(3)  # Let the callback permission request be processed
+    res = has_single_permission(permission)
+    #logger.info("Has single permission %r is %s" % (permission, res))
+    if res:
         EXTERNAL_DATA_EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
         return True
     return False

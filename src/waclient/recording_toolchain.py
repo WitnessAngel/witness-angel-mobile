@@ -124,7 +124,10 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
         )
         sensors.append(microphone_sensor)
 
-    assert sensors, sensors  # By construction, it can't be empty
+    if not sensors:
+        logger.warning("No sensor is allowed by app permissions, aborting recorder setup")
+        return None
+
     sensors_manager = SensorsManager(sensors=sensors)
 
     # Off-band workers

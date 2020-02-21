@@ -27,7 +27,9 @@ from waclient.common_config import (
     DEFAULT_CONFIG_TEMPLATE,
     APP_CONFIG_FILE,
     request_external_storage_dirs_access,
-    SRC_ROOT_DIR, WIP_RECORDING_MARKER, DEFAULT_REQUESTED_PERMISSIONS)
+    SRC_ROOT_DIR, WIP_RECORDING_MARKER, 
+    DEFAULT_REQUESTED_PERMISSIONS_MAPPER, 
+    request_single_permission)
 from waclient.service_controller import ServiceController
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
@@ -122,6 +124,9 @@ class WitnessAngelClientApp(App):
             token = (section, key)
             if token == ("usersettings", "daemonize_service"):
                 self.switch_daemonize_service(int(value))  # Passed as STR!!
+            elif key in DEFAULT_REQUESTED_PERMISSIONS_MAPPER and int(value):
+                logger.info("on_config_change %s %s", key, value)
+                request_single_permission(DEFAULT_REQUESTED_PERMISSIONS_MAPPER[key])
 
     def switch_daemonize_service(self, value):
         self.service_controller.switch_daemonize_service(value)
@@ -130,6 +135,7 @@ class WitnessAngelClientApp(App):
         """Enables the user to switch to another application, causing the app to wait
         until the user switches back to it eventually.
         """
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON PAUSE HOOK WAS CALLED")
         return True  # ACCEPT pausing
 
     def on_resume(self):
@@ -157,15 +163,27 @@ class WitnessAngelClientApp(App):
         )
         self._request_recording_state()  # Immediate first iteration
 
-        # FIXME - only request permissions of sensors ENABLED IN CONF!!
-        request_multiple_permissions(
-            permissions=DEFAULT_REQUESTED_PERMISSIONS
-        )  # These permissions might NOT be granted by user!
+        # These permissions might NOT be granted now by user!
+        self._request_permissions_for_all_enabled_sensors()
 
         atexit.register(self.on_stop)  # Cleanup in case of crash
 
         # import logging_tree
         # logging_tree.printout()
+
+    def _request_permissions_for_all_enabled_sensors(self, only_this_sensor=None):
+        """"
+        Loop on user settinsg, and only request permissions for enabled sensors.
+        """
+        needed_permissions = []
+        for (setting, permission) in DEFAULT_REQUESTED_PERMISSIONS_MAPPER.items():
+            if self.config.getboolean("usersettings", setting):
+                needed_permissions.append(permission)
+        if needed_permissions:
+            logger.info("Checking necessary user permissions %s" % str(needed_permissions))
+            request_multiple_permissions(
+                permissions=needed_permissions
+            )
 
     def get_daemonize_service(self):
         return self.config.getboolean("usersettings", "daemonize_service")
