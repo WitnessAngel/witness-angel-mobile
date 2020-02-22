@@ -142,6 +142,7 @@ class WitnessAngelClientApp(App):
         """Called when the app is resumed. Used to restore data that has been
         stored in on_pause().
         """
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON PAUSE HOOK WAS CALLED")
         pass
 
     def on_start(self):

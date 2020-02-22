@@ -63,6 +63,7 @@ if IS_ANDROID:
 
 
 else:
+    CONTEXT = None  # Unused on Desktop
     INTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelInternal"
     _EXTERNAL_APP_ROOT = Path(storagepath.get_home_dir()) / "WitnessAngelExternal"
     INTERNAL_CACHE_DIR = Path(storagepath.get_home_dir()) / "WitnessAngelCache"

@@ -65,12 +65,15 @@ def inject_boot_receiver_into_android_manifest_template():
 def add_java_boot_service_file_to_build():
 
     app_build_directory = get_app_build_directory()
-    target_file = app_build_directory.joinpath("src/main/java/org/whitemirror/witnessangeldemo")
+    target_dir = app_build_directory.joinpath("src/main/java/org/whitemirror/witnessangeldemo")
+
+    if not target_dir.exists():  # FIXME put before APK assemble instead???
+        logger.warning("Couldn't copy MyBootBroadcastReceiver.java since target dir %s doesn't exist (yet), maybe on next build?" % target_dir)
 
     logger.info("Copying MyBootBroadcastReceiver.java into app java libs")
     shutil.copy(
         THIS_DIR / "MyBootBroadcastReceiver.java",
-        target_file / "MyBootBroadcastReceiver.java"
+            target_dir / "MyBootBroadcastReceiver.java"
     )
 
 
@@ -95,7 +98,7 @@ def complete_apk_blacklist():
 
 def before_apk_build(p4a_toolchain):
     ###inject_boot_receiver_into_android_manifest_template()
-    add_java_boot_service_file_to_build()
+    ###add_java_boot_service_file_to_build()
     complete_apk_blacklist()
 
 
