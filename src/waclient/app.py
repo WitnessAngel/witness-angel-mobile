@@ -108,7 +108,8 @@ class WitnessAngelClientApp(App):
         """Populate config with default values, before the loading of user preferences."""
         config.read(str(DEFAULT_CONFIG_TEMPLATE))
         config.filename = self.get_application_config()
-        config.write()
+        if not os.path.exists(config.filename):
+            config.write()  # Initial user preferences file
 
     def build_settings(self, settings):
         """Read the user settings schema and create a panel from it."""
@@ -142,7 +143,7 @@ class WitnessAngelClientApp(App):
         """Called when the app is resumed. Used to restore data that has been
         stored in on_pause().
         """
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON PAUSE HOOK WAS CALLED")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON RESUME HOOK WAS CALLED")
         pass
 
     def on_start(self):
