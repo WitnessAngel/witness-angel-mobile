@@ -3,6 +3,24 @@ from waclient.common_config import PACKAGE_NAME
 CHANNEL_ID = PACKAGE_NAME
 
 
+
+def preload_java_classes():
+    """
+    Workaround so that pyjnius finds java classes even from secondary thread.
+    To be called from main process thread.
+    """
+    from jnius import autoclass
+    autoclass('android.graphics.BitmapFactory')
+    autoclass("{}.R$drawable".format(PACKAGE_NAME))
+    autoclass('android.content.Intent')
+    autoclass('android.app.PendingIntent')
+    autoclass('android.app.NotificationManager')
+    autoclass('android.app.NotificationChannel')
+    autoclass('android.app.Notification$Builder')
+    autoclass('android.content.Context')
+    autoclass('java.lang.String')
+
+
 def _set_icons(context, notification, icon=None):
     '''
     Set the small application icon displayed at the top panel together with

@@ -41,14 +41,9 @@ THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
     max_workers=1, thread_name_prefix="service_worker"  # SINGLE worker for now, to avoid concurrency
 )
 
-
 if IS_ANDROID:
-    from waclient.android_utils import build_notification_channel, build_notification
-    build_notification_channel(CONTEXT, "MY BELLE NOTIFICATION")
-    notification = build_notification(CONTEXT, title="Mon Titre", message="salutttt", ticker="msg for impaired people")
-    notification_uid = 1
-    CONTEXT.startForeground(notification_uid, notification)
-
+    from waclient.android_utils import preload_java_classes
+    preload_java_classes()
 
 
 @ServerClass
@@ -134,7 +129,7 @@ class BackgroundServer(object):
         if IS_ANDROID:
             from jnius import autoclass
             PythonService = autoclass('org.kivy.android.PythonService')
-            PythonService.mService.setAutoRestartService(value)
+            PythonService.mService.setAutoStopService(not value)
         # Nothing to do for desktop platforms
 
     @osc.address_method("/switch_daemonize_service")
@@ -160,6 +155,15 @@ class BackgroundServer(object):
             if self._recording_toolchain:  # Else we just let cancellation occur
                 start_recording_toolchain(self._recording_toolchain)
                 logger.info("Recording started")
+
+                if IS_ANDROID:
+                    from waclient.android_utils import build_notification_channel, build_notification
+                    build_notification_channel(CONTEXT, "Witness Angel Service")
+                    notification = build_notification(CONTEXT, title="Sensors are active", message="Click to manage Witness Angel state",
+                                                      ticker="Witness Angel sensors are active")
+                    notification_uid = 1
+                    CONTEXT.startForeground(notification_uid, notification)
+
         finally:
             self._status_change_in_progress = False
             self.broadcast_recording_state()  # Even on error
@@ -200,6 +204,10 @@ class BackgroundServer(object):
             logger.info("Stopping recording")
             stop_recording_toolchain(self._recording_toolchain)
             logger.info("Recording stopped")
+
+            if IS_ANDROID:
+                CONTEXT.stopForeground(True)  # Does remove notification
+
         finally:  # Trigger all this even if container flushing failed
             self._recording_toolchain = (
                 None
