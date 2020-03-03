@@ -59,7 +59,14 @@
         "options": ["0.5", "1", "5", "10", "30"],
         "desc": "Min interval in seconds between value retrievals (gps, sensors...)."
     },
-
+    {
+        "title": "Pregenerated keys",
+        "type": "options",
+        "section": "usersettings",
+        "key": "max_free_keys_per_type",
+        "options": ["0", "1", "5", "10", "20"],
+        "desc": "How many keys of each type must be produced ahead of time."
+    },
     {
         "title": "Language",
         "type": "options",

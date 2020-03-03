@@ -60,7 +60,7 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
         "container_member_duration_s", 60, converter=float
     )
     polling_interval_s = get_conf_value("polling_interval_s", 0.5, converter=float)
-    max_free_keys_per_type = get_conf_value("max_free_keys_per_type", 5, converter=int)
+    max_free_keys_per_type = get_conf_value("max_free_keys_per_type", 1, converter=int)
 
     logger.info(
         "Toolchain configuration is %s",
@@ -132,14 +132,17 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
 
     # Off-band workers
 
-    free_keys_generator_worker = get_free_keys_generator_worker(
-        key_storage=local_key_storage,
-        max_free_keys_per_type=max_free_keys_per_type,
-        sleep_on_overflow_s=0.5
-        * max_free_keys_per_type
-        * container_member_duration_s,  # TODO make it configurable?
-        key_types=PREGENERATED_KEY_TYPES,
-    )
+    if max_free_keys_per_type:
+        free_keys_generator_worker = get_free_keys_generator_worker(
+            key_storage=local_key_storage,
+            max_free_keys_per_type=max_free_keys_per_type,
+            sleep_on_overflow_s=0.5
+            * max_free_keys_per_type
+            * container_member_duration_s,  # TODO make it configurable?
+            key_types=PREGENERATED_KEY_TYPES,
+        )
+    else:
+        free_keys_generator_worker = None
 
     toolchain = dict(
         sensors_manager=sensors_manager,
@@ -157,9 +160,12 @@ def start_recording_toolchain(toolchain):
     Start all the sensors, thus ensuring that the toolchain begins to record end-to-end.
     """
 
-    logger.info("Starting the generator of free keys")
     free_keys_generator_worker = toolchain["free_keys_generator_worker"]
-    free_keys_generator_worker.start()
+    if free_keys_generator_worker:
+        logger.info("Starting the generator of free keys")
+        free_keys_generator_worker.start()
+    else:
+        logger.info("Ignoring the generator of free keys")
 
     sensors_manager = toolchain["sensors_manager"]
     sensors_manager.start()
@@ -182,8 +188,9 @@ def stop_recording_toolchain(toolchain):
     container_storage = toolchain["container_storage"]
     free_keys_generator_worker = toolchain["free_keys_generator_worker"]
 
-    logger.info("Stopping the generator of free keys")
-    free_keys_generator_worker.stop()
+    if free_keys_generator_worker:
+        logger.info("Stopping the generator of free keys")
+        free_keys_generator_worker.stop()
 
     # logger.info("Stopping sensors manager")
     sensors_manager.stop()
