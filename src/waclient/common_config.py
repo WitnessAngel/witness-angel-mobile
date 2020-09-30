@@ -7,7 +7,7 @@ from kivy import platform
 
 from plyer import storagepath
 
-from wacryptolib.escrow import LOCAL_ESCROW_PLACEHOLDER
+from wacryptolib.container import LOCAL_ESCROW_MARKER
 
 
 PACKAGE_NAME = "org.whitemirror.witnessangeldemo"
@@ -170,14 +170,14 @@ _PROD_ENCRYPTION_CONF = dict(
             data_encryption_algo="AES_EAX",
             key_encryption_strata=[
                 dict(
-                    key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_PLACEHOLDER
+                    key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_MARKER
                 )
             ],
             data_signatures=[
                 dict(
                     message_prehash_algo="SHA512",
                     signature_algo="DSA_DSS",
-                    signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                    signature_escrow=LOCAL_ESCROW_MARKER,
                 )
             ],
         ),
@@ -194,7 +194,7 @@ _PROD_ENCRYPTION_CONF = dict(
                 dict(
                     message_prehash_algo="SHA256",
                     signature_algo="ECC_DSS",
-                    signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                    signature_escrow=LOCAL_ESCROW_MARKER,
                 ),
             ],
         )
@@ -208,14 +208,14 @@ _TEST_ENCRYPTION_CONF = dict(
             data_encryption_algo="AES_EAX",
             key_encryption_strata=[
                 dict(
-                    key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_PLACEHOLDER
+                    key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_MARKER
                 )
             ],
             data_signatures=[
                 dict(
                     message_prehash_algo="SHA512",
                     signature_algo="RSA_PSS",
-                    signature_escrow=LOCAL_ESCROW_PLACEHOLDER,
+                    signature_escrow=LOCAL_ESCROW_MARKER,
                 )
             ],
         )

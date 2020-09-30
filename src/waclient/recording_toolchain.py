@@ -75,7 +75,7 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
     )
 
     container_storage = ContainerStorage(
-        encryption_conf=encryption_conf,
+        default_encryption_conf=encryption_conf,
         containers_dir=INTERNAL_CONTAINERS_DIR,
         max_containers_count=max_containers_count,
         local_key_storage=local_key_storage,
