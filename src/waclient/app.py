@@ -113,7 +113,7 @@ class WitnessAngelClientApp(App):
 
     def build_settings(self, settings):
         """Read the user settings schema and create a panel from it."""
-        settings_file = join(dirname(__file__), "user_settings_schema.json")
+        settings_file = join(dirname(__file__), "user_settings_schema.json")  # FIXME use DEFAULT_CONFIG_SCHEMA var
         settings.add_json_panel(
             title=self.title, config=self.config, filename=settings_file
         )

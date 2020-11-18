@@ -17,7 +17,7 @@ from kivy.uix.progressbar import ProgressBar
 from kivy.uix.textinput import TextInput
 
 
-class TransitionProgress(ProgressBar):
+class TransitionProgress(ProgressBar):  # FIXME what for ??
     """ProgressBar with pre-defined animations for fading in and out."""
 
     _in = Animation(opacity=1.0, duration=0.4)

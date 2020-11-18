@@ -29,7 +29,7 @@ if IS_ANDROID:
     autoclass("org.jnius.NativeInvocationHandler")
 
 
-def build_recording_toolchain(config, local_key_storage, encryption_conf):
+def build_recording_toolchain(config, key_storage_pool, encryption_conf):
     """Instantiate the whole toolchain of sensors and aggregators, depending on the config.
 
     Returns None if no toolchain is enabled by config.
@@ -78,7 +78,7 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
         default_encryption_conf=encryption_conf,
         containers_dir=INTERNAL_CONTAINERS_DIR,
         max_containers_count=max_containers_count,
-        local_key_storage=local_key_storage,
+        key_storage_pool=key_storage_pool,
     )
 
     # Tarfile builder level
@@ -104,7 +104,7 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
 
     # Sensors level
 
-    sensors= []
+    sensors = []
 
     if record_gyroscope:  # No need for specific permission!
         gyroscope_sensor = get_gyroscope_sensor(
@@ -129,6 +129,8 @@ def build_recording_toolchain(config, local_key_storage, encryption_conf):
         return None
 
     sensors_manager = SensorsManager(sensors=sensors)
+
+    local_key_storage = key_storage_pool.get_local_key_storage()
 
     # Off-band workers
 

@@ -25,7 +25,7 @@ from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
 from wacryptolib.container import decrypt_data_from_container
-from wacryptolib.key_storage import FilesystemKeyStorage
+from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
 from wacryptolib.utilities import load_from_json_file
 
 # os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
@@ -71,7 +71,7 @@ class BackgroundServer(object):
             CallbackHandler(self._remote_logging_callback)
         )
         self._termination_event = threading.Event()
-        self._local_key_storage = FilesystemKeyStorage(keys_dir=INTERNAL_KEYS_DIR)
+        self._key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
         logger.info("Service started")
 
         # Initial setup of service according to persisted config
@@ -149,7 +149,7 @@ class BackgroundServer(object):
                 config = self._load_config()
                 self._recording_toolchain = build_recording_toolchain(
                     config,
-                    local_key_storage=self._local_key_storage,
+                        key_storage_pool=self._key_storage_pool,
                     encryption_conf=encryption_conf,
                 )
             if self._recording_toolchain:  # Else we just let cancellation occur
@@ -232,7 +232,7 @@ class BackgroundServer(object):
         )  # Double exports would replace colliding files
         container = load_from_json_file(container_filepath)
         tarfile_bytes = decrypt_data_from_container(
-            container, local_key_storage=self._local_key_storage
+            container, key_storage_pool=self._key_storage_pool
         )
         tarfile_bytesio = io.BytesIO(tarfile_bytes)
         tarfile_obj = tarfile.open(

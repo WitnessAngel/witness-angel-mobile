@@ -14,7 +14,7 @@ from waclient.recording_toolchain import (
     start_recording_toolchain,
     stop_recording_toolchain,
 )
-from wacryptolib.key_storage import FilesystemKeyStorage
+from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
 from wacryptolib.sensor import TarfileRecordsAggregator
 from wacryptolib.utilities import load_from_json_bytes
 
@@ -22,11 +22,15 @@ from wacryptolib.utilities import load_from_json_bytes
 def test_nominal_recording_toolchain_case():
 
     config = ConfigParser()  # Empty but OK
+    config.setdefaults("usersettings",
+                       {"record_gyroscope": 1,
+                        "record_gps": 1,
+                        "record_microphone": 1})
 
-    local_key_storage = FilesystemKeyStorage(keys_dir=INTERNAL_KEYS_DIR)
+    key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
     encryption_conf = get_encryption_conf("test")
     toolchain = build_recording_toolchain(
-        config, local_key_storage=local_key_storage, encryption_conf=encryption_conf
+        config, key_storage_pool=key_storage_pool, encryption_conf=encryption_conf
     )
     sensors_manager = toolchain["sensors_manager"]
     data_aggregators = toolchain["data_aggregators"]
@@ -34,6 +38,7 @@ def test_nominal_recording_toolchain_case():
     container_storage = toolchain["container_storage"]
 
     purge_test_containers()
+
     # TODO - make this a PURGE() methods of storage!!!
     # CLEANUP of already existing containers
     # for container_name in container_storage.list_container_names(sorted=True):

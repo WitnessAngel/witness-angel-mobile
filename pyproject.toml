@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry"]
+requires = ["poetry_core"]
 build-backend = "poetry.masonry.api"
 
 
@@ -58,7 +58,7 @@ freezegun = "^0.3.12"
 gevent = "^1.4"
 
 # Linters and formatters
-black = {version = "^18.3-alpha.0",allows-prereleases = true}
+black = {version = "^18.3-alpha.0",allow-prereleases = true}
 pylint = "^2.3"
 safety = "^1.8"
 yamllint = "^1.15"
