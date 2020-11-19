@@ -31,7 +31,7 @@ from waclient.common_config import (
 from waclient.service_controller import ServiceController
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
-from waclient.utilities.osc import get_osc_server
+from waguilib.service_control.osc_transport import get_osc_server
 # from waclient.utilities.i18n import Lang
 from wacryptolib.container import (
     extract_metadata_from_container,

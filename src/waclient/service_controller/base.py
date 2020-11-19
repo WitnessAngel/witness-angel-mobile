@@ -1,6 +1,6 @@
 from kivy.logger import Logger as logger
 
-from waclient.utilities.osc import get_osc_client
+from waguilib.service_control.osc_transport import get_osc_client
 
 
 class ServiceControllerBase:
