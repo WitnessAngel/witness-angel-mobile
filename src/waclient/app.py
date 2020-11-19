@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
+import atexit
 import functools
 import logging
 import os
-import shutil
 from os.path import join, dirname
-from pathlib import Path
 
-import atexit
 
 os.environ["KIVY_NO_ARGS"] = "1"
 

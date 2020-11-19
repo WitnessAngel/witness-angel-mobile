@@ -4,27 +4,7 @@
 #:import randint random.randint
 #:import to_rgba kivy.utils.get_color_from_hex
 #:import tr waclient.app.tr
-#:import KivyConsole waclient.utilities.widgets.KivyConsole
-
-
-<ConsoleOutput>:
-    readonly: True
-    padding: 6, 6
-    size_hint: (1, None)
-
-<KivyConsole>:
-    console_output: console_output
-    scroll_view: scroll_view
-    ScrollView:
-        id: scroll_view
-        bar_width: 10
-        ConsoleOutput:
-            id: console_output
-            height: max(self.parent.height, self.minimum_height)
-            font_name: root.font_name
-            font_size: root.font_size
-            foreground_color: root.foreground_color
-            background_color: root.background_color
+#:import LoggingConsole waguilib.widgets.logging_console.LoggingConsole
 
 
 [FileListEntry@FloatLayout+TreeViewNode]:
@@ -105,7 +85,7 @@ ScreenManager:
                 on_state: app.switch_to_recording_state(is_recording=(self.state == "down"))
                 font_size: "30sp"
 
-            KivyConsole:
+            LoggingConsole:
                 id: kivy_console
                 canvas.after:
                     Color:
