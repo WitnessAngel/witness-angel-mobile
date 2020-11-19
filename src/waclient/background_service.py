@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import io
 import logging
 import os
@@ -247,7 +249,8 @@ class BackgroundServer(object):
 
     @osc.address_method("/attempt_container_decryption")
     @safe_catch_unhandled_exception
-    def attempt_container_decryption(self, container_filepath):
+    def attempt_container_decryption(self, container_filepath: str):
+        container_filepath = Path(container_filepath)
         return self._offload_task(self._offloaded_attempt_container_decryption, container_filepath=container_filepath)
 
     @osc.address_method("/stop_server")

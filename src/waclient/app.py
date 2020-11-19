@@ -324,7 +324,7 @@ class WitnessAngelClientApp(App):
         self.root.ids.filebrowser.layout.ids.treeview._trigger_layout()  # TEMPORARY
 
     def attempt_container_decryption(self, filepath):
-        assert isinstance(filepath, str), filepath
+        assert isinstance(filepath, str), filepath  # OSCP doesn't handle Path instances
         if not request_external_storage_dirs_access():
             logger.warning("Access to external storage not granted, aborting decryption attempt.")
             return
