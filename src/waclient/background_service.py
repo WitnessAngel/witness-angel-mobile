@@ -24,7 +24,7 @@ from waclient.recording_toolchain import (
 from waclient.utilities.logging import CallbackHandler
 from waclient.utilities.misc import safe_catch_unhandled_exception
 from waclient.utilities.osc import get_osc_server, get_osc_client
-from wacryptolib.container import decrypt_data_from_container
+from wacryptolib.container import decrypt_data_from_container, load_container_from_filesystem
 from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
 from wacryptolib.utilities import load_from_json_file
 
@@ -230,7 +230,7 @@ class BackgroundServer(object):
         target_directory.mkdir(
             exist_ok=True
         )  # Double exports would replace colliding files
-        container = load_from_json_file(container_filepath)
+        container = load_container_from_filesystem(container_filepath, include_data_ciphertext=True)
         tarfile_bytes = decrypt_data_from_container(
             container, key_storage_pool=self._key_storage_pool
         )
