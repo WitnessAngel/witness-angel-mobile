@@ -20,7 +20,7 @@ class GpsValueProvider(PeriodicValueMixin, TaskRunnerStateMachineBase):
 
     _lock = threading.RLock()  # Recursive due to PC testcase...
 
-    def __init__(self, interval_s: int, **kwargs):
+    def __init__(self, interval_s: float, **kwargs):
         super().__init__(**kwargs)
         self._interval_s = interval_s
         if gps_is_implemented:

@@ -15,7 +15,7 @@ class MicrophoneSensor(PeriodicTaskHandler):
     _lock = threading.Lock()
     _current_start_time = None
 
-    def __init__(self, interval_s: int, tarfile_aggregator: TarfileRecordsAggregator):
+    def __init__(self, interval_s: float, tarfile_aggregator: TarfileRecordsAggregator):
         super().__init__(interval_s=interval_s, runonstart=False)
         self._tarfile_aggregator = tarfile_aggregator
 

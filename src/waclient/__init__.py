@@ -1,4 +1,9 @@
 
+import os
+if os.getenv("WACLIENT_ENABLE_TYPEGUARD"):
+    from typeguard.importhook import install_import_hook
+    install_import_hook('waclient')
+
 
 try:
     # MUST BE ROBUST DUE TO NEED FOR RESILIENT "CRASH HANDLER" ACCESS #
