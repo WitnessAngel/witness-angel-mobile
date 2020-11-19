@@ -43,7 +43,7 @@ THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
 )
 
 if IS_ANDROID:
-    from waclient.android_utils import preload_java_classes
+    from waguilib.android_helpers import preload_java_classes
     preload_java_classes()
 
 
@@ -158,7 +158,7 @@ class BackgroundServer(object):
                 logger.info("Recording started")
 
                 if IS_ANDROID:
-                    from waclient.android_utils import build_notification_channel, build_notification
+                    from waguilib.android_helpers import build_notification_channel, build_notification
                     build_notification_channel(CONTEXT, "Witness Angel Service")
                     notification = build_notification(CONTEXT, title="Sensors are active", message="Click to manage Witness Angel state",
                                                       ticker="Witness Angel sensors are active")
