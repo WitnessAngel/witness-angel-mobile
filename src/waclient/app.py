@@ -25,9 +25,9 @@ from waclient.common_config import (
     DEFAULT_CONFIG_TEMPLATE,
     APP_CONFIG_FILE,
     request_external_storage_dirs_access,
-    SRC_ROOT_DIR, WIP_RECORDING_MARKER, 
-    DEFAULT_REQUESTED_PERMISSIONS_MAPPER, 
-    request_single_permission)
+    SRC_ROOT_DIR, WIP_RECORDING_MARKER,
+    DEFAULT_REQUESTED_PERMISSIONS_MAPPER,
+    request_single_permission, DEFAULT_CONFIG_SCHEMA)
 from waguilib.service_control import ServiceController
 from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from waguilib.service_control.osc_transport import get_osc_server
@@ -53,44 +53,29 @@ osc, osc_starter_callback = get_osc_server(is_master=True)
 
 
 @ServerClass
-class WitnessAngelClientApp(App):
+class WAGuiApp(App):
     """
     Main GUI app, which controls the recording service (via OSC protocol), and
     exposes settings as well as existing containers.
     """
 
-    title = "Witness Angel"
+    title: str = None  # TO OVERRIDE at class level
 
     service_querying_interval = 1  # To check when service is ready, at app start
 
     use_kivy_settings = False  # No need
 
-    language = None
+    language = None  # TO OVERRIDE at instance level
 
 
     def __init__(self, **kwargs):
         self._unanswered_service_state_requests = 0  # Used to detect a service not responding anymore to status requests
         print("STARTING INIT OF WitnessAngelClientApp")
-        super(WitnessAngelClientApp, self).__init__(**kwargs)
+        super(WAGuiApp, self).__init__(**kwargs)
         print("AFTER PARENT INIT OF WitnessAngelClientApp")
         self.settings_cls = SettingsWithTabbedPanel
         osc_starter_callback()  # Opens server port
         print("FINISHED INIT OF WitnessAngelClientApp")
-
-    def get_app_icon(self):
-        return self.get_asset_abspath("data/icons/witness_angel_logo_256.png")
-
-    def build(self):
-        """Initialize the GUI based on the kv file and set up events.
-
-        Returns the root widget of the app.
-        """
-        self.icon = self.get_app_icon()
-        self.language = self.config.getdefault("usersettings", "language", "en")
-        # tr.switch_lang(self.language)  TODO LATER
-
-        self._console_output = self.root.ids.kivy_console.console_output
-        return self.root
 
     def load_config(self):
         # Hook here if needed
@@ -110,14 +95,33 @@ class WitnessAngelClientApp(App):
 
     def build_settings(self, settings):
         """Read the user settings schema and create a panel from it."""
-        settings_file = join(dirname(__file__), "user_settings_schema.json")  # FIXME use DEFAULT_CONFIG_SCHEMA var
+        settings_file = DEFAULT_CONFIG_SCHEMA
         settings.add_json_panel(
             title=self.title, config=self.config, filename=settings_file
         )
 
-    def on_config_change(self, config, section, key, value):
-        """Called when the user changes a config value via the settings panel.
+
+class WitnessAngelClientApp(WAGuiApp):
+
+    title = "Witness Angel"
+
+    def get_app_icon(self):
+        return self.get_asset_abspath("data/icons/witness_angel_logo_256.png")
+
+    def build(self):
+        """Initialize the GUI based on the kv file and set up events.
+
+        Returns the root widget of the app.
         """
+        self.icon = self.get_app_icon()
+        self.language = self.config.getdefault("usersettings", "language", "en")
+        # tr.switch_lang(self.language)  TODO LATER
+
+        self._console_output = self.root.ids.kivy_console.console_output
+        return self.root
+
+    def on_config_change(self, config, section, key, value):
+        """Called when the user changes a config value via the settings panel."""
         if config is self.config:
             token = (section, key)
             if token == ("usersettings", "daemonize_service"):
