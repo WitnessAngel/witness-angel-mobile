@@ -187,7 +187,7 @@ _PROD_ENCRYPTION_CONF = dict(
             key_encryption_strata=[
                 dict(
                     key_encryption_algo="RSA_OAEP",
-                    key_escrow=dict(url=_main_remote_escrow_url),
+                    key_escrow=dict(escrow_type="jsonrpc", url=_main_remote_escrow_url),
                 )
             ],
             data_signatures=[

@@ -7,6 +7,7 @@ def list_test_containers():
     return [
         os.path.join(INTERNAL_CONTAINERS_DIR, filename)
         for filename in os.listdir(INTERNAL_CONTAINERS_DIR)
+        if filename.endswith(".crypt")  # Ignore offloaded data files
     ]
 
 
