@@ -1,7 +1,7 @@
 import time, os
 
 from _waclient_test_utilities import purge_test_containers, list_test_containers
-from waclient.service_controller import ServiceController
+from waguilib.service_control import ServiceController
 
 
 def _test_service_controller(

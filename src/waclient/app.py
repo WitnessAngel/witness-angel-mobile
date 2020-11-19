@@ -28,7 +28,7 @@ from waclient.common_config import (
     SRC_ROOT_DIR, WIP_RECORDING_MARKER, 
     DEFAULT_REQUESTED_PERMISSIONS_MAPPER, 
     request_single_permission)
-from waclient.service_controller import ServiceController
+from waguilib.service_control import ServiceController
 from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from waguilib.service_control.osc_transport import get_osc_server
 # from waclient.utilities.i18n import Lang
