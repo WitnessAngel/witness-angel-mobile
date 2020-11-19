@@ -29,8 +29,7 @@ from waclient.common_config import (
     DEFAULT_REQUESTED_PERMISSIONS_MAPPER, 
     request_single_permission)
 from waclient.service_controller import ServiceController
-from waclient.utilities.logging import CallbackHandler
-from waclient.utilities.misc import safe_catch_unhandled_exception
+from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from waguilib.service_control.osc_transport import get_osc_server
 # from waclient.utilities.i18n import Lang
 from wacryptolib.container import (

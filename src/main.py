@@ -25,9 +25,10 @@ def launch_app_or_service(is_service):
               % is_service)
         exc_info = sys.exc_info()
         target_url = "https://waescrow.prolifik.net/crashdumps/"  # Can't access common config safely here
-        from waclient.utilities.crashdumps import generate_and_send_crashdump  # Should be mostly safe to import
+        from waguilib.logging.crashdumps import generate_and_send_crashdump  # Should be mostly safe to import
         report = generate_and_send_crashdump(exc_info=exc_info, target_url=target_url)
         print(report)  # Not to stderr for now, since it is hooked by Kivy logging
+
 
 if __name__ == "__main__":
     launch_app_or_service(is_service=False)

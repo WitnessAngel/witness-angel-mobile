@@ -26,6 +26,7 @@ def _test_service_controller(
         print("OSC stats received through ping() call:", stats)
 
         for i in range(recording_iterations):
+            print("=======NEW RECORDING ITERATION IN TESTS=======")
             ctrl.start_recording(env="test")
             ctrl.start_recording(env="test")  # Ignored
 
