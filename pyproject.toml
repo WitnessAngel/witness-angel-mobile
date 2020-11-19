@@ -66,6 +66,7 @@ yamllint = "^1.15"
 xenon = "^0.5"
 mypy = "^0.701"
 doc8 = "^0.8"
+pytest-env = "^0.6.2"
 
 # Documentation
 sphinx = "^2.0"
