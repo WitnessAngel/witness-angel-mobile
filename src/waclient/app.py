@@ -77,6 +77,8 @@ class WAGuiApp(App):
         osc_starter_callback()  # Opens server port
         print("FINISHED INIT OF WitnessAngelClientApp")
 
+    # SETTINGS BUILDING AND SAVING #
+
     def load_config(self):
         # Hook here if needed
         APP_CONFIG_FILE.touch(exist_ok=True)  # For initial creation
@@ -99,6 +101,116 @@ class WAGuiApp(App):
         settings.add_json_panel(
             title=self.title, config=self.config, filename=settings_file
         )
+
+    # APP LIFECYCLE AND RECORDING STATE #
+
+    def on_pause(self):
+        """Enables the user to switch to another application, causing the app to wait
+        until the user switches back to it eventually.
+        """
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON PAUSE HOOK WAS CALLED")
+        return True  # ACCEPT pausing
+
+    def on_resume(self):
+        """Called when the app is resumed. Used to restore data that has been
+        stored in on_pause().
+        """
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON RESUME HOOK WAS CALLED")
+        pass
+
+    def on_start(self):
+        """Event handler for the `on_start` event which is fired after
+        initialization (after build() has been called) but before the
+        application has started running the events loop.
+        """
+        self.service_controller = ServiceController()
+
+        # Redirect root logger traffic to GUI console
+        logging.getLogger(None).addHandler(CallbackHandler(self.log_output))
+
+        # Constantly check the state of background service
+        Clock.schedule_interval(
+            self._request_recording_state, self.service_querying_interval
+        )
+        self._request_recording_state()  # Immediate first iteration
+
+        self.root.ids.recording_btn.disabled = True
+
+        atexit.register(self.on_stop)  # Cleanup in case of crash
+
+    def on_stop(self):
+        """Event handler for the `on_stop` event which is fired when the
+        application has finished running (i.e. the window is about to be
+        closed).
+        """
+        atexit.unregister(self.on_stop)  # Not needed anymore
+        if not self.get_daemonize_service():
+            self.service_controller.stop_service()  # Will wait for termination, then kill it
+
+    def switch_to_recording_state(self, is_recording):
+        """
+        Might be called as a reaction to the service broadcasting a changed state.
+         Let it propagate anyway in this case, the service will just ignore the duplicated command.
+        """
+        self.root.ids.recording_btn.disabled = True
+        if is_recording:
+            WIP_RECORDING_MARKER.touch(exist_ok=True)
+            self.service_controller.start_recording()
+        else:
+            try:
+                WIP_RECORDING_MARKER.unlink()
+            except FileNotFoundError:
+                pass
+            self.service_controller.stop_recording()
+
+    def _request_recording_state(self, *args, **kwargs):
+        """Ask the service for an update on its recording state."""
+        self._unanswered_service_state_requests += 1
+        if self._unanswered_service_state_requests > 2:
+            self._unanswered_service_state_requests = -10  # Leave some time for the service to go online
+            logger.info("Launching recorder service")
+            self.service_controller.start_service()
+        else:
+            self.service_controller.broadcast_recording_state()
+
+    @osc.address_method("/receive_recording_state")
+    @safe_catch_unhandled_exception
+    def receive_recording_state(self, is_recording):
+        #print(">>>>> app receive_recording_state", repr(is_recording))
+        self._unanswered_service_state_requests = 0  # RESET
+        if is_recording == "":  # Special case (ternary value, but None is not supported by OSC)
+            self.root.ids.recording_btn.disabled = True
+        else:
+            expected_state = "down" if is_recording else "normal"
+            self.root.ids.recording_btn.state = expected_state
+            self.root.ids.recording_btn.disabled = False
+
+    # SERVICE FEEDBACKS AND DAEMONIZATION #
+
+    def get_daemonize_service(self):  # OVERRIDE THIS TO FETCH USER SETTINGS
+        return False
+
+    def switch_daemonize_service(self, value):
+        self.service_controller.switch_daemonize_service(value)
+
+    @osc.address_method("/log_output")
+    @safe_catch_unhandled_exception
+    def _post_log_output(self, msg):
+        callback = functools.partial(self.log_output, msg)
+        Clock.schedule_once(callback)
+
+    def log_output(self, msg, *args, **kwargs):  # OVERRIDE THIS TO DISPLAY OUTPUT
+        pass  # Do nothing by default
+
+    # MISC UTILITIES #
+
+    @staticmethod
+    def get_nice_size(size):
+        for unit in filesize_units:
+            if size < 1024.0:
+                return "%1.0f %s" % (size, unit)
+            size /= 1024.0
+        return size
 
 
 class WitnessAngelClientApp(WAGuiApp):
@@ -130,49 +242,14 @@ class WitnessAngelClientApp(WAGuiApp):
                 logger.info("on_config_change %s %s", key, value)
                 request_single_permission(DEFAULT_REQUESTED_PERMISSIONS_MAPPER[key])
 
-    def switch_daemonize_service(self, value):
-        self.service_controller.switch_daemonize_service(value)
-
-    def on_pause(self):
-        """Enables the user to switch to another application, causing the app to wait
-        until the user switches back to it eventually.
-        """
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON PAUSE HOOK WAS CALLED")
-        return True  # ACCEPT pausing
-
-    def on_resume(self):
-        """Called when the app is resumed. Used to restore data that has been
-        stored in on_pause().
-        """
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>> ON RESUME HOOK WAS CALLED")
-        pass
-
     def on_start(self):
         """Event handler for the `on_start` event which is fired after
         initialization (after build() has been called) but before the
         application has started running the events loop.
         """
-
-        self.service_controller = ServiceController()
-
-        # Redirect root logger traffic to GUI console
-        logging.getLogger(None).addHandler(CallbackHandler(self.log_output))
-
-        self.root.ids.recording_btn.disabled = True
-
-        # Constantly check the state of background service
-        Clock.schedule_interval(
-            self._request_recording_state, self.service_querying_interval
-        )
-        self._request_recording_state()  # Immediate first iteration
-
+        super().on_start()
         # These permissions might NOT be granted now by user!
         self._request_permissions_for_all_enabled_sensors()
-
-        atexit.register(self.on_stop)  # Cleanup in case of crash
-
-        # import logging_tree
-        # logging_tree.printout()
 
     def _request_permissions_for_all_enabled_sensors(self, only_this_sensor=None):
         """"
@@ -199,74 +276,13 @@ class WitnessAngelClientApp(WAGuiApp):
         """Return the absolute path to an asset like "data/icons/myimage.png"."""
         return str(SRC_ROOT_DIR.joinpath(asset_relpath))
 
-    def on_stop(self):
-        """Event handler for the `on_stop` event which is fired when the
-        application has finished running (i.e. the window is about to be
-        closed).
-        """
-        atexit.unregister(self.on_stop)  # Not needed anymore
-        if not self.get_daemonize_service():
-            self.service_controller.stop_service()  # Will wait for termination, then kill it
-
     def log_output(self, msg, *args, **kwargs):
         """
         Extra args/kwargs are for example the "dt" parameter of Clock callbacks.
         """
         self._console_output.add_text(msg)
 
-    def switch_to_recording_state(self, is_recording):
-        """
-        Might be called as a reaction to the service broadcasting a changed state.
-         Wlet it propagate anyway in this case, the service will just ignore the duplicated command.
-        """
-        self.root.ids.recording_btn.disabled = True
-        if is_recording:
-            WIP_RECORDING_MARKER.touch(exist_ok=True)
-            self.service_controller.start_recording()
-        else:
-            try:
-                WIP_RECORDING_MARKER.unlink()
-            except FileNotFoundError:
-                pass
-            self.service_controller.stop_recording()
-
-    @osc.address_method("/log_output")
-    @safe_catch_unhandled_exception
-    def _post_log_output(self, msg):
-        callback = functools.partial(self.log_output, msg)
-        Clock.schedule_once(callback)
-
-    def _request_recording_state(self, *args, **kwargs):
-        """Ask the service for an update on its recording state."""
-        self._unanswered_service_state_requests += 1
-        if self._unanswered_service_state_requests > 2:
-            self._unanswered_service_state_requests = -10  # Leave some time for the service to go online
-            logger.info("Launching recorder service")
-            self.service_controller.start_service()
-        else:
-            self.service_controller.broadcast_recording_state()
-
-    @osc.address_method("/receive_recording_state")
-    @safe_catch_unhandled_exception
-    def receive_recording_state(self, is_recording):
-        #print(">>>>> app receive_recording_state", repr(is_recording))
-        self._unanswered_service_state_requests = 0  # RESET
-        if is_recording == "":  # Special case (ternary value, but None is not supported by OSC)
-            self.root.ids.recording_btn.disabled = True
-        else:
-            expected_state = "down" if is_recording else "normal"
-            self.root.ids.recording_btn.state = expected_state
-            self.root.ids.recording_btn.disabled = False
-
-    @staticmethod
-    def get_nice_size(size):
-        for unit in filesize_units:
-            if size < 1024.0:
-                return "%1.0f %s" % (size, unit)
-            size /= 1024.0
-        return size
-
-    def get_container_info(self, filepath):
+    def get_container_info(self, filepath):  # FIXME centralize this
         """Return a text with info about the container algorithms and inner members metadata.
          """
         if not filepath:
@@ -274,7 +290,7 @@ class WitnessAngelClientApp(WAGuiApp):
 
         filename = os.path.basename(filepath)
         try:
-            container = load_from_json_file(filepath)
+            container = load_from_json_file(filepath)  # FIXME use dedicated wacryptolib methods
 
             info_lines = []
 
@@ -309,7 +325,7 @@ class WitnessAngelClientApp(WAGuiApp):
             logging.error("Error when reading container %s: %r", filename, exc)
             return "Container analysis failed"
 
-    def purge_all_containers(self):
+    def purge_all_containers(self):  # FIXME use wacryptolib methods!
         """Delete all containers from internal storage."""
         containers_dir = self.internal_containers_dir
         logger.info("Purging all containers from %s", containers_dir)
