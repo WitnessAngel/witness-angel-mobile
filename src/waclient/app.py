@@ -104,6 +104,14 @@ class WAGuiApp(App):
 
     # APP LIFECYCLE AND RECORDING STATE #
 
+    def set_recording_btn_state(self, pushed: bool=None, disabled: bool=None):
+        assert pushed is not None or disabled is not None, (pushed, disabled)
+        recording_btn = self.root.ids.recording_btn
+        if pushed is not None:
+            recording_btn.state = "down" if pushed else "normal"
+        if disabled is not None:
+            recording_btn.disabled = disabled
+
     def on_pause(self):
         """Enables the user to switch to another application, causing the app to wait
         until the user switches back to it eventually.
@@ -134,7 +142,7 @@ class WAGuiApp(App):
         )
         self._request_recording_state()  # Immediate first iteration
 
-        self.root.ids.recording_btn.disabled = True
+        self.set_recording_btn_state(disabled=True)
 
         atexit.register(self.on_stop)  # Cleanup in case of crash
 
@@ -152,7 +160,7 @@ class WAGuiApp(App):
         Might be called as a reaction to the service broadcasting a changed state.
          Let it propagate anyway in this case, the service will just ignore the duplicated command.
         """
-        self.root.ids.recording_btn.disabled = True
+        self.set_recording_btn_state(disabled=True)
         if is_recording:
             WIP_RECORDING_MARKER.touch(exist_ok=True)
             self.service_controller.start_recording()
@@ -179,11 +187,9 @@ class WAGuiApp(App):
         #print(">>>>> app receive_recording_state", repr(is_recording))
         self._unanswered_service_state_requests = 0  # RESET
         if is_recording == "":  # Special case (ternary value, but None is not supported by OSC)
-            self.root.ids.recording_btn.disabled = True
+            self.set_recording_btn_state(disabled=True)
         else:
-            expected_state = "down" if is_recording else "normal"
-            self.root.ids.recording_btn.state = expected_state
-            self.root.ids.recording_btn.disabled = False
+            self.set_recording_btn_state(pushed=is_recording, disabled=False)
 
     # SERVICE FEEDBACKS AND DAEMONIZATION #
 
