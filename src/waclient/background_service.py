@@ -38,9 +38,6 @@ osc, osc_starter_callback = get_osc_server(is_master=False)
 # TODO add exception swallowers, and logging pushed to frontend app (if present)
 
 
-THREAD_POOL_EXECUTOR = ThreadPoolExecutor(
-    max_workers=1, thread_name_prefix="service_worker"  # SINGLE worker for now, to avoid concurrency
-)
 
 if IS_ANDROID:
     from waguilib.android_helpers import preload_java_classes
@@ -48,8 +45,7 @@ if IS_ANDROID:
 
 
 @ServerClass
-class BackgroundServer(object):
-
+class WaBackgroundService:
     """
     The background server automatically starts when service script is launched.
 
@@ -58,13 +54,17 @@ class BackgroundServer(object):
     While the server is alive, recordings can be started and stopped several times without problem.
     """
 
+    # CLASS VARIABLES TO BE OVERRIDEN #
+    internal_keys_dir: str = None
+    thread_pool_executor: ThreadPoolExecutor = None
+
     _sock = None
-
     _recording_toolchain = None
-
     _status_change_in_progress = False  # Set to True while recording is starting/stopping
 
     def __init__(self):
+        self._key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
+
         logger.info("Starting service")  # Will not be sent to App (too early)
         osc_starter_callback()  # Opens server port
         self._osc_client = get_osc_client(to_master=True)
@@ -72,15 +72,34 @@ class BackgroundServer(object):
             CallbackHandler(self._remote_logging_callback)
         )
         self._termination_event = threading.Event()
-        self._key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
         logger.info("Service started")
 
         # Initial setup of service according to persisted config
         config = self._load_config()
-        daemonize_service = config.getboolean("usersettings", "daemonize_service")
+        try:
+            daemonize_service = config.getboolean("usersettings", "daemonize_service")
+        except ConfigParserError:
+            daemonize_service = False  # Probably App is just initializing itself
         self.switch_daemonize_service(daemonize_service)
         if WIP_RECORDING_MARKER.exists():
             self.start_recording()  # Autorecord e.g. after a restart due to closing of main android Activity
+
+    def _load_config(self, filename=APP_CONFIG_FILE):
+        logger.info(f"Reloading config file {filename}")
+        config = (
+            ConfigParser()
+        )  # No NAME here, since named parsers must be Singletons in process!
+        try:
+            if not os.path.exists(filename):
+                raise FileNotFoundError(filename)
+            config.read(str(filename))  # Fails silently if file not found
+        except ConfigParserError as exc:
+            logger.error(
+                f"Service: Ignored missing or corrupted config file {filename}, ignored ({exc!r})"
+            )
+            raise
+        # logger.info(f"Config file {filename} loaded")
+        return config
 
     def _remote_logging_callback(self, msg):
         return self._send_message("/log_output", "Service: " + msg)
@@ -98,24 +117,7 @@ class BackgroundServer(object):
             return
 
     def _offload_task(self, method, *args, **kwargs):
-        return THREAD_POOL_EXECUTOR.submit(method, *args, **kwargs)
-
-    def _load_config(self, filename=APP_CONFIG_FILE):
-        logger.info(f"Reloading config file {filename}")
-        config = (
-            ConfigParser()
-        )  # No NAME here, sicne named parsers must be Singletons in process!
-        try:
-            if not os.path.exists(filename):
-                raise FileNotFoundError(filename)
-            config.read(str(filename))  # Fails silently if file not found
-        except ConfigParserError as exc:
-            logger.error(
-                f"Service: Ignored missing or corrupted config file {filename}, ignored ({exc!r})"
-            )
-            raise
-        # logger.info(f"Config file {filename} loaded")
-        return config
+        return self.thread_pool_executor.submit(method, *args, **kwargs)
 
     @osc.address_method("/ping")
     @safe_catch_unhandled_exception
@@ -160,7 +162,8 @@ class BackgroundServer(object):
                 if IS_ANDROID:
                     from waguilib.android_helpers import build_notification_channel, build_notification
                     build_notification_channel(CONTEXT, "Witness Angel Service")
-                    notification = build_notification(CONTEXT, title="Sensors are active", message="Click to manage Witness Angel state",
+                    notification = build_notification(CONTEXT, title="Sensors are active",
+                                                      message="Click to manage Witness Angel state",
                                                       ticker="Witness Angel sensors are active")
                     notification_uid = 1
                     CONTEXT.startForeground(notification_uid, notification)
@@ -222,6 +225,38 @@ class BackgroundServer(object):
         self._status_change_in_progress = True
         return self._offload_task(self._offloaded_stop_recording)
 
+    @osc.address_method("/stop_server")
+    @safe_catch_unhandled_exception
+    def stop_server(self):
+        logger.info("Stopping service")
+
+        if self.is_recording:
+            logger.info(
+                "Recording is in progress, we stop it as part of service shutdown"
+            )
+            self.stop_recording().result(timeout=30)   # SYNCHRONOUS CALL (but through threadpool still)
+
+        osc.stop_all()
+        self._termination_event.set()
+        logger.info("Service stopped")
+
+    @safe_catch_unhandled_exception
+    def join(self):
+        """
+        Wait for the termination of the background server
+        (meant for use by the main thread of the service process).
+        """
+        self._termination_event.wait()
+
+        
+class BackgroundServer(WaBackgroundService):
+
+    # CLASS VARIABLES #
+    internal_keys_dir = INTERNAL_KEYS_DIR
+    thread_pool_executor = ThreadPoolExecutor(
+        max_workers=1, thread_name_prefix="service_worker"  # SINGLE worker for now, to avoid concurrency
+    )
+
     @safe_catch_unhandled_exception
     def _offloaded_attempt_container_decryption(self, container_filepath):
         logger.info("Decryption requested for container %s", container_filepath)
@@ -251,29 +286,6 @@ class BackgroundServer(object):
     def attempt_container_decryption(self, container_filepath: str):
         container_filepath = Path(container_filepath)
         return self._offload_task(self._offloaded_attempt_container_decryption, container_filepath=container_filepath)
-
-    @osc.address_method("/stop_server")
-    @safe_catch_unhandled_exception
-    def stop_server(self):
-        logger.info("Stopping service")
-
-        if self.is_recording:
-            logger.info(
-                "Recording is in progress, we stop it as part of service shutdown"
-            )
-            self.stop_recording().result(timeout=30)   # SYNCHRONOUS CALL (but through threadpool still)
-
-        osc.stop_all()
-        self._termination_event.set()
-        logger.info("Service stopped")
-
-    @safe_catch_unhandled_exception
-    def join(self):
-        """
-        Wait for the termination of the background server
-        (meant for use by the main thread of the service process).
-        """
-        self._termination_event.wait()
 
 
 def main():
