@@ -55,7 +55,6 @@ class WaBackgroundService:
     """
 
     # CLASS VARIABLES TO BE OVERRIDEN #
-    internal_keys_dir: str = None
     thread_pool_executor: ThreadPoolExecutor = None
 
     _sock = None
@@ -67,7 +66,7 @@ class WaBackgroundService:
 
         logger.info("Starting service")  # Will not be sent to App (too early)
         osc_starter_callback()  # Opens server port
-        self._osc_client = get_osc_client(to_master=True)
+        self._osc_client = get_osc_client(to_app=True)
         logging.getLogger(None).addHandler(
             CallbackHandler(self._remote_logging_callback)
         )
@@ -91,7 +90,7 @@ class WaBackgroundService:
         )  # No NAME here, since named parsers must be Singletons in process!
         try:
             if not os.path.exists(filename):
-                raise FileNotFoundError(filename)
+                raise FileNotFoundError(filename)  # APP must be launched first to create settings
             config.read(str(filename))  # Fails silently if file not found
         except ConfigParserError as exc:
             logger.error(
@@ -102,7 +101,7 @@ class WaBackgroundService:
         return config
 
     def _remote_logging_callback(self, msg):
-        return self._send_message("/log_output", "Service: " + msg)
+        return self._send_message("/log_output", "Service: " + msg + "aaaaaaaaa" * 10000)
 
     def _send_message(self, address, *values):
         #print("Message sent from service to app: %s" % address)

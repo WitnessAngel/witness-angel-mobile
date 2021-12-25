@@ -81,7 +81,7 @@ ScreenManager:
                 id: recording_btn
                 text: tr._('Start Witness Angel') if self.state == 'normal' else tr._('Stop Witness Angel')
                 pos_hint: {'center_x': 0.5}
-                size_hint: (0.7, 0.2)
+                size_hint: (0.7, 0.1)
                 on_state: app.switch_to_recording_state(is_recording=(self.state == "down"))
                 font_size: "30sp"
 

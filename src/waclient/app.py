@@ -51,12 +51,12 @@ class WitnessAngelClientApp(WAGuiApp):
 
         Returns the root widget of the app.
         """
+        super().build()
         self.icon = self.get_app_icon()
         self.language = self.config.getdefault("usersettings", "language", "en")
         # tr.switch_lang(self.language)  TODO LATER
 
         self._console_output = self.root.ids.kivy_console.console_output
-        return self.root
 
     def on_config_change(self, config, section, key, value):
         """Called when the user changes a config value via the settings panel."""

@@ -80,6 +80,8 @@ def add_java_boot_service_file_to_build():
 def complete_apk_blacklist():
     """Needed until Buildozer supports "--blacklist" option."""
 
+    # FIXME USE android.blacklist_src instead of HOOK!!!!!!
+
     blacklist_additions = ["# custom entries added by buildozer_hooks.py", "Crypto/SelfTest/*"]
     logger.info("Completing blacklist.txt with entries %s" % str(blacklist_additions))
 
