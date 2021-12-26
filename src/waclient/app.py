@@ -8,7 +8,7 @@ from kivy.logger import Logger as logger
 from waguilib.application import WAGuiApp
 from wacryptolib.container import (
     extract_metadata_from_container,
-    get_encryption_configuration_summary,
+    get_cryptoconf_summary,
 )
 from wacryptolib.utilities import load_from_json_file
 
@@ -140,7 +140,7 @@ class WitnessAngelClientApp(WAGuiApp):
             info_lines.append("")
 
             info_lines.append("ALGORITHMS:")
-            summary = get_encryption_configuration_summary(container)
+            summary = get_cryptoconf_summary(container)
             info_lines.append(summary)
 
             return "\n".join(info_lines)
@@ -176,7 +176,7 @@ class WitnessAngelClientApp(WAGuiApp):
     def get_encryption_conf_text(self):
         """Return the global conf for container encryption."""
         conf = get_encryption_conf()
-        return get_encryption_configuration_summary(conf)
+        return get_cryptoconf_summary(conf)
 
 
 def main():
