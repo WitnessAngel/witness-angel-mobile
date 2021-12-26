@@ -142,7 +142,7 @@ class WaBackgroundService:
     @safe_catch_unhandled_exception
     def _offloaded_start_recording(self, env):
         try:
-            encryption_conf = get_encryption_conf(env)
+            cryptoconf = get_encryption_conf(env)
             if self.is_recording:
                 #logger.debug("Ignoring redundant call to service.start_recording()")
                 return
@@ -152,7 +152,7 @@ class WaBackgroundService:
                 self._recording_toolchain = build_recording_toolchain(
                     config,
                         key_storage_pool=self._key_storage_pool,
-                    encryption_conf=encryption_conf,
+                    cryptoconf=cryptoconf,
                 )
             if self._recording_toolchain:  # Else we just let cancellation occur
                 start_recording_toolchain(self._recording_toolchain)

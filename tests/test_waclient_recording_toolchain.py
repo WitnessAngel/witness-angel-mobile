@@ -28,9 +28,9 @@ def test_nominal_recording_toolchain_case():
                         "record_microphone": 1})
 
     key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
-    encryption_conf = get_encryption_conf("test")
+    cryptoconf = get_encryption_conf("test")
     toolchain = build_recording_toolchain(
-        config, key_storage_pool=key_storage_pool, encryption_conf=encryption_conf
+        config, key_storage_pool=key_storage_pool, cryptoconf=cryptoconf
     )
     sensors_manager = toolchain["sensors_manager"]
     data_aggregators = toolchain["data_aggregators"]
