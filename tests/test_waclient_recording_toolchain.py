@@ -7,7 +7,7 @@ from _waclient_test_utilities import purge_test_containers
 from waclient.common_config import (
     INTERNAL_CONTAINERS_DIR,
     INTERNAL_KEYS_DIR,
-    get_encryption_conf,
+    get_cryptoconf,
 )
 from waclient.recording_toolchain import (
     build_recording_toolchain,
@@ -28,7 +28,7 @@ def test_nominal_recording_toolchain_case():
                         "record_microphone": 1})
 
     key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
-    cryptoconf = get_encryption_conf("test")
+    cryptoconf = get_cryptoconf("test")
     toolchain = build_recording_toolchain(
         config, key_storage_pool=key_storage_pool, cryptoconf=cryptoconf
     )

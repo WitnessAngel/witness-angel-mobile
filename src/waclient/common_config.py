@@ -114,7 +114,7 @@ _TEST_ENCRYPTION_CONF = dict(
     ]
 )
 
-def get_encryption_conf(env=""):
+def get_cryptoconf(env=""):
     return (
         _TEST_ENCRYPTION_CONF
         if (env and env.upper() == "TEST")

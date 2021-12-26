@@ -16,7 +16,7 @@ from waclient.common_config import (
     APP_CONFIG_FILE,
     INTERNAL_KEYS_DIR,
     EXTERNAL_DATA_EXPORTS_DIR,
-    get_encryption_conf,
+    get_cryptoconf,
     IS_ANDROID, WIP_RECORDING_MARKER, CONTEXT)
 from waclient.recording_toolchain import (
     build_recording_toolchain,
@@ -142,7 +142,7 @@ class WaBackgroundService:
     @safe_catch_unhandled_exception
     def _offloaded_start_recording(self, env):
         try:
-            cryptoconf = get_encryption_conf(env)
+            cryptoconf = get_cryptoconf(env)
             if self.is_recording:
                 #logger.debug("Ignoring redundant call to service.start_recording()")
                 return

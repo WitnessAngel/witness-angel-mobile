@@ -14,7 +14,7 @@ from wacryptolib.utilities import load_from_json_file
 
 from waclient.common_config import (
     INTERNAL_CONTAINERS_DIR,
-    get_encryption_conf,
+    get_cryptoconf,
     request_multiple_permissions,
     request_external_storage_dirs_access,
     SRC_ROOT_DIR,
@@ -173,9 +173,9 @@ class WitnessAngelClientApp(WAGuiApp):
             return
         self.service_controller.attempt_container_decryption(filepath)
 
-    def get_encryption_conf_text(self):
-        """Return the global conf for container encryption."""
-        conf = get_encryption_conf()
+    def get_cryptoconf_text(self):
+        """Return the globalcryptoconffor container encryption."""
+       cryptoconf= get_cryptoconf()
         return get_cryptoconf_summary(conf)
 
 
