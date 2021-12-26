@@ -25,7 +25,7 @@ from waclient.recording_toolchain import (
 )
 from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from waguilib.service_control.osc_transport import get_osc_server, get_osc_client
-from wacryptolib.container import decrypt_data_from_container, load_container_from_filesystem
+from wacryptolib.cryptainer import decrypt_data_from_container, load_container_from_filesystem
 from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
 from wacryptolib.utilities import load_from_json_file
 

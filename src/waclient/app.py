@@ -6,7 +6,7 @@ import os
 from kivy.logger import Logger as logger
 
 from waguilib.application import WAGuiApp
-from wacryptolib.container import (
+from wacryptolib.cryptainer import (
     extract_metadata_from_container,
     get_cryptoconf_summary,
 )

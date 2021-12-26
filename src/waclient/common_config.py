@@ -1,7 +1,7 @@
 
 from waguilib.importable_settings import *
 
-from wacryptolib.container import LOCAL_ESCROW_MARKER
+from wacryptolib.cryptainer import LOCAL_ESCROW_MARKER
 
 
 # Process parameters #
