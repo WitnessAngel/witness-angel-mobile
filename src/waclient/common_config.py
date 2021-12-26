@@ -55,7 +55,7 @@ PREGENERATED_KEY_TYPES = [
 
 _main_remote_escrow_url = "https://waescrow.prolifik.net/json/"
 
-_PROD_ENCRYPTION_CONF = dict(
+_PROD_CRYPTOCONF = dict(
     data_encryption_strata=[
         # First we encrypt with local key and sign via main remote escrow
         dict(
@@ -93,7 +93,7 @@ _PROD_ENCRYPTION_CONF = dict(
     ]
 )
 
-_TEST_ENCRYPTION_CONF = dict(
+_TEST_CRYPTOCONF = dict(
     data_encryption_strata=[
         # We only encrypt/sign with local key, in test environment
         dict(
@@ -116,7 +116,7 @@ _TEST_ENCRYPTION_CONF = dict(
 
 def get_cryptoconf(env=""):
     return (
-        _TEST_ENCRYPTION_CONF
+        _TEST_CRYPTOCONF
         if (env and env.upper() == "TEST")
-        else _PROD_ENCRYPTION_CONF
+        else _PROD_CRYPTOCONF
     )
