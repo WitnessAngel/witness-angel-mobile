@@ -175,8 +175,8 @@ class WitnessAngelClientApp(WAGuiApp):
 
     def get_cryptoconf_text(self):
         """Return the globalcryptoconffor container encryption."""
-       cryptoconf= get_cryptoconf()
-        return get_cryptoconf_summary(conf)
+        cryptoconf= get_cryptoconf()
+        return get_cryptoconf_summary(cryptoconf)
 
 
 def main():

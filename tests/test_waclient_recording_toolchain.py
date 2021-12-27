@@ -14,7 +14,7 @@ from waclient.recording_toolchain import (
     start_recording_toolchain,
     stop_recording_toolchain,
 )
-from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
+from wacryptolib.keystore import FilesystemKeystore, FilesystemKeystorePool
 from wacryptolib.sensor import TarfileRecordsAggregator
 from wacryptolib.utilities import load_from_json_bytes
 
@@ -27,10 +27,10 @@ def test_nominal_recording_toolchain_case():
                         "record_gps": 1,
                         "record_microphone": 1})
 
-    key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
+    keystore_pool = FilesystemKeystorePool(INTERNAL_KEYS_DIR)
     cryptoconf = get_cryptoconf("test")
     toolchain = build_recording_toolchain(
-        config, key_storage_pool=key_storage_pool, cryptoconf=cryptoconf
+        config, keystore_pool=keystore_pool, cryptoconf=cryptoconf
     )
     sensors_manager = toolchain["sensors_manager"]
     data_aggregators = toolchain["data_aggregators"]

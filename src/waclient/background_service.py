@@ -25,8 +25,8 @@ from waclient.recording_toolchain import (
 )
 from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from waguilib.service_control.osc_transport import get_osc_server, get_osc_client
-from wacryptolib.cryptainer import decrypt_data_from_cryptainer, load_cryptainer_from_filesystem
-from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
+from wacryptolib.cryptainer import decrypt_payload_from_cryptainer, load_cryptainer_from_filesystem
+from wacryptolib.keystore import FilesystemKeystore, FilesystemKeystorePool
 from wacryptolib.utilities import load_from_json_file
 
 # os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
@@ -62,7 +62,7 @@ class WaBackgroundService:
     _status_change_in_progress = False  # Set to True while recording is starting/stopping
 
     def __init__(self):
-        self._key_storage_pool = FilesystemKeyStoragePool(INTERNAL_KEYS_DIR)
+        self._keystore_pool = FilesystemKeystorePool(INTERNAL_KEYS_DIR)
 
         logger.info("Starting service")  # Will not be sent to App (too early)
         osc_starter_callback()  # Opens server port
@@ -151,7 +151,7 @@ class WaBackgroundService:
                 config = self._load_config()
                 self._recording_toolchain = build_recording_toolchain(
                     config,
-                        key_storage_pool=self._key_storage_pool,
+                        keystore_pool=self._keystore_pool,
                     cryptoconf=cryptoconf,
                 )
             if self._recording_toolchain:  # Else we just let cancellation occur
@@ -265,9 +265,9 @@ class BackgroundServer(WaBackgroundService):
         target_directory.mkdir(
             exist_ok=True
         )  # Double exports would replace colliding files
-        cryptainer = load_cryptainer_from_filesystem(cryptainer_filepath, include_data_ciphertext=True)
-        tarfile_bytes = decrypt_data_from_cryptainer(
-            cryptainer, key_storage_pool=self._key_storage_pool
+        cryptainer = load_cryptainer_from_filesystem(cryptainer_filepath, include_payload_ciphertext=True)
+        tarfile_bytes = decrypt_payload_from_cryptainer(
+            cryptainer, keystore_pool=self._keystore_pool
         )
         tarfile_bytesio = io.BytesIO(tarfile_bytes)
         tarfile_obj = tarfile.open(

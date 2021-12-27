@@ -103,14 +103,14 @@ class MicrophoneSensor(PeriodicTaskHandler):
         assert from_datetime and to_datetime, (from_datetime, to_datetime)
         if not self.temp_file_path_finished.exists():
             return  # Might be a user's manual action?
-        data = self.temp_file_path_finished.read_bytes()
+        payload = self.temp_file_path_finished.read_bytes()
         self.temp_file_path_finished.unlink()  # Immediate safety
         self._tarfile_aggregator.add_record(
             sensor_name="microphone",
             from_datetime=from_datetime,
             to_datetime=to_datetime,
             extension=".mp4",  # Beware, change this if recorder output format changes!
-            data=data,
+            payload=payload,
         )
 
     @synchronized
