@@ -56,11 +56,11 @@ PREGENERATED_KEY_TYPES = [
 _main_remote_escrow_url = "https://waescrow.prolifik.net/json/"
 
 _PROD_CRYPTOCONF = dict(
-    data_encryption_strata=[
+    data_encryption_layers=[
         # First we encrypt with local key and sign via main remote escrow
         dict(
             data_encryption_algo="AES_EAX",
-            key_encryption_strata=[
+            key_encryption_layers=[
                 dict(
                     key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_MARKER
                 )
@@ -76,7 +76,7 @@ _PROD_CRYPTOCONF = dict(
         # Then we encrypt with escrow key and sign via local keys
         dict(
             data_encryption_algo="AES_CBC",
-            key_encryption_strata=[
+            key_encryption_layers=[
                 dict(
                     key_encryption_algo="RSA_OAEP",
                     key_escrow=dict(escrow_type="jsonrpc", url=_main_remote_escrow_url),
@@ -94,11 +94,11 @@ _PROD_CRYPTOCONF = dict(
 )
 
 _TEST_CRYPTOCONF = dict(
-    data_encryption_strata=[
+    data_encryption_layers=[
         # We only encrypt/sign with local key, in test environment
         dict(
             data_encryption_algo="AES_EAX",
-            key_encryption_strata=[
+            key_encryption_layers=[
                 dict(
                     key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_MARKER
                 )

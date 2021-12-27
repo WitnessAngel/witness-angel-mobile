@@ -146,7 +146,7 @@ class WaBackgroundService:
             if self.is_recording:
                 #logger.debug("Ignoring redundant call to service.start_recording()")
                 return
-            logger.info("Starting recording")
+            logger.info("Starting offloaded recording")
             if not self._recording_toolchain:
                 config = self._load_config()
                 self._recording_toolchain = build_recording_toolchain(
@@ -156,7 +156,7 @@ class WaBackgroundService:
                 )
             if self._recording_toolchain:  # Else we just let cancellation occur
                 start_recording_toolchain(self._recording_toolchain)
-                logger.info("Recording started")
+                logger.info("Offloaded recording started")
 
                 if IS_ANDROID:
                     from waguilib.android_helpers import build_notification_channel, build_notification
