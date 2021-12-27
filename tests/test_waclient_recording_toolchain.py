@@ -3,9 +3,9 @@ import time
 
 from kivy.config import ConfigParser
 
-from _waclient_test_utilities import purge_test_containers
+from _waclient_test_utilities import purge_test_cryptainers
 from waclient.common_config import (
-    INTERNAL_CONTAINERS_DIR,
+    INTERNAL_CRYPTAINER_DIR,
     INTERNAL_KEYS_DIR,
     get_cryptoconf,
 )
@@ -35,14 +35,14 @@ def test_nominal_recording_toolchain_case():
     sensors_manager = toolchain["sensors_manager"]
     data_aggregators = toolchain["data_aggregators"]
     tarfile_aggregators = toolchain["tarfile_aggregators"]
-    container_storage = toolchain["container_storage"]
+    cryptainer_storage = toolchain["container_storage"]
 
-    purge_test_containers()
+    purge_test_cryptainers()
 
     # TODO - make this a PURGE() methods of storage!!!
     # CLEANUP of already existing containers
-    # for container_name in container_storage.list_container_names(sorted=True):
-    #    container_storage._delete_container(container_name)
+    # for container_name in container_storage.list_cryptainer_names(sorted=True):
+    #    container_storage._delete_cryptainer(container_name)
     # assert not len(container_storage)
 
     start_recording_toolchain(toolchain)
@@ -57,11 +57,11 @@ def test_nominal_recording_toolchain_case():
             assert len(tarfile_aggregator) == 0
         time.sleep(1)
 
-    assert len(container_storage) == 1  # Too quick recording to have container rotation
-    (container_name,) = container_storage.list_container_names(as_sorted=True)
+    assert len(cryptainer_storage) == 1  # Too quick recording to have container rotation
+    (cryptainer_name,) = cryptainer_storage.list_cryptainer_names(as_sorted=True)
 
-    tarfile_bytestring = container_storage.decrypt_container_from_storage(
-        container_name
+    tarfile_bytestring = cryptainer_storage.decrypt_cryptainer_from_storage(
+        cryptainer_name
     )
 
     tar_file = TarfileRecordsAggregator.read_tarfile_from_bytestring(tarfile_bytestring)

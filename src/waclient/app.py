@@ -7,13 +7,13 @@ from kivy.logger import Logger as logger
 
 from waguilib.application import WAGuiApp
 from wacryptolib.cryptainer import (
-    extract_metadata_from_container,
+    extract_metadata_from_cryptainer,
     get_cryptoconf_summary,
 )
 from wacryptolib.utilities import load_from_json_file
 
 from waclient.common_config import (
-    INTERNAL_CONTAINERS_DIR,
+    INTERNAL_CRYPTAINER_DIR,
     get_cryptoconf,
     request_multiple_permissions,
     request_external_storage_dirs_access,
@@ -95,8 +95,8 @@ class WitnessAngelClientApp(WAGuiApp):
         return self.config.getboolean("usersettings", "daemonize_service")
 
     @property
-    def internal_containers_dir(self):
-        return str(INTERNAL_CONTAINERS_DIR)
+    def internal_cryptainer_dir(self):
+        return str(INTERNAL_CRYPTAINER_DIR)
 
     def get_asset_abspath(self, asset_relpath):
         """Return the absolute path to an asset like "data/icons/myimage.png"."""
@@ -108,7 +108,7 @@ class WitnessAngelClientApp(WAGuiApp):
         """
         self._console_output.add_text(msg)
 
-    def get_container_info(self, filepath):  # FIXME centralize this
+    def get_cryptainer_info(self, filepath):  # FIXME centralize this
         """Return a text with info about the container algorithms and inner members metadata.
          """
         if not filepath:
@@ -116,11 +116,11 @@ class WitnessAngelClientApp(WAGuiApp):
 
         filename = os.path.basename(filepath)
         try:
-            container = load_from_json_file(filepath)  # FIXME use dedicated wacryptolib methods
+            cryptainer = load_from_json_file(filepath)  # FIXME use dedicated wacryptolib methods
 
             info_lines = []
 
-            metadata = extract_metadata_from_container(container)
+            metadata = extract_metadata_from_cryptainer(cryptainer)
             if not metadata:
                 info_lines.append(
                     "No metadata found in container regarding inner files."
@@ -135,12 +135,12 @@ class WitnessAngelClientApp(WAGuiApp):
             info_lines.append("")
 
             info_lines.append("KEYCHAIN ID:")
-            info_lines.append(str(container.get("keychain_uid", "<not found>")))
+            info_lines.append(str(cryptainer.get("keychain_uid", "<not found>")))
 
             info_lines.append("")
 
             info_lines.append("ALGORITHMS:")
-            summary = get_cryptoconf_summary(container)
+            summary = get_cryptoconf_summary(cryptainer)
             info_lines.append(summary)
 
             return "\n".join(info_lines)
@@ -151,12 +151,12 @@ class WitnessAngelClientApp(WAGuiApp):
             logging.error("Error when reading container %s: %r", filename, exc)
             return "Container analysis failed"
 
-    def purge_all_containers(self):  # FIXME use wacryptolib methods!
+    def purge_all_cryptainers(self):  # FIXME use wacryptolib methods!
         """Delete all containers from internal storage."""
-        containers_dir = self.internal_containers_dir
-        logger.info("Purging all containers from %s", containers_dir)
-        for filename in os.listdir(containers_dir):
-            filepath = os.path.join(containers_dir, filename)
+        cryptainer_dir = self.internal_cryptainer_dir
+        logger.info("Purging all containers from %s", cryptainer_dir)
+        for filename in os.listdir(cryptainer_dir):
+            filepath = os.path.join(cryptainer_dir, filename)
             os.remove(filepath)
         self.refresh_filebrowser()
 
@@ -166,12 +166,12 @@ class WitnessAngelClientApp(WAGuiApp):
         # "on_entries_cleared: treeview.root.nodes = []" not calling _trigger_layout()
         self.root.ids.filebrowser.layout.ids.treeview._trigger_layout()  # TEMPORARY
 
-    def attempt_container_decryption(self, filepath):
+    def attempt_cryptainer_decryption(self, filepath):
         assert isinstance(filepath, str), filepath  # OSCP doesn't handle Path instances
         if not request_external_storage_dirs_access():
             logger.warning("Access to external storage not granted, aborting decryption attempt.")
             return
-        self.service_controller.attempt_container_decryption(filepath)
+        self.service_controller.attempt_cryptainer_decryption(filepath)
 
     def get_cryptoconf_text(self):
         """Return the globalcryptoconffor container encryption."""

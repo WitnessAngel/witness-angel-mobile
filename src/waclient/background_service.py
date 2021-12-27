@@ -25,7 +25,7 @@ from waclient.recording_toolchain import (
 )
 from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from waguilib.service_control.osc_transport import get_osc_server, get_osc_client
-from wacryptolib.cryptainer import decrypt_data_from_container, load_container_from_filesystem
+from wacryptolib.cryptainer import decrypt_data_from_cryptainer, load_cryptainer_from_filesystem
 from wacryptolib.key_storage import FilesystemKeyStorage, FilesystemKeyStoragePool
 from wacryptolib.utilities import load_from_json_file
 
@@ -257,17 +257,17 @@ class BackgroundServer(WaBackgroundService):
     )
 
     @safe_catch_unhandled_exception
-    def _offloaded_attempt_container_decryption(self, container_filepath):
-        logger.info("Decryption requested for container %s", container_filepath)
+    def _offloaded_attempt_cryptainer_decryption(self, cryptainer_filepath):
+        logger.info("Decryption requested for container %s", cryptainer_filepath)
         target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(
-            os.path.basename(container_filepath)
+            os.path.basename(cryptainer_filepath)
         )
         target_directory.mkdir(
             exist_ok=True
         )  # Double exports would replace colliding files
-        container = load_container_from_filesystem(container_filepath, include_data_ciphertext=True)
-        tarfile_bytes = decrypt_data_from_container(
-            container, key_storage_pool=self._key_storage_pool
+        cryptainer = load_cryptainer_from_filesystem(cryptainer_filepath, include_data_ciphertext=True)
+        tarfile_bytes = decrypt_data_from_cryptainer(
+            cryptainer, key_storage_pool=self._key_storage_pool
         )
         tarfile_bytesio = io.BytesIO(tarfile_bytes)
         tarfile_obj = tarfile.open(
@@ -280,11 +280,11 @@ class BackgroundServer(WaBackgroundService):
             target_directory,
         )
 
-    @osc.address_method("/attempt_container_decryption")
+    @osc.address_method("/attempt_cryptainer_decryption")
     @safe_catch_unhandled_exception
-    def attempt_container_decryption(self, container_filepath: str):
-        container_filepath = Path(container_filepath)
-        return self._offload_task(self._offloaded_attempt_container_decryption, container_filepath=container_filepath)
+    def attempt_cryptainer_decryption(self, cryptainer_filepath: str):
+        cryptainer_filepath = Path(cryptainer_filepath)
+        return self._offload_task(self._offloaded_attempt_cryptainer_decryption, cryptainer_filepath=cryptainer_filepath)
 
 
 def main():
