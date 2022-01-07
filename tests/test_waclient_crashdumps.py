@@ -4,7 +4,7 @@ import pytest
 import responses
 from requests import ConnectionError
 
-from waguilib.logging.crashdumps import generate_and_send_crashdump
+from wacomponents.logging.crashdumps import generate_and_send_crashdump
 
 
 @responses.activate

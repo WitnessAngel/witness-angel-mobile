@@ -4,7 +4,7 @@
 #:import randint random.randint
 #:import to_rgba kivy.utils.get_color_from_hex
 #:import tr waclient.app.tr
-#:import LoggingConsole waguilib.widgets.logging_console.LoggingConsole
+#:import LoggingConsole wacomponents.widgets.logging_console.LoggingConsole
 
 
 [FileListEntry@FloatLayout+TreeViewNode]:
@@ -64,7 +64,7 @@ ScreenManager:
                     #ActionButton:
                     #    icon: 'atlas://data/images/defaulttheme/overflow'
                     ActionButton:
-                        text: tr._('Cryptainers')
+                        text: tr._('Containers')
                         on_release: root.current = "cryptainers"
                     ActionGroup:
                         mode: "spinner"

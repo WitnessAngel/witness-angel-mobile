@@ -1,7 +1,7 @@
 
-from waguilib.importable_settings import *
+from wacomponents.default_settings import *
 
-from wacryptolib.cryptainer import LOCAL_ESCROW_MARKER
+from wacryptolib.cryptainer import LOCAL_KEYFACTORY_TRUSTEE_MARKER
 
 
 # Process parameters #
@@ -38,11 +38,11 @@ _folders_summary = dict(
         WACLIENT_PACKAGE_DIR=WACLIENT_PACKAGE_DIR,
         INTERNAL_APP_ROOT=INTERNAL_APP_ROOT,
         INTERNAL_CACHE_DIR=INTERNAL_CACHE_DIR,
-        INTERNAL_KEYS_DIR=INTERNAL_KEYS_DIR,
+        INTERNAL_KEYSTORE_POOL_DIR=INTERNAL_KEYSTORE_POOL_DIR,
         INTERNAL_CRYPTAINER_DIR=INTERNAL_CRYPTAINER_DIR,
-        EXTERNAL_DATA_EXPORTS_DIR=EXTERNAL_DATA_EXPORTS_DIR,
+        EXTERNAL_EXPORTS_DIR=EXTERNAL_EXPORTS_DIR,
 )
-print(">>>>>>>>>>> SUMMARY OF WAGUILIB FOLDERS CONFIGURATION:", str(_folders_summary))
+print(">>>>>>>>>>> SUMMARY OF WACOMPONENTS FOLDERS CONFIGURATION:", str(_folders_summary))
 
 
 # Encryption settings #
@@ -53,40 +53,40 @@ PREGENERATED_KEY_TYPES = [
     "ECC_DSS",
 ]  # Must be the union of asymmetric encryption/signature keys below
 
-_main_remote_escrow_url = "https://waescrow.prolifik.net/json/"
+_main_remote_trustee_url = "https://watrustee.prolifik.net/json/"
 
 _PROD_CRYPTOCONF = dict(
-    payload_encryption_layers=[
-        # First we encrypt with local key and sign via main remote escrow
+    payload_cipher_layers=[
+        # First we encrypt with local key and sign via main remote trustee
         dict(
-            payload_encryption_algo="AES_EAX",
-            key_encryption_layers=[
+            payload_cipher_algo="AES_EAX",
+            key_cipher_layers=[
                 dict(
-                    key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_MARKER
+                    key_cipher_algo="RSA_OAEP", key_cipher_trustee=LOCAL_KEYFACTORY_TRUSTEE_MARKER
                 )
             ],
             payload_signatures=[
                 dict(
                     message_prehash_algo="SHA512",
-                    signature_algo="DSA_DSS",
-                    signature_escrow=LOCAL_ESCROW_MARKER,
+                    payload_signature_algo="DSA_DSS",
+                    payload_signature_trustee=LOCAL_KEYFACTORY_TRUSTEE_MARKER,
                 )
             ],
         ),
-        # Then we encrypt with escrow key and sign via local keys
+        # Then we encrypt with trustee key and sign via local keys
         dict(
-            payload_encryption_algo="AES_CBC",
-            key_encryption_layers=[
+            payload_cipher_algo="AES_CBC",
+            key_cipher_layers=[
                 dict(
-                    key_encryption_algo="RSA_OAEP",
-                    key_escrow=dict(escrow_type="jsonrpc", url=_main_remote_escrow_url),
+                    key_cipher_algo="RSA_OAEP",
+                    key_cipher_trustee=dict(trustee_type="jsonrpc", url=_main_remote_trustee_url),
                 )
             ],
             payload_signatures=[
                 dict(
                     message_prehash_algo="SHA256",
-                    signature_algo="ECC_DSS",
-                    signature_escrow=LOCAL_ESCROW_MARKER,
+                    payload_signature_algo="ECC_DSS",
+                    payload_signature_trustee=LOCAL_KEYFACTORY_TRUSTEE_MARKER,
                 ),
             ],
         )
@@ -94,20 +94,20 @@ _PROD_CRYPTOCONF = dict(
 )
 
 _TEST_CRYPTOCONF = dict(
-    payload_encryption_layers=[
+    payload_cipher_layers=[
         # We only encrypt/sign with local key, in test environment
         dict(
-            payload_encryption_algo="AES_EAX",
-            key_encryption_layers=[
+            payload_cipher_algo="AES_EAX",
+            key_cipher_layers=[
                 dict(
-                    key_encryption_algo="RSA_OAEP", key_escrow=LOCAL_ESCROW_MARKER
+                    key_cipher_algo="RSA_OAEP", key_cipher_trustee=LOCAL_KEYFACTORY_TRUSTEE_MARKER
                 )
             ],
             payload_signatures=[
                 dict(
                     message_prehash_algo="SHA512",
-                    signature_algo="RSA_PSS",
-                    signature_escrow=LOCAL_ESCROW_MARKER,
+                    payload_signature_algo="RSA_PSS",
+                    payload_signature_trustee=LOCAL_KEYFACTORY_TRUSTEE_MARKER,
                 )
             ],
         )

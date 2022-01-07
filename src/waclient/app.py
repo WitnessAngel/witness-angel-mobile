@@ -5,14 +5,14 @@ import os
 
 from kivy.logger import Logger as logger
 
-from waguilib.application import WAGuiApp
+from wacomponents.application import WaRecorderGui
 from wacryptolib.cryptainer import (
     extract_metadata_from_cryptainer,
     get_cryptoconf_summary,
 )
 from wacryptolib.utilities import load_from_json_file
 
-from waclient.common_config import (
+from waclient.common_config import (  # See "from wacomponents.system_permissions import"
     INTERNAL_CRYPTAINER_DIR,
     get_cryptoconf,
     request_multiple_permissions,
@@ -21,7 +21,7 @@ from waclient.common_config import (
     DEFAULT_REQUESTED_PERMISSIONS_MAPPER,
     request_single_permission, DEFAULT_CONFIG_SCHEMA, APP_CONFIG_FILE, DEFAULT_CONFIG_TEMPLATE)
 # from waclient.utilities.i18n import Lang
-from waguilib.importable_settings import WIP_RECORDING_MARKER
+from wacomponents.default_settings import WIP_RECORDING_MARKER
 
 
 class A:  # TODO put back translation tooling
@@ -33,7 +33,7 @@ tr = A()  # ("en")
 
 
 
-class WitnessAngelClientApp(WAGuiApp):
+class WitnessAngelClientApp(WaRecorderGui):
 
     # CLASS VARIABLES #
     title = "Witness Angel"
@@ -175,7 +175,7 @@ class WitnessAngelClientApp(WAGuiApp):
 
     def get_cryptoconf_text(self):
         """Return the globalcryptoconffor container encryption."""
-        cryptoconf= get_cryptoconf()
+        cryptoconf = get_cryptoconf()
         return get_cryptoconf_summary(cryptoconf)
 
 

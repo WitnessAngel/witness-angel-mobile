@@ -40,8 +40,8 @@ def test_gyroscope_sensor():
     sensor.stop()
     sensor.join()
 
-    json_aggregator.flush_dataset()
-    assert not json_aggregator._current_dataset
+    json_aggregator.flush_payload()
+    assert not json_aggregator._current_payload
 
     assert len(fake_tarfile_aggregator._test_records) == 2
 

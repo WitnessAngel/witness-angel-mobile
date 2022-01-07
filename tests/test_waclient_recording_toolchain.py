@@ -6,7 +6,7 @@ from kivy.config import ConfigParser
 from _waclient_test_utilities import purge_test_cryptainers
 from waclient.common_config import (
     INTERNAL_CRYPTAINER_DIR,
-    INTERNAL_KEYS_DIR,
+    INTERNAL_KEYSTORE_POOL_DIR,
     get_cryptoconf,
 )
 from waclient.recording_toolchain import (
@@ -27,7 +27,7 @@ def test_nominal_recording_toolchain_case():
                         "record_gps": 1,
                         "record_microphone": 1})
 
-    keystore_pool = FilesystemKeystorePool(INTERNAL_KEYS_DIR)
+    keystore_pool = FilesystemKeystorePool(INTERNAL_KEYSTORE_POOL_DIR)
     cryptoconf = get_cryptoconf("test")
     toolchain = build_recording_toolchain(
         config, keystore_pool=keystore_pool, cryptoconf=cryptoconf
@@ -58,7 +58,7 @@ def test_nominal_recording_toolchain_case():
         time.sleep(1)
 
     assert len(cryptainer_storage) == 1  # Too quick recording to have container rotation
-    (cryptainer_name,) = cryptainer_storage.list_cryptainer_names(as_sorted=True)
+    (cryptainer_name,) = cryptainer_storage.list_cryptainer_names(sorted=True)
 
     tarfile_bytestring = cryptainer_storage.decrypt_cryptainer_from_storage(
         cryptainer_name

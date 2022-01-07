@@ -14,8 +14,8 @@ from kivy.logger import Logger as logger
 from oscpy.server import ServerClass
 from waclient.common_config import (
     APP_CONFIG_FILE,
-    INTERNAL_KEYS_DIR,
-    EXTERNAL_DATA_EXPORTS_DIR,
+    INTERNAL_KEYSTORE_POOL_DIR,
+    EXTERNAL_EXPORTS_DIR,
     get_cryptoconf,
     IS_ANDROID, WIP_RECORDING_MARKER, CONTEXT)
 from waclient.recording_toolchain import (
@@ -23,29 +23,28 @@ from waclient.recording_toolchain import (
     start_recording_toolchain,
     stop_recording_toolchain,
 )
-from waguilib.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
-from waguilib.service_control.osc_transport import get_osc_server, get_osc_client
+from wacomponents.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
+from wacomponents.service_control import get_osc_server, get_osc_client
 from wacryptolib.cryptainer import decrypt_payload_from_cryptainer, load_cryptainer_from_filesystem
-from wacryptolib.keystore import FilesystemKeystore, FilesystemKeystorePool
-from wacryptolib.utilities import load_from_json_file
+from wacryptolib.keystore import FilesystemKeystorePool
 
 # os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
 
 osc, osc_starter_callback = get_osc_server(is_master=False)
 
 # FIXME what happens if exception on remote OSC endpoint ? CRASH!!
-# TODO add custom "local escrow resolver"
+# TODO add custom "local trustee resolver"
 # TODO add exception swallowers, and logging pushed to frontend app (if present)
 
 
 
 if IS_ANDROID:
-    from waguilib.android_helpers import preload_java_classes
+    from wacomponents.application.android_helpers import preload_java_classes
     preload_java_classes()
 
 
 @ServerClass
-class WaBackgroundService:
+class WaRecorderService:
     """
     The background server automatically starts when service script is launched.
 
@@ -62,7 +61,7 @@ class WaBackgroundService:
     _status_change_in_progress = False  # Set to True while recording is starting/stopping
 
     def __init__(self):
-        self._keystore_pool = FilesystemKeystorePool(INTERNAL_KEYS_DIR)
+        self._keystore_pool = FilesystemKeystorePool(INTERNAL_KEYSTORE_POOL_DIR)
 
         logger.info("Starting service")  # Will not be sent to App (too early)
         osc_starter_callback()  # Opens server port
@@ -159,7 +158,7 @@ class WaBackgroundService:
                 logger.info("Offloaded recording started")
 
                 if IS_ANDROID:
-                    from waguilib.android_helpers import build_notification_channel, build_notification
+                    from wacomponents.application.android_helpers import build_notification_channel, build_notification
                     build_notification_channel(CONTEXT, "Witness Angel Service")
                     notification = build_notification(CONTEXT, title="Sensors are active",
                                                       message="Click to manage Witness Angel state",
@@ -248,10 +247,10 @@ class WaBackgroundService:
         self._termination_event.wait()
 
         
-class BackgroundServer(WaBackgroundService):
+class BackgroundServer(WaRecorderService):
 
     # CLASS VARIABLES #
-    internal_keys_dir = INTERNAL_KEYS_DIR
+    internal_keys_dir = INTERNAL_KEYSTORE_POOL_DIR
     thread_pool_executor = ThreadPoolExecutor(
         max_workers=1, thread_name_prefix="service_worker"  # SINGLE worker for now, to avoid concurrency
     )
@@ -259,7 +258,7 @@ class BackgroundServer(WaBackgroundService):
     @safe_catch_unhandled_exception
     def _offloaded_attempt_cryptainer_decryption(self, cryptainer_filepath):
         logger.info("Decryption requested for container %s", cryptainer_filepath)
-        target_directory = EXTERNAL_DATA_EXPORTS_DIR.joinpath(
+        target_directory = EXTERNAL_EXPORTS_DIR.joinpath(
             os.path.basename(cryptainer_filepath)
         )
         target_directory.mkdir(
