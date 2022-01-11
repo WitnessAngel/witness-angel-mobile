@@ -15,7 +15,7 @@ from waclient.recording_toolchain import (
     stop_recording_toolchain,
 )
 from wacryptolib.keystore import FilesystemKeystore, FilesystemKeystorePool
-from wacryptolib.sensor import TarfileRecordsAggregator
+from wacryptolib.sensor import TarfileRecordAggregator
 from wacryptolib.utilities import load_from_json_bytes
 
 
@@ -54,17 +54,17 @@ def test_nominal_recording_toolchain_case():
         for data_aggregator in data_aggregators:
             assert len(data_aggregator) == 0
         for tarfile_aggregator in tarfile_aggregators:
-            assert len(tarfile_aggregator) == 0
+            assert tarfile_aggregator.get_record_count() == 0
         time.sleep(1)
 
-    assert len(cryptainer_storage) == 1  # Too quick recording to have container rotation
+    assert cryptainer_storage.get_cryptainer_count() == 1  # Too quick recording to have container rotation
     (cryptainer_name,) = cryptainer_storage.list_cryptainer_names(sorted=True)
 
     tarfile_bytestring = cryptainer_storage.decrypt_cryptainer_from_storage(
         cryptainer_name
     )
 
-    tar_file = TarfileRecordsAggregator.read_tarfile_from_bytestring(tarfile_bytestring)
+    tar_file = TarfileRecordAggregator.read_tarfile_from_bytestring(tarfile_bytestring)
     tarfile_members = tar_file.getnames()
     assert len(tarfile_members) == 3
 

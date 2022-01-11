@@ -4,7 +4,7 @@ from datetime import timezone, datetime
 from kivy.logger import Logger as logger
 
 from waclient.common_config import IS_ANDROID, INTERNAL_CACHE_DIR
-from wacryptolib.sensor import TarfileRecordsAggregator
+from wacryptolib.sensor import TarfileRecordAggregator
 from wacryptolib.utilities import PeriodicTaskHandler, synchronized
 
 
@@ -15,7 +15,7 @@ class MicrophoneSensor(PeriodicTaskHandler):
     _lock = threading.Lock()
     _current_start_time = None
 
-    def __init__(self, interval_s: float, tarfile_aggregator: TarfileRecordsAggregator):
+    def __init__(self, interval_s: float, tarfile_aggregator: TarfileRecordAggregator):
         super().__init__(interval_s=interval_s, runonstart=False)
         self._tarfile_aggregator = tarfile_aggregator
 
