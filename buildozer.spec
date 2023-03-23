@@ -33,7 +33,7 @@ version.filename = pyproject.toml
 
 # (list) Application requirements
 # comma seperated e.g. requirements = sqlite3,kivy
-requirements = python3,sqlite3,kivy==2.0.0rc1,pycryptodome,oscpy,git+https://github.com/kivy/plyer,decorator,docutils,pygments,schema,click,pymongo,jsonrpc-requests,multitimer,uuid0,pytz,requests,pybase62
+requirements = python3,sqlite3,kivy==2.0.0rc1,pycryptodome,oscpy,git+https://github.com/kivy/plyer,decorator,docutils,pygments,schema,click,pymongo,jsonrpc-requests,multitimer,uuid0,pytz,requests,pybase62,git+https://github.com/WitnessAngel/witness-angel-cryptolib.git@wakeygen_stable,git+https://github.com/WitnessAngel/witness-angel-components.git@wanvr_stable
 
 # (list) Garden requirements
 #garden_requirements =

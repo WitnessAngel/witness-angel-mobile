@@ -7,7 +7,7 @@ import shutil
 
 # @pytest.fixture(autouse=True)
 def ___ignore_app_ini(request):
-    settings_file = "witness-angel-client/WitnessAngelClientApp.ini"
+    settings_file = "witness-angel-client/WitnessAngelClientApp.ini"  #FIXME changed
     backup_file = "witness-angel-client/_WitnessAngelClientApp.ini"
 
     if os.path.exists(settings_file):

@@ -63,7 +63,7 @@
         "title": "Pregenerated keys",
         "type": "options",
         "section": "usersettings",
-        "key": "max_free_keys_per_type",
+        "key": "max_free_keys_per_algo",
         "options": ["0", "1", "5", "10", "20"],
         "desc": "How many keys of each type must be produced ahead of time."
     },

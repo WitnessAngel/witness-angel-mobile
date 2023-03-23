@@ -59,7 +59,7 @@ gevent = "^1.4"
 typeguard = "^2.10.0"
 
 # Linters and formatters
-black = {version = "^18.3-alpha.0",allow-prereleases = true}
+black = {version = "^18.3-alpha.0", allow-prereleases = true}
 pylint = "^2.3"
 safety = "^1.8"
 yamllint = "^1.15"

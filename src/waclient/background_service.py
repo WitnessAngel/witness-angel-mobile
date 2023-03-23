@@ -17,7 +17,7 @@ from waclient.common_config import (
     INTERNAL_KEYSTORE_POOL_DIR,
     EXTERNAL_EXPORTS_DIR,
     get_cryptoconf,
-    IS_ANDROID, WIP_RECORDING_MARKER, CONTEXT)
+    IS_ANDROID, WIP_RECORDING_MARKER,)
 from waclient.recording_toolchain import (
     build_recording_toolchain,
     start_recording_toolchain,
@@ -25,12 +25,13 @@ from waclient.recording_toolchain import (
 )
 from wacomponents.logging.handlers import CallbackHandler, safe_catch_unhandled_exception
 from wacomponents.service_control import get_osc_server, get_osc_client
+from wacomponents.utilities import MONOTHREAD_POOL_EXECUTOR
 from wacryptolib.cryptainer import decrypt_payload_from_cryptainer, load_cryptainer_from_filesystem
 from wacryptolib.keystore import FilesystemKeystorePool
 
 # os.environ["KIVY_NO_CONSOLELOG"] = "1"  # IMPORTANT
 
-osc, osc_starter_callback = get_osc_server(is_master=False)
+osc, osc_starter_callback = get_osc_server(is_application=False)
 
 # FIXME what happens if exception on remote OSC endpoint ? CRASH!!
 # TODO add custom "local trustee resolver"
@@ -52,9 +53,6 @@ class WaRecorderService:
 
     While the server is alive, recordings can be started and stopped several times without problem.
     """
-
-    # CLASS VARIABLES TO BE OVERRIDEN #
-    thread_pool_executor: ThreadPoolExecutor = None
 
     _sock = None
     _recording_toolchain = None
@@ -115,7 +113,7 @@ class WaRecorderService:
             return
 
     def _offload_task(self, method, *args, **kwargs):
-        return self.thread_pool_executor.submit(method, *args, **kwargs)
+        return MONOTHREAD_POOL_EXECUTOR.submit(method, *args, **kwargs)
 
     @osc.address_method("/ping")
     @safe_catch_unhandled_exception
@@ -159,12 +157,12 @@ class WaRecorderService:
 
                 if IS_ANDROID:
                     from wacomponents.application.android_helpers import build_notification_channel, build_notification
-                    build_notification_channel(CONTEXT, "Witness Angel Service")
-                    notification = build_notification(CONTEXT, title="Sensors are active",
+                    build_notification_channel(ANDROID_CONTEXT, "Witness Angel Service")
+                    notification = build_notification(ANDROID_CONTEXT, title="Sensors are active",
                                                       message="Click to manage Witness Angel state",
                                                       ticker="Witness Angel sensors are active")
                     notification_uid = 1
-                    CONTEXT.startForeground(notification_uid, notification)
+                    ANDROID_CONTEXT.startForeground(notification_uid, notification)
 
         finally:
             self._status_change_in_progress = False
@@ -251,9 +249,6 @@ class BackgroundServer(WaRecorderService):
 
     # CLASS VARIABLES #
     internal_keys_dir = INTERNAL_KEYSTORE_POOL_DIR
-    thread_pool_executor = ThreadPoolExecutor(
-        max_workers=1, thread_name_prefix="service_worker"  # SINGLE worker for now, to avoid concurrency
-    )
 
     @safe_catch_unhandled_exception
     def _offloaded_attempt_cryptainer_decryption(self, cryptainer_filepath):

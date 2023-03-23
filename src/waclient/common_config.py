@@ -31,7 +31,6 @@ DEFAULT_CONFIG_SCHEMA = WACLIENT_PACKAGE_DIR.joinpath("user_settings_schema.json
 APP_CONFIG_FILE = INTERNAL_APP_ROOT / "waclient_config.ini"  # Might no exist yet
 
 _folders_summary = dict(
-        WACLIENT_TYPE=WACLIENT_TYPE,
         IS_ANDROID=IS_ANDROID,
         CWD=os.getcwd(),
         SRC_ROOT_DIR=SRC_ROOT_DIR,
@@ -53,7 +52,7 @@ PREGENERATED_KEY_TYPES = [
     "ECC_DSS",
 ]  # Must be the union of asymmetric encryption/signature keys below
 
-_main_remote_trustee_url = "https://watrustee.prolifik.net/json/"
+_main_remote_trustee_url = "https://watrustee.prolifik.net/jsonrpc/"
 
 _PROD_CRYPTOCONF = dict(
     payload_cipher_layers=[
